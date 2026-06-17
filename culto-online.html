@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Culto Online | AD Setúbal</title>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    /* LIVE HERO */
+    .live-hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      overflow: hidden;
+      padding-top: 68px;
+    }
+    .live-hero-bg {
+      position: absolute; inset: 0;
+      background: url('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1800&q=80') center/cover no-repeat;
+    }
+    .live-hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.1) 100%);
+    }
+    .live-hero-content {
+      position: relative; z-index: 2;
+      padding: 0 3rem 5rem;
+    }
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 0.7rem;
+      background: #dc2626; color: #fff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
+      padding: 0.4rem 1rem; margin-bottom: 1.5rem;
+    }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: blink 1.2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.25} }
+    .live-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(5rem, 14vw, 14rem);
+      font-weight: 900; color: #fff;
+      text-transform: uppercase; line-height: 0.88;
+      letter-spacing: -0.01em; margin-bottom: 2rem;
+    }
+    .live-bottom {
+      position: relative; z-index: 2;
+      display: grid; grid-template-columns: 1fr auto;
+      align-items: end; padding: 0 3rem 3rem; gap: 2rem;
+    }
+    .live-sub { font-size: 1.05rem; color: rgba(255,255,255,0.58); font-weight: 400; line-height: 1.78; max-width: 480px; }
+    .live-btns { display: flex; gap: 0.8rem; flex-shrink: 0; }
+
+    /* SCHEDULE */
+    .schedule-band {
+      background: var(--dark2);
+      display: grid; grid-template-columns: repeat(4,1fr);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .sched-block {
+      padding: 2.8rem 2.5rem;
+      border-right: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.2s;
+    }
+    .sched-block:last-child { border-right: none; }
+    .sched-block:hover { background: rgba(255,255,255,0.03); }
+    .sched-day {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.26em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 0.5rem;
+    }
+    .sched-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.15rem; font-weight: 700;
+      color: #fff; margin-bottom: 0.25rem; text-transform: uppercase;
+    }
+    .sched-time { font-size: 0.88rem; color: rgba(255,255,255,0.35); font-weight: 400; }
+    .sched-live {
+      display: inline-block; background: var(--teal); color: #fff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.16em;
+      padding: 0.18rem 0.6rem; margin-top: 0.5rem;
+    }
+
+    /* PLATFORMS */
+    .platforms-grid { display: grid; grid-template-columns: repeat(3,1fr); }
+    .platform-block {
+      padding: 4rem 3rem; text-align: center;
+      border-right: 1px solid var(--border-light);
+      transition: background 0.2s;
+      text-decoration: none; display: block; color: inherit;
+    }
+    .platform-block:last-child { border-right: none; }
+    .platform-block:hover { background: var(--light); }
+    .platform-icon {
+      width: 62px; height: 62px;
+      background: var(--dark);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.3rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.9rem; font-weight: 900;
+      color: #fff; letter-spacing: 0.04em;
+      transition: background 0.2s;
+    }
+    .platform-block:hover .platform-icon { background: var(--teal); }
+    .platform-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.2rem; font-weight: 800;
+      color: var(--dark); text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 0.5rem;
+    }
+    .platform-desc { font-size: 0.9rem; color: rgba(0,0,0,0.48); font-weight: 400; line-height: 1.7; }
+
+    /* CONGREGATIONS ONLINE */
+    .cong-online-grid { display: grid; grid-template-columns: repeat(3,1fr); }
+    .cong-online-block {
+      padding: 3.5rem 3rem;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: background 0.2s;
+    }
+    .cong-online-block:nth-child(3n) { border-right: none; }
+    .cong-online-block:hover { background: rgba(255,255,255,0.03); }
+    .cong-abbr {
+      width: 46px; height: 46px; background: var(--teal);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.9rem; font-weight: 900; color: #fff;
+      margin-bottom: 1rem; letter-spacing: 0.04em;
+    }
+    .cong-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.2rem; font-weight: 800;
+      color: #fff; text-transform: uppercase;
+      letter-spacing: 0.04em; margin-bottom: 0.5rem;
+    }
+    .cong-sched { font-size: 0.85rem; color: rgba(255,255,255,0.4); font-weight: 400; line-height: 1.7; margin-bottom: 1rem; }
+    .cong-link {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--teal); text-decoration: none; transition: color 0.2s;
+    }
+    .cong-link:hover { color: var(--orange); }
+
+    @media (max-width: 900px) {
+      .live-hero-content { padding: 0 1.5rem 3rem; }
+      .live-bottom { grid-template-columns: 1fr; padding: 0 1.5rem 2.5rem; gap: 1.5rem; }
+      .live-btns { flex-wrap: wrap; }
+      .schedule-band { grid-template-columns: 1fr 1fr; }
+      .sched-block { border-bottom: 1px solid rgba(255,255,255,0.05); }
+      .platforms-grid { grid-template-columns: 1fr; }
+      .platform-block { border-right: none; border-bottom: 1px solid var(--border-light); }
+      .cong-online-grid { grid-template-columns: 1fr; }
+      .cong-online-block { border-right: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LIVE HERO -->
+  <section class="live-hero">
+    <div class="live-hero-bg"></div>
+    <div class="live-hero-overlay"></div>
+    <div class="live-hero-content">
+      <div><div class="live-badge"><span class="live-dot"></span>Ao Vivo — Dom 16h00</div></div>
+      <h1 class="live-title">Culto<br>Online</h1>
+    </div>
+    <div class="live-bottom">
+      <p class="live-sub">Assiste ao culto da AD Setúbal ao vivo no YouTube, ou revê pregações anteriores a qualquer hora.</p>
+      <div class="live-btns">
+        <a href="https://www.youtube.com/@adsetubal" target="_blank" class="btn btn-teal">Ver no YouTube</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCHEDULE -->
+  <div class="schedule-band">
+    <div class="sched-block fade-in">
+      <p class="sched-day">Domingo</p>
+      <p class="sched-name">Escola Dominical</p>
+      <p class="sched-time">15h00</p>
+    </div>
+    <div class="sched-block fade-in">
+      <p class="sched-day">Domingo</p>
+      <p class="sched-name">Culto Público</p>
+      <p class="sched-time">16h00</p>
+      <span class="sched-live">Ao Vivo</span>
+    </div>
+    <div class="sched-block fade-in">
+      <p class="sched-day">4.ª Feira</p>
+      <p class="sched-name">Reunião de Oração</p>
+      <p class="sched-time">10h00</p>
+    </div>
+    <div class="sched-block fade-in">
+      <p class="sched-day">6.ª Feira</p>
+      <p class="sched-name">Estudo Bíblico</p>
+      <p class="sched-time">20h30</p>
+    </div>
+  </div>
+
+  <!-- PLATFORMS -->
+  <div class="white-section">
+    <div class="section-pad" style="text-align:center; padding-bottom:3rem;">
+      <span class="eyebrow">Onde Nos Encontrar</span>
+      <h2 class="display-lg">Plataformas</h2>
+    </div>
+    <div class="platforms-grid">
+      <a href="https://www.youtube.com/@adsetubal" target="_blank" class="platform-block fade-in">
+        <div class="platform-icon">YT</div>
+        <p class="platform-name">YouTube</p>
+        <p class="platform-desc">Cultos ao vivo e arquivo completo de pregações da AD Setúbal.</p>
+      </a>
+      <a href="https://www.instagram.com/adsetubal/" target="_blank" class="platform-block fade-in">
+        <div class="platform-icon">IG</div>
+        <p class="platform-name">Instagram</p>
+        <p class="platform-desc">Momentos da comunidade, avisos e partilhas inspiradoras.</p>
+      </a>
+      <a href="mailto:GeralADSetubal@gmail.com" class="platform-block fade-in">
+        <div class="platform-icon">✉</div>
+        <p class="platform-name">Email</p>
+        <p class="platform-desc">Contacta-nos directamente para qualquer questão ou pedido de oração.</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- CONGREGATIONS ONLINE -->
+  <div class="dark-section">
+    <div class="section-pad" style="padding-bottom:3rem;">
+      <span class="eyebrow">Todas as Congregações</span>
+      <h2 class="display-lg" style="color:#fff;">Segue a Tua<br>Congregação</h2>
+    </div>
+    <div class="cong-online-grid">
+      <div class="cong-online-block fade-in">
+        <div class="cong-abbr">ST</div>
+        <p class="cong-title">Setúbal — Sede</p>
+        <p class="cong-sched">Dom 15h00 Escola · 16h00 Culto<br>4.ª Feira 10h00 Oração<br>6.ª Feira 20h30 Estudo</p>
+        <a href="https://www.facebook.com/adsetubal" target="_blank" class="cong-link">facebook.com/adsetubal →</a>
+      </div>
+      <div class="cong-online-block fade-in">
+        <div class="cong-abbr">BR</div>
+        <p class="cong-title">Barreiro</p>
+        <p class="cong-sched">Dom 09h30 Culto · 11h30 Escola<br>3.ª Feira 20h30 Oração<br>5.ª Feira 20h30 Estudo</p>
+        <a href="https://www.facebook.com/adpbarreiro" target="_blank" class="cong-link">facebook.com/adpbarreiro →</a>
+      </div>
+      <div class="cong-online-block fade-in">
+        <div class="cong-abbr">PN</div>
+        <p class="cong-title">Pinhal Novo</p>
+        <p class="cong-sched">Dom 10h00 Culto · 11h30 Escola<br>3.ª Feira 15h30 Oração<br>5.ª Feira 20h30 Estudo</p>
+        <a href="https://www.facebook.com/adpinhalnovo" target="_blank" class="cong-link">facebook.com/adpinhalnovo →</a>
+      </div>
+      <div class="cong-online-block fade-in">
+        <div class="cong-abbr">MT</div>
+        <p class="cong-title">Moita</p>
+        <p class="cong-sched">Dom 10h00 Culto e Escola<br>3.ª Feira 20h30 Estudo</p>
+        <a href="https://www.facebook.com/admoita" target="_blank" class="cong-link">facebook.com/admoita →</a>
+      </div>
+      <div class="cong-online-block fade-in">
+        <div class="cong-abbr">MJ</div>
+        <p class="cong-title">Montijo</p>
+        <p class="cong-sched">Dom 17h30 Culto<br>4.ª Feira 20h30 Estudo</p>
+        <a href="https://www.facebook.com/admontijo" target="_blank" class="cong-link">facebook.com/admontijo →</a>
+      </div>
+      <div class="cong-online-block fade-in">
+        <div class="cong-abbr" style="background:var(--orange);">BJ</div>
+        <p class="cong-title">Missão Beja</p>
+        <p class="cong-sched">Beja, Vidigueira, Ermidas,<br>Alvalade do Sado, Ferreira<br>do Alentejo e Ervidel</p>
+        <a href="congregacoes.html" class="cong-link">Ver horários →</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="shared.js"></script>
+</body>
+</html>

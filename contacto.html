@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contacto | AD Setúbal</title>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    .contact-split { display: grid; grid-template-columns: 1fr 1fr; }
+    .contact-info-col { background: var(--dark2); padding: 6rem 4rem; display: flex; flex-direction: column; gap: 2.5rem; }
+    .contact-form-col { background: var(--light); padding: 6rem 4rem; }
+    .info-block { border-bottom: 1px solid rgba(255,255,255,0.07); padding-bottom: 2rem; }
+    .info-block:last-of-type { border-bottom: none; }
+    .info-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.26em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.6rem; display: block; }
+    .info-label.orange { color: var(--orange); }
+    .info-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem; text-transform: uppercase; }
+    .info-value { font-size: 0.92rem; color: rgba(255,255,255,0.45); font-weight: 400; line-height: 1.85; }
+    .info-value a { color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; }
+    .info-value a:hover { color: var(--teal); }
+    .social-row { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+    .social-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 1.1rem; border: 1px solid rgba(255,255,255,0.14); font-family: 'Barlow Condensed', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.45); text-decoration: none; transition: all 0.2s; }
+    .social-btn:hover { border-color: var(--teal); color: var(--teal); }
+    .form-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: var(--dark); text-transform: uppercase; line-height: 0.95; margin-bottom: 0.6rem; }
+    .form-sub { font-size: 0.92rem; color: rgba(0,0,0,0.48); font-weight: 400; margin-bottom: 2.5rem; line-height: 1.72; }
+    .form-group { margin-bottom: 1.1rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-label { display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.42); margin-bottom: 0.5rem; }
+    .form-input, .form-select, .form-textarea { width: 100%; padding: 0.85rem 1rem; border: 1.5px solid #d8d8d8; background: #fff; font-family: 'Barlow', sans-serif; font-size: 0.9rem; color: var(--dark); outline: none; transition: border-color 0.2s; appearance: none; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--teal); }
+    .form-textarea { resize: vertical; min-height: 130px; }
+    .form-select-wrap { position: relative; }
+    .form-select-wrap::after { content: '▾'; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--teal); pointer-events: none; font-size: 0.85rem; }
+    .form-check-group { display: flex; align-items: flex-start; gap: 0.7rem; }
+    .form-check { width: 16px; height: 16px; accent-color: var(--teal); flex-shrink: 0; margin-top: 3px; cursor: pointer; }
+    .form-check-label { font-size: 0.82rem; color: rgba(0,0,0,0.45); font-weight: 400; line-height: 1.65; }
+    .form-submit { width: 100%; padding: 1rem; background: var(--dark); color: #fff; border: none; font-family: 'Barlow Condensed', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; margin-top: 1.2rem; }
+    .form-submit:hover { background: var(--teal); }
+    .success-msg { display: none; padding: 1rem 1.4rem; border-left: 3px solid var(--teal); background: rgba(41,168,171,0.07); font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; color: var(--teal); margin-top: 1rem; text-transform: uppercase; }
+    .faq-grid { display: grid; grid-template-columns: repeat(2,1fr); }
+    .faq-item { padding: 3.5rem 3.5rem; border-right: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.2s; }
+    .faq-item:hover { background: rgba(255,255,255,0.03); }
+    .faq-item:nth-child(2n) { border-right: none; }
+    .faq-q { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.8rem; }
+    .faq-a { font-size: 0.92rem; line-height: 1.82; color: rgba(255,255,255,0.42); font-weight: 400; }
+    .cta-bar { background: var(--teal); padding: 4.5rem 3rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+    .cta-bar h2 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; color: #fff; text-transform: uppercase; line-height: 1; }
+    .cta-bar p { font-size: 0.95rem; color: rgba(255,255,255,0.72); font-weight: 400; margin-top: 0.4rem; }
+    @media (max-width: 900px) {
+      .contact-split { grid-template-columns: 1fr; }
+      .contact-info-col, .contact-form-col { padding: 4rem 1.5rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .faq-grid { grid-template-columns: 1fr; }
+      .faq-item { border-right: none; padding: 2.5rem 1.5rem; }
+      .cta-bar { padding: 3rem 1.5rem; flex-direction: column; }
+    }
+  </style>
+</head>
+<body data-nav-light="true">
+
+  <div class="page-header">
+    <div class="page-header-bg" style="background-image:url('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1600&q=80');"></div>
+    <div class="page-header-overlay"></div>
+    <div class="page-header-content fade-in">
+      <span class="eyebrow">Fala Connosco</span>
+      <h1>Contacto</h1>
+      <p>Estamos aqui para te receber, responder às tuas perguntas e ajudar-te a encontrar a tua comunidade.</p>
+    </div>
+  </div>
+
+  <div class="contact-split">
+    <div class="contact-info-col fade-in">
+      <div>
+        <span class="eyebrow">AD Setúbal</span>
+        <h2 class="display-md" style="color:#fff;">Estamos<br>Disponíveis</h2>
+      </div>
+      <div class="info-block">
+        <span class="info-label">Sede — Setúbal</span>
+        <p class="info-title">Assembleia de Deus de Setúbal</p>
+        <p class="info-value">Rua Almeida Garrett, n.º 47-49<br>Setúbal, Portugal</p>
+      </div>
+      <div class="info-block">
+        <span class="info-label">Email</span>
+        <p class="info-value"><a href="mailto:GeralADSetubal@gmail.com">GeralADSetubal@gmail.com</a></p>
+      </div>
+      <div class="info-block">
+        <span class="info-label">Horários — Sede</span>
+        <p class="info-value">
+          Dom 15h00 — Escola Dominical<br>
+          Dom 16h00 — Culto Público<br>
+          4.ª Feira 10h00 — Reunião de Oração<br>
+          6.ª Feira 20h30 — Estudo Bíblico
+        </p>
+      </div>
+      <div class="info-block">
+        <span class="info-label">Redes Sociais</span>
+        <div class="social-row">
+          <a href="https://www.youtube.com/@adsetubal" target="_blank" class="social-btn">▶ YouTube</a>
+          <a href="https://www.instagram.com/adsetubal/" target="_blank" class="social-btn">◉ Instagram</a>
+          <a href="https://www.facebook.com/adsetubal" target="_blank" class="social-btn">f Facebook</a>
+        </div>
+      </div>
+      <div>
+        <span class="info-label orange">Outras Congregações</span>
+        <p class="info-value">Para contactar diretamente uma congregação específica, consulta a página de <a href="congregacoes.html">Congregações</a>.</p>
+      </div>
+    </div>
+
+    <div class="contact-form-col fade-in">
+      <h2 class="form-title">Envia uma<br>Mensagem</h2>
+      <p class="form-sub">Preenche o formulário e entraremos em contacto em breve. Podes também escrever diretamente para GeralADSetubal@gmail.com.</p>
+      <form id="contact-form" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Nome</label>
+            <input class="form-input" type="text" placeholder="O seu nome" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Apelido</label>
+            <input class="form-input" type="text" placeholder="O seu apelido" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" placeholder="o.seu@email.com" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Congregação de interesse</label>
+          <div class="form-select-wrap">
+            <select class="form-select">
+              <option value="">Seleciona uma congregação</option>
+              <optgroup label="Distrito de Setúbal">
+                <option>Setúbal — Sede</option><option>Barreiro</option>
+                <option>Pinhal Novo</option><option>Moita</option>
+                <option>Aires (Palmela)</option><option>Montijo</option>
+                <option>Alcochete</option>
+              </optgroup>
+              <optgroup label="Área de Missão Beja">
+                <option>Beja</option><option>Vidigueira</option>
+                <option>Ermidas</option><option>Alvalade do Sado</option>
+                <option>Ferreira do Alentejo</option><option>Ervidel</option>
+              </optgroup>
+              <option>Online</option>
+              <option>Outra / Geral</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assunto</label>
+          <div class="form-select-wrap">
+            <select class="form-select">
+              <option value="">Seleciona um assunto</option>
+              <option>Informações Gerais</option><option>Primeira Visita</option>
+              <option>Batismo</option><option>Casamento</option>
+              <option>Aconselhamento</option><option>Pedido de Oração</option>
+              <option>Outro</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mensagem</label>
+          <textarea class="form-textarea" placeholder="Escreve a tua mensagem aqui..."></textarea>
+        </div>
+        <div class="form-group">
+          <div class="form-check-group">
+            <input class="form-check" type="checkbox" id="privacy" required />
+            <label class="form-check-label" for="privacy">Aceito a política de privacidade e consinto o tratamento dos meus dados para resposta ao pedido.</label>
+          </div>
+        </div>
+        <button class="form-submit" type="submit">Enviar Mensagem</button>
+        <div class="success-msg" id="success-msg">✓ Mensagem enviada com sucesso.</div>
+      </form>
+    </div>
+  </div>
+
+  <div class="dark-section">
+    <div class="section-pad" style="padding-bottom:3rem; text-align:center;">
+      <span class="eyebrow">Ajuda</span>
+      <h2 class="display-lg" style="color:#fff;">Perguntas<br>Frequentes</h2>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item fade-in">
+        <p class="faq-q">Posso visitar mesmo sem ser crente?</p>
+        <p class="faq-a">Sim. As nossas portas estão abertas a todos, sem obrigações nem pressões. Vem como és.</p>
+      </div>
+      <div class="faq-item fade-in">
+        <p class="faq-q">Como são os cultos? O que devo esperar?</p>
+        <p class="faq-a">Os cultos incluem louvor, oração e pregação baseada na Bíblia. Duram cerca de 90 minutos e são acessíveis a todos.</p>
+      </div>
+      <div class="faq-item fade-in">
+        <p class="faq-q">Existe escola dominical para crianças?</p>
+        <p class="faq-a">Sim. A Escola Dominical funciona aos domingos na maioria das congregações, com ensino adaptado para diferentes idades.</p>
+      </div>
+      <div class="faq-item fade-in">
+        <p class="faq-q">Como posso ser batizado?</p>
+        <p class="faq-a">Fala diretamente com um pastor após o culto ou envia uma mensagem pelo formulário. Toda a orientação será fornecida.</p>
+      </div>
+      <div class="faq-item fade-in">
+        <p class="faq-q">Qual a diferença entre o Distrito de Setúbal e a Área de Missão Beja?</p>
+        <p class="faq-a">O Distrito de Setúbal abrange as congregações estabelecidas na Margem Sul. A Área de Missão Beja é o trabalho missionário ativo no Alentejo.</p>
+      </div>
+      <div class="faq-item fade-in">
+        <p class="faq-q">Os cultos são transmitidos online?</p>
+        <p class="faq-a">Sim. Os cultos da sede de Setúbal são transmitidos ao vivo no YouTube. Consulta a página de Culto Online para mais detalhes.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-bar fade-in">
+    <div>
+      <h2>Encontra a Tua Congregação</h2>
+      <p>Temos 13 localidades no Distrito de Setúbal e na Área de Missão de Beja.</p>
+    </div>
+    <a href="congregacoes.html" class="btn btn-white">Ver Congregações</a>
+  </div>
+
+  <script src="shared.js"></script>
+  <script>
+    function handleSubmit(e) {
+      e.preventDefault();
+      document.getElementById('success-msg').style.display = 'block';
+      e.target.reset();
+      setTimeout(() => { document.getElementById('success-msg').style.display = 'none'; }, 5000);
+    }
+  </script>
+</body>
+</html>

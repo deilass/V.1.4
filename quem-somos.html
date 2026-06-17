@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quem Somos | AD Setúbal</title>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    /* MISSION STATEMENT */
+    .mission-block {
+      background: var(--dark);
+      padding: 7rem 3rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center;
+    }
+    .mission-block-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(3rem, 6vw, 6rem);
+      font-weight: 900; color: #fff;
+      text-transform: uppercase; line-height: 0.92;
+    }
+    .mission-block-title em { color: var(--teal); font-style: normal; }
+    .mission-block-right { display: flex; flex-direction: column; gap: 1.8rem; }
+    .mission-block-text {
+      font-size: 1.05rem; color: rgba(255,255,255,0.52);
+      line-height: 1.85; font-weight: 400;
+      padding-left: 1.5rem;
+      border-left: 2px solid rgba(255,255,255,0.1);
+    }
+
+    /* VALUES */
+    .values-grid { display: grid; grid-template-columns: repeat(2,1fr); }
+    .value-block {
+      padding: 4.5rem 3.5rem;
+      border-right: 1px solid rgba(255,255,255,0.07);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      transition: background 0.25s;
+      background: var(--dark2);
+    }
+    .value-block:hover { background: rgba(255,255,255,0.03); }
+    .value-block:nth-child(2n) { border-right: none; }
+    .value-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 5rem; font-weight: 900;
+      color: rgba(41,168,171,0.12); line-height: 1;
+      margin-bottom: 0.8rem;
+    }
+    .value-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.5rem; font-weight: 800;
+      color: #fff; text-transform: uppercase; margin-bottom: 0.7rem;
+    }
+    .value-text { font-size: 0.95rem; line-height: 1.85; color: rgba(255,255,255,0.45); font-weight: 400; }
+
+    /* HISTORY SPLIT */
+    .history-split { display: grid; grid-template-columns: 1fr 1fr; }
+    .history-img { position: relative; overflow: hidden; min-height: 580px; }
+    .history-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+    .history-text {
+      background: var(--light);
+      padding: 6rem 4.5rem;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .history-text .display-md { color: var(--dark); margin-bottom: 1.2rem; }
+    .history-text .body-text { margin-bottom: 1.2rem; }
+
+    /* QUOTE */
+    .quote-section {
+      position: relative; min-height: 55vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; overflow: hidden;
+    }
+    .quote-bg {
+      position: absolute; inset: 0;
+      background: url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1600&q=80') center/cover no-repeat;
+    }
+    .quote-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.82); }
+    .quote-content { position: relative; z-index: 2; padding: 4rem 2rem; max-width: 780px; }
+    .quote-mark {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 6rem; font-weight: 900;
+      color: var(--teal); opacity: 0.4;
+      line-height: 0.7; margin-bottom: 1rem;
+    }
+    .quote-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 400; color: #fff;
+      line-height: 1.25; margin-bottom: 1.5rem;
+      font-style: italic;
+    }
+    .quote-ref {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--teal);
+    }
+
+    /* BELIEFS */
+    .beliefs-grid { display: grid; grid-template-columns: repeat(3,1fr); }
+    .belief-block {
+      padding: 3.5rem 3rem;
+      border-right: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .belief-block:nth-child(3n) { border-right: none; }
+    .belief-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 3.5rem; font-weight: 900;
+      color: var(--teal); opacity: 0.2;
+      line-height: 1; margin-bottom: 0.7rem;
+    }
+    .belief-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.1rem; font-weight: 800;
+      color: var(--dark); text-transform: uppercase;
+      letter-spacing: 0.05em; margin-bottom: 0.6rem;
+    }
+    .belief-text { font-size: 0.9rem; line-height: 1.82; color: rgba(0,0,0,0.52); font-weight: 400; }
+
+    /* CTA */
+    .cta-section {
+      background: var(--teal);
+      padding: 7rem 3rem;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 65% 35%, rgba(245,130,31,0.3) 0%, transparent 60%);
+    }
+    .cta-section h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 900; color: #fff;
+      text-transform: uppercase; line-height: 0.95;
+      margin-bottom: 1.2rem; position: relative;
+    }
+    .cta-section p {
+      font-size: 1.05rem; color: rgba(255,255,255,0.78);
+      font-weight: 400; max-width: 480px;
+      margin: 0 auto 2.5rem; line-height: 1.75; position: relative;
+    }
+    .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; }
+
+    @media (max-width: 900px) {
+      .mission-block { grid-template-columns: 1fr; padding: 4rem 1.5rem; gap: 3rem; }
+      .values-grid { grid-template-columns: 1fr; }
+      .value-block { border-right: none; padding: 3rem 1.5rem; }
+      .history-split { grid-template-columns: 1fr; }
+      .history-img { min-height: 320px; position: relative; }
+      .history-img img { position: relative; }
+      .history-text { padding: 4rem 1.5rem; }
+      .beliefs-grid { grid-template-columns: 1fr; }
+      .belief-block { border-right: none; padding: 2.5rem 1.5rem; }
+      .cta-section { padding: 5rem 1.5rem; }
+    }
+  </style>
+</head>
+<body data-nav-light="true">
+
+  <div class="page-header">
+    <div class="page-header-bg" style="background-image:url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1600&q=80');"></div>
+    <div class="page-header-overlay"></div>
+    <div class="page-header-content fade-in">
+      <span class="eyebrow">A Nossa Identidade</span>
+      <h1>Quem Somos</h1>
+      <p>Uma comunidade cristã evangélica pentecostal com décadas de história ao serviço do Distrito de Setúbal e da Área de Missão de Beja.</p>
+    </div>
+  </div>
+
+  <!-- MISSION -->
+  <div class="mission-block">
+    <div class="fade-in">
+      <h2 class="mission-block-title">Uma Igreja,<br><em>Muitas</em><br>Famílias</h2>
+    </div>
+    <div class="mission-block-right fade-in">
+      <p class="mission-block-text">Somos uma comunidade cristã evangélica pentecostal aberta a todos, independentemente de quem és ou de onde vens. Fundados nos princípios do Evangelho, vivemos em comunidade, adoramos juntos e crescemos na fé.</p>
+      <p class="mission-block-text">Com presença em 13 localidades entre o Distrito de Setúbal e o Alentejo, levamos a mensagem do Evangelho onde quer que sejamos chamados.</p>
+    </div>
+  </div>
+
+  <!-- VALUES -->
+  <div class="dark-section">
+    <div class="section-pad" style="padding-bottom:3rem; text-align:center;">
+      <span class="eyebrow">Os Nossos Valores</span>
+      <h2 class="display-lg" style="color:#fff;">O Que Nos<br>Define</h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-block fade-in">
+        <div class="value-num">01</div>
+        <h3 class="value-title">Fé Pentecostal</h3>
+        <p class="value-text">Cremos numa fé viva, expressa no dia-a-dia e enraizada nas Escrituras. O Espírito Santo é central na nossa vida e adoração.</p>
+      </div>
+      <div class="value-block fade-in">
+        <div class="value-num">02</div>
+        <h3 class="value-title">Comunidade</h3>
+        <p class="value-text">Somos uma família. Celebramos juntos, choramos juntos e crescemos juntos. Ninguém caminha sozinho nesta comunidade.</p>
+      </div>
+      <div class="value-block fade-in">
+        <div class="value-num">03</div>
+        <h3 class="value-title">Inclusão</h3>
+        <p class="value-text">As nossas portas estão abertas a todos, sem distinção de raça, cultura, língua ou posição social. Todos são bem-vindos.</p>
+      </div>
+      <div class="value-block fade-in">
+        <div class="value-num">04</div>
+        <h3 class="value-title">Missão</h3>
+        <p class="value-text">Estamos comprometidos com a missão local e além-fronteiras. A Área de Missão de Beja é expressão do nosso compromisso missionário.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="history-split">
+    <div class="history-img">
+      <img src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=900&q=80" alt="História" />
+    </div>
+    <div class="history-text fade-in">
+      <span class="eyebrow">A Nossa História</span>
+      <div class="teal-bar"></div>
+      <h2 class="display-md">Décadas de Fé<br>e Serviço</h2>
+      <p class="body-text">A Assembleia de Deus de Setúbal tem uma longa história de fé e serviço na região. Desde os primeiros anos, o compromisso com a Palavra de Deus e com a missão tem sido o centro de tudo o que fazemos.</p>
+      <p class="body-text">Ao longo dos anos, crescemos para abranger diversas congregações no Distrito de Setúbal e expandimos a nossa missão para o Alentejo com presença em Beja, Vidigueira, Ermidas, Alvalade do Sado, Ferreira do Alentejo e Ervidel.</p>
+      <a href="contacto.html" class="btn btn-teal">Fala Connosco</a>
+    </div>
+  </div>
+
+  <!-- QUOTE -->
+  <div class="quote-section">
+    <div class="quote-bg"></div>
+    <div class="quote-overlay"></div>
+    <div class="quote-content fade-in">
+      <div class="quote-mark">"</div>
+      <p class="quote-text">Ide por todo o mundo e pregai o evangelho a toda a criatura.</p>
+      <p class="quote-ref">Marcos 16:15</p>
+    </div>
+  </div>
+
+  <!-- BELIEFS -->
+  <div class="white-section">
+    <div class="section-pad" style="text-align:center; padding-bottom:3rem;">
+      <span class="eyebrow">Doutrina</span>
+      <h2 class="display-lg">O Que Cremos</h2>
+    </div>
+    <div class="beliefs-grid">
+      <div class="belief-block fade-in">
+        <div class="belief-num">01</div>
+        <h3 class="belief-title">A Bíblia</h3>
+        <p class="belief-text">Cremos que a Bíblia é a Palavra inspirada de Deus, regra infalível de fé e prática para o crente.</p>
+      </div>
+      <div class="belief-block fade-in">
+        <div class="belief-num">02</div>
+        <h3 class="belief-title">A Salvação</h3>
+        <p class="belief-text">Cremos na salvação pela graça, mediante a fé em Jesus Cristo, que morreu e ressuscitou pelos nossos pecados.</p>
+      </div>
+      <div class="belief-block fade-in">
+        <div class="belief-num">03</div>
+        <h3 class="belief-title">O Espírito Santo</h3>
+        <p class="belief-text">Cremos no batismo do Espírito Santo e nos dons espirituais para a edificação da Igreja.</p>
+      </div>
+      <div class="belief-block fade-in">
+        <div class="belief-num">04</div>
+        <h3 class="belief-title">O Batismo</h3>
+        <p class="belief-text">Cremos no batismo em água por imersão, como testemunho público da fé e da nova vida em Cristo.</p>
+      </div>
+      <div class="belief-block fade-in">
+        <div class="belief-num">05</div>
+        <h3 class="belief-title">A Santa Ceia</h3>
+        <p class="belief-text">Cremos na Santa Ceia como memorial da obra redentora de Cristo, a ser celebrada pelos crentes.</p>
+      </div>
+      <div class="belief-block fade-in">
+        <div class="belief-num">06</div>
+        <h3 class="belief-title">A Segunda Vinda</h3>
+        <p class="belief-text">Cremos no regresso literal e glorioso de Jesus Cristo para levar a sua Igreja e estabelecer o seu reino.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section fade-in">
+    <h2>Vem Connosco</h2>
+    <p>Encontra a congregação mais perto de ti ou assiste ao culto online. Estamos à tua espera.</p>
+    <div class="cta-btns">
+      <a href="congregacoes.html" class="btn btn-white">Ver Congregações</a>
+      <a href="participa.html" class="btn btn-outline-white">Participa</a>
+      <a href="culto-online.html" class="btn btn-dark">Culto Online</a>
+    </div>
+  </div>
+
+  <script src="shared.js"></script>
+</body>
+</html>

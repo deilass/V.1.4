@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oferta | AD Setúbal</title>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    .offer-split { display: grid; grid-template-columns: 1fr 1fr; }
+    .offer-info-col { background: var(--dark); padding: 6rem 4rem; display: flex; flex-direction: column; justify-content: center; }
+    .offer-info-col .display-md { color: #fff; margin-bottom: 1.2rem; }
+    .offer-info-col .body-text { color: rgba(255,255,255,0.55); margin-bottom: 1.2rem; }
+
+    .offer-pay-col { background: var(--light); padding: 6rem 4rem; display: flex; flex-direction: column; justify-content: center; }
+    .pay-card { background: #fff; border: 1.5px solid #e2e2e2; padding: 2.5rem; }
+    .pay-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.6rem; }
+    .pay-card-head h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.2rem; font-weight: 800; color: var(--dark); text-transform: uppercase; }
+    .pay-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+      background: var(--teal); color: #fff; padding: 0.3rem 0.8rem;
+    }
+    .pay-row { display: flex; justify-content: space-between; gap: 1rem; padding: 0.9rem 0; border-top: 1px solid #ececec; font-size: 0.9rem; }
+    .pay-row:first-of-type { border-top: none; }
+    .pay-row .pay-label { color: rgba(0,0,0,0.45); }
+    .pay-row .pay-value { font-weight: 700; color: var(--dark); }
+    .pay-row .pay-value.todo { color: var(--orange); font-weight: 600; font-size: 0.84rem; }
+    .pay-note { font-size: 0.85rem; color: rgba(0,0,0,0.45); line-height: 1.7; margin-top: 1.4rem; }
+    .pay-note a { color: var(--teal); font-weight: 600; }
+    .offer-note-strip {
+      background: #fff3e0; border-left: 3px solid var(--orange);
+      padding: 1rem 1.4rem; font-size: 0.85rem; color: #7a4a10;
+      margin-top: 2rem; line-height: 1.6;
+    }
+
+    /* WHERE IT GOES */
+    .where-grid { display: grid; grid-template-columns: repeat(3,1fr); }
+    .where-block {
+      padding: 4rem 3rem; text-align: center;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      transition: background 0.2s;
+    }
+    .where-block:last-child { border-right: none; }
+    .where-block:hover { background: rgba(255,255,255,0.03); }
+    .where-icon { width: 50px; height: 50px; margin: 0 auto 1.2rem; stroke: var(--teal); }
+    .where-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.15rem; font-weight: 800; color: #fff; text-transform: uppercase; margin-bottom: 0.6rem; letter-spacing: 0.04em; }
+    .where-text { font-size: 0.9rem; color: rgba(255,255,255,0.45); line-height: 1.75; font-weight: 400; }
+
+    @media (max-width: 900px) {
+      .offer-split { grid-template-columns: 1fr; }
+      .offer-info-col, .offer-pay-col { padding: 4rem 1.5rem; }
+      .where-grid { grid-template-columns: 1fr; }
+      .where-block { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 3rem 1.5rem; }
+    }
+  </style>
+</head>
+<body data-nav-light="true">
+
+  <div class="page-header">
+    <div class="page-header-bg" style="background-image:url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1600&q=80');"></div>
+    <div class="page-header-overlay"></div>
+    <div class="page-header-content fade-in">
+      <span class="eyebrow">Dízimos e Ofertas</span>
+      <h1>Oferta</h1>
+      <p>Dar faz parte da nossa fé — um gesto de gratidão e confiança em Deus que sustenta a obra em cada uma das nossas congregações.</p>
+    </div>
+  </div>
+
+  <div class="offer-split">
+    <div class="offer-info-col fade-in">
+      <span class="eyebrow">Porque Damos</span>
+      <h2 class="display-md">Um Gesto de Fé,<br>Não uma Obrigação</h2>
+      <p class="body-text">A Bíblia, em Malaquias 3:10, convida o povo de Deus a trazer o dízimo como expressão de confiança Nele. Mais do que um valor, dar é reconhecer que tudo o que temos vem de Deus — e sustenta o louvor, o ensino, a beneficência e a obra em cada congregação.</p>
+      <p class="body-text">Podes contribuir através do nosso portal de doações online, por transferência bancária, ou em mão durante o culto, junto da tesouraria da tua congregação.</p>
+      <div><a href="https://www.doar.adsetubal.pt/" target="_blank" class="btn btn-teal">Doar Online</a></div>
+    </div>
+
+    <div class="offer-pay-col fade-in">
+      <div class="pay-card">
+        <div class="pay-card-head">
+          <h3>Transferência Bancária</h3>
+          <span class="pay-badge">Sede — Setúbal</span>
+        </div>
+        <div class="pay-row"><span class="pay-label">Titular</span><span class="pay-value todo">[a confirmar com a tesouraria]</span></div>
+        <div class="pay-row"><span class="pay-label">IBAN</span><span class="pay-value todo">[a confirmar com a tesouraria]</span></div>
+        <div class="pay-row"><span class="pay-label">MB Way</span><span class="pay-value todo">[a confirmar com a tesouraria]</span></div>
+        <p class="pay-note">Cada congregação tem a sua própria tesouraria. Para dízimos ou ofertas destinados a uma congregação fora da Sede, fala com a liderança local — consulta os contactos em <a href="congregacoes.html">Congregações</a>.</p>
+      </div>
+      <div class="offer-note-strip">
+        Nota para a equipa da igreja: os campos de Titular, IBAN e MB Way estão por preencher de propósito. Substituam-nos pelos dados reais da tesouraria antes de publicar o site.
+      </div>
+    </div>
+  </div>
+
+  <div class="dark-section">
+    <div class="section-pad" style="text-align:center; padding-bottom:3rem;">
+      <span class="eyebrow">Onde Vai a Tua Oferta</span>
+      <h2 class="display-lg" style="color:#fff;">O Que Sustenta</h2>
+    </div>
+    <div class="where-grid">
+      <div class="where-block fade-in">
+        <svg class="where-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <p class="where-title">Louvor e Ensino</p>
+        <p class="where-text">Cultos, EBD e formação bíblica em cada uma das 13 congregações.</p>
+      </div>
+      <div class="where-block fade-in">
+        <svg class="where-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3" y="9" width="18" height="11" rx="2"/><path d="M3 13h18M12 9v11"/></svg>
+        <p class="where-title">Beneficência</p>
+        <p class="where-text">Apoio direto a famílias em situação de carência na nossa comunidade.</p>
+      </div>
+      <div class="where-block fade-in">
+        <svg class="where-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M12 21s7-7.4 7-12a7 7 0 10-14 0c0 4.6 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>
+        <p class="where-title">Manutenção das Casas</p>
+        <p class="where-text">Cuidar dos espaços onde a igreja se reúne, em cada congregação.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="shared.js"></script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Participa | AD Setúbal</title>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    /* QUICK NAV CHIPS */
+    .quicknav-bar {
+      background: var(--dark2);
+      padding: 1.5rem 3rem;
+      display: flex; gap: 0.6rem; flex-wrap: wrap;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .quicknav-chip {
+      padding: 0.5rem 1.4rem;
+      border: 1px solid rgba(255,255,255,0.18);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: rgba(255,255,255,0.6); text-decoration: none;
+      transition: all 0.2s;
+    }
+    .quicknav-chip:hover { border-color: var(--teal); color: var(--teal); }
+
+    /* MINISTRY SPLIT (reaproveita o padrão de history-split) */
+    .min-split { display: grid; grid-template-columns: 1fr 1fr; }
+    .min-img { position: relative; overflow: hidden; min-height: 540px; }
+    .min-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.75); }
+    .min-text { padding: 6rem 4.5rem; display: flex; flex-direction: column; justify-content: center; }
+    .min-text.on-dark { background: var(--dark); }
+    .min-text.on-light { background: var(--light); }
+    .min-text.on-dark .display-md { color: #fff; }
+    .min-text.on-dark .body-text { color: rgba(255,255,255,0.55); }
+    .min-text .body-text { margin-bottom: 1.2rem; }
+    .min-meta { display: flex; flex-direction: column; gap: 0.6rem; margin: 1.4rem 0 1.8rem; }
+    .min-meta-row { display: flex; align-items: flex-start; gap: 0.7rem; font-size: 0.9rem; font-weight: 400; }
+    .min-meta-row svg { width: 17px; height: 17px; flex-shrink: 0; margin-top: 2px; stroke: var(--teal); }
+    .min-text.on-dark .min-meta-row { color: rgba(255,255,255,0.6); }
+    .min-text.on-light .min-meta-row { color: rgba(0,0,0,0.55); }
+    .min-btns { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+
+    /* CTA BAND (mesmo padrão usado em index.html) */
+    .mission-band {
+      padding: 5rem 3rem;
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 3rem; align-items: center;
+    }
+    .mission-band h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 900; color: #fff;
+      text-transform: uppercase; line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .mission-band p { font-size: 1rem; color: rgba(255,255,255,0.85); font-weight: 400; max-width: 560px; line-height: 1.7; }
+
+    @media (max-width: 900px) {
+      .mission-band { grid-template-columns: 1fr; padding: 4rem 1.5rem; }
+    }
+
+    @media (max-width: 900px) {
+      .quicknav-bar { padding: 1.2rem 1.5rem; }
+      .min-split { grid-template-columns: 1fr; }
+      .min-img { min-height: 320px; position: relative; }
+      .min-img img { position: relative; }
+      .min-text { padding: 4rem 1.5rem; }
+    }
+  </style>
+</head>
+<body data-nav-light="true">
+
+  <div class="page-header">
+    <div class="page-header-bg" style="background-image:url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1600&q=80');"></div>
+    <div class="page-header-overlay"></div>
+    <div class="page-header-content fade-in">
+      <span class="eyebrow">Vive a Igreja Durante a Semana</span>
+      <h1>Participa</h1>
+      <p>A vida da igreja não acaba no domingo. Escolhe por onde queres começar a participar e a servir.</p>
+    </div>
+  </div>
+
+  <div class="quicknav-bar">
+    <a href="#connect" class="quicknav-chip">Connect</a>
+    <a href="#mulheres" class="quicknav-chip">Mulheres</a>
+    <a href="#ebd" class="quicknav-chip">EBD</a>
+    <a href="#beneficencia" class="quicknav-chip">Beneficência</a>
+  </div>
+
+  <!-- CONNECT -->
+  <div class="min-split" id="connect">
+    <div class="min-img">
+      <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=900&q=80" alt="Connect" />
+    </div>
+    <div class="min-text on-dark fade-in">
+      <span class="eyebrow">Ministério de Jovens</span>
+      <div class="teal-bar"></div>
+      <h2 class="display-md">Connect</h2>
+      <p class="body-text">O Connect é o ministério de jovens da AD Setúbal: um espaço para crescer na fé, fazer amizades para a vida e descobrir o propósito de Deus em comunidade. Louvor, Palavra e muita comunhão.</p>
+      <div class="min-meta">
+        <div class="min-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
+          Segue o Connect: <a href="https://www.instagram.com/connect_adstb/" target="_blank" style="color:var(--teal);">@connect_adstb</a>
+        </div>
+        <div class="min-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 21s7-7.4 7-12a7 7 0 10-14 0c0 4.6 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>
+          Encontros em várias congregações — confirma o horário na tua zona.
+        </div>
+      </div>
+      <div class="min-btns">
+        <a href="https://www.instagram.com/connect_adstb/" target="_blank" class="btn btn-teal">Seguir @connect_adstb</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MULHERES -->
+  <div class="min-split" id="mulheres">
+    <div class="min-text on-light fade-in" style="order:2;">
+      <span class="eyebrow">Ministério de Mulheres</span>
+      <div class="teal-bar"></div>
+      <h2 class="display-md" style="color:var(--dark);">Mulheres em<br>Comunhão</h2>
+      <p class="body-text">Um ministério dedicado a inspirar, discipular e unir as mulheres da igreja em todas as fases da vida. Encontros de oração, formação bíblica e momentos de comunhão que fortalecem a fé e criam laços verdadeiros.</p>
+      <div class="min-meta">
+        <div class="min-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          Encontros periódicos de oração e formação.
+        </div>
+        <div class="min-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 20s-8-4.8-8-11a4.6 4.6 0 018-3 4.6 4.6 0 018 3c0 6.2-8 11-8 11z"/></svg>
+          Aberto a mulheres de todas as idades e fases de vida.
+        </div>
+      </div>
+      <div class="min-btns">
+        <a href="contacto.html" class="btn btn-dark">Pedir Mais Informações</a>
+      </div>
+    </div>
+    <div class="min-img" style="order:1;">
+      <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=900&q=80" alt="Ministério de Mulheres" />
+    </div>
+  </div>
+
+  <!-- EBD -->
+  <div class="min-split" id="ebd">
+    <div class="min-img">
+      <img src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=900&q=80" alt="Escola Bíblica Dominical" />
+    </div>
+    <div class="min-text on-dark fade-in">
+      <span class="eyebrow">Ensino Bíblico</span>
+      <div class="teal-bar"></div>
+      <h2 class="display-md">Escola Bíblica<br>Dominical</h2>
+      <p class="body-text">A Escola Bíblica Dominical é o tempo de ensino da Palavra antes do culto de domingo, com turmas organizadas por idade — das crianças aos adultos. O lugar onde a fé se entende para se viver melhor.</p>
+      <div class="min-meta">
+        <div class="min-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          Setúbal — Sede: domingo às 15h00, antes do Culto Público.
+        </div>
+        <div class="min-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          Barreiro e Pinhal Novo: domingo às 11h30. Moita: domingo às 10h00.
+        </div>
+      </div>
+      <div class="min-btns">
+        <a href="congregacoes.html" class="btn btn-outline-white">Ver Todos os Horários</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- BENEFICÊNCIA -->
+  <div class="min-split" id="beneficencia">
+    <div class="min-text on-light fade-in" style="order:2;">
+      <span class="eyebrow orange">Ação Social</span>
+      <div class="teal-bar" style="background:var(--orange);"></div>
+      <h2 class="display-md" style="color:var(--dark);">Beneficência</h2>
+      <p class="body-text">O ministério de Beneficência é o braço de ação social da igreja: apoio a famílias em situação de carência com bens essenciais, acompanhamento próximo e o amor ao próximo posto em prática.</p>
+      <div class="min-meta">
+        <div class="min-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 20s-8-4.8-8-11a4.6 4.6 0 018-3 4.6 4.6 0 018 3c0 6.2-8 11-8 11z"/></svg>
+          Apoio com bens essenciais a famílias da comunidade.
+        </div>
+        <div class="min-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="9" width="18" height="11" rx="2"/><path d="M3 13h18M12 9v11"/></svg>
+          Queres doar bens ou ser voluntário? Fala connosco.
+        </div>
+      </div>
+      <div class="min-btns">
+        <a href="contacto.html" class="btn btn-teal">Quero Ajudar</a>
+      </div>
+    </div>
+    <div class="min-img" style="order:1;">
+      <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=900&q=80" alt="Beneficência" />
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="mission-band fade-in" style="background:var(--orange);">
+    <div>
+      <h2>Não sabes por onde começar?</h2>
+      <p>Fala com a equipa da tua congregação — vamos ajudar-te a encontrar o teu lugar.</p>
+    </div>
+    <a href="contacto.html" class="btn btn-white">Falar Connosco</a>
+  </div>
+
+  <script src="shared.js"></script>
+</body>
+</html>

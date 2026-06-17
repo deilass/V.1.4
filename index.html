@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AD Setúbal — Assembleia de Deus</title>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    /* ===== HERO ===== */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: flex-end;
+      overflow: hidden;
+      padding-top: 68px;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: url('https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1800&q=80') center/cover no-repeat;
+    }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.1) 100%);
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 0 3rem 5rem;
+      max-width: 1100px;
+    }
+    .hero-content .eyebrow { margin-bottom: 1rem; }
+    .hero-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(4.5rem, 12vw, 13rem);
+      font-weight: 900; color: #fff;
+      line-height: 0.88;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+    }
+    .hero-bottom {
+      position: relative; z-index: 2;
+      display: grid; grid-template-columns: 1fr auto;
+      align-items: end;
+      padding: 0 3rem 3rem;
+      gap: 2rem;
+    }
+    .hero-sub {
+      font-size: 1.08rem; color: rgba(255,255,255,0.62);
+      font-weight: 400; line-height: 1.75;
+      max-width: 480px;
+    }
+    .hero-btns { display: flex; gap: 0.8rem; flex-shrink: 0; }
+
+    /* ===== TICKER ===== */
+    .ticker {
+      background: var(--teal);
+      overflow: hidden; height: 48px;
+      display: flex; align-items: center;
+    }
+    .ticker-inner {
+      display: flex; gap: 4rem;
+      animation: ticker 30s linear infinite;
+      white-space: nowrap;
+    }
+    .ticker-item {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      display: flex; align-items: center; gap: 1.5rem;
+    }
+    .ticker-dot { width: 5px; height: 5px; background: rgba(255,255,255,0.5); border-radius: 50%; flex-shrink: 0; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ===== STATEMENT ===== */
+    .statement {
+      background: var(--dark);
+      padding: 6rem 3rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center;
+    }
+    .statement-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(2.8rem, 5vw, 5rem);
+      font-weight: 900; color: #fff;
+      text-transform: uppercase; line-height: 0.95;
+    }
+    .statement-title span { color: var(--teal); }
+    .statement-right { display: flex; flex-direction: column; gap: 1.8rem; }
+    .statement-text {
+      font-size: 1.05rem; color: rgba(255,255,255,0.55);
+      font-weight: 400; line-height: 1.85;
+      border-left: 2px solid rgba(255,255,255,0.1);
+      padding-left: 1.6rem;
+    }
+
+    /* ===== SCHEDULE STRIP ===== */
+    .schedule-strip {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .schedule-block {
+      padding: 2.8rem 2.5rem;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      background: var(--dark2);
+      transition: background 0.2s;
+      cursor: default;
+    }
+    .schedule-block:last-child { border-right: none; }
+    .schedule-block:hover { background: rgba(255,255,255,0.03); }
+    .schedule-day {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.26em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 0.5rem;
+    }
+    .schedule-service {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.15rem; font-weight: 700;
+      color: #fff; margin-bottom: 0.25rem;
+      text-transform: uppercase;
+    }
+    .schedule-time { font-size: 0.88rem; color: rgba(255,255,255,0.38); font-weight: 400; }
+
+    /* ===== LOCATIONS ===== */
+    .locations-header {
+      background: var(--dark);
+      padding: 5rem 3rem 3rem;
+    }
+    .locations-grid { display: grid; grid-template-columns: repeat(3,1fr); }
+    .loc-card { position: relative; overflow: hidden; aspect-ratio: 2/3; }
+    .loc-card img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      filter: brightness(0.55);
+      transition: transform 0.7s ease, filter 0.4s;
+    }
+    .loc-card:hover img { transform: scale(1.07); filter: brightness(0.4); }
+    .loc-card-body {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 2.5rem 2rem;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);
+    }
+    .loc-card-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.24em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 0.4rem;
+    }
+    .loc-card-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 2.4rem; font-weight: 900;
+      color: #fff; text-transform: uppercase;
+      line-height: 0.92; margin-bottom: 0.5rem;
+    }
+    .loc-card-time {
+      font-size: 0.85rem; color: rgba(255,255,255,0.6);
+      font-weight: 400; margin-bottom: 1.2rem;
+    }
+    .loc-card-link {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.6); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .loc-card:hover .loc-card-link { color: var(--teal); }
+    .locations-footer {
+      background: var(--dark);
+      padding: 3rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      text-align: center;
+    }
+
+    /* ===== ONLINE SPLIT ===== */
+    .online-split { display: grid; grid-template-columns: 1fr 1fr; }
+    .online-img { position: relative; overflow: hidden; min-height: 540px; }
+    .online-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5); }
+    .online-img-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .play-btn {
+      width: 80px; height: 80px;
+      border: 2px solid rgba(255,255,255,0.5);
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; transition: border-color 0.2s, background 0.2s;
+    }
+    .play-btn:hover { border-color: var(--teal); background: rgba(41,168,171,0.2); }
+    .play-btn svg { width: 26px; height: 26px; fill: #fff; margin-left: 5px; }
+    .online-text {
+      background: var(--dark);
+      padding: 5rem 4rem;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .online-text .display-lg { color: #fff; margin-bottom: 1.2rem; }
+    .online-text p { font-size: 1rem; color: rgba(255,255,255,0.5); line-height: 1.85; margin-bottom: 2rem; }
+    .online-links { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+
+    /* ===== ABOUT SPLIT ===== */
+    .about-split { display: grid; grid-template-columns: 1fr 1fr; }
+    .about-img { position: relative; overflow: hidden; min-height: 520px; }
+    .about-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+    .about-text {
+      background: var(--light);
+      padding: 6rem 4rem;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .about-text .display-md { color: var(--dark); margin-bottom: 1.2rem; }
+    .about-text .body-text { margin-bottom: 2rem; }
+
+    /* ===== MISSION BAND ===== */
+    .mission-band {
+      background: var(--teal);
+      padding: 5rem 3rem;
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 3rem; align-items: center;
+    }
+    .mission-band h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 900; color: #fff;
+      text-transform: uppercase; line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .mission-band p { font-size: 1rem; color: rgba(255,255,255,0.78); font-weight: 400; max-width: 560px; line-height: 1.7; }
+
+    /* ===== PARTICIPA STRIP ===== */
+    .participa-header { background: var(--white); padding: 5rem 3rem 2.5rem; text-align: center; }
+    .participa-grid { display: grid; grid-template-columns: repeat(4,1fr); }
+    .participa-card {
+      padding: 3rem 2.2rem;
+      border-right: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+      text-decoration: none; color: inherit; display: block;
+      transition: background 0.2s;
+    }
+    .participa-card:last-child { border-right: none; }
+    .participa-card:hover { background: var(--light); }
+    .participa-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 0.8rem;
+    }
+    .participa-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.5rem; font-weight: 800;
+      color: var(--dark); text-transform: uppercase;
+      margin-bottom: 0.6rem; line-height: 1.05;
+    }
+    .participa-desc { font-size: 0.88rem; line-height: 1.7; color: rgba(0,0,0,0.5); font-weight: 400; margin-bottom: 1rem; }
+    .participa-link {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--dark);
+    }
+    .participa-card:hover .participa-link { color: var(--teal); }
+
+    /* ===== GALERIA STRIP ===== */
+    .galeria-header { background: var(--dark2); padding: 4.5rem 3rem 2.5rem; }
+    .galeria-strip { display: grid; grid-template-columns: repeat(6,1fr); background: var(--dark2); }
+    .galeria-tile { position: relative; aspect-ratio: 3/4; overflow: hidden; }
+    .galeria-tile img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.7); transition: transform 0.6s, filter 0.3s; }
+    .galeria-tile:hover img { transform: scale(1.08); filter: brightness(0.55); }
+    .galeria-footer { background: var(--dark2); padding: 2.5rem 3rem 4rem; text-align: center; }
+
+    @media (max-width: 900px) {
+      .participa-grid { grid-template-columns: 1fr 1fr; }
+      .participa-header { padding: 3.5rem 1.5rem 2rem; }
+      .participa-card { padding: 2.2rem 1.5rem; }
+      .galeria-strip { grid-template-columns: repeat(3,1fr); }
+      .galeria-header { padding: 3.5rem 1.5rem 2rem; }
+    }
+      .hero { min-height: 100svh; }
+      .hero-content { padding: 0 1.5rem 3rem; }
+      .hero-bottom { grid-template-columns: 1fr; padding: 0 1.5rem 2.5rem; gap: 1.5rem; }
+      .hero-btns { flex-wrap: wrap; }
+      .statement { grid-template-columns: 1fr; padding: 4rem 1.5rem; gap: 3rem; }
+      .schedule-strip { grid-template-columns: 1fr 1fr; }
+      .schedule-block { border-bottom: 1px solid rgba(255,255,255,0.06); }
+      .locations-header { padding: 4rem 1.5rem 2rem; }
+      .locations-grid { grid-template-columns: 1fr; }
+      .loc-card { aspect-ratio: 16/10; }
+      .locations-footer { padding: 2rem 1.5rem; }
+      .online-split, .about-split { grid-template-columns: 1fr; }
+      .online-img, .about-img { min-height: 320px; position: relative; }
+      .online-img img, .about-img img { position: relative; }
+      .online-text, .about-text { padding: 4rem 1.5rem; }
+      .mission-band { grid-template-columns: 1fr; padding: 4rem 1.5rem; }
+    }
+    @media (max-width: 500px) {
+      .schedule-strip { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="eyebrow">Assembleia de Deus de Setúbal</span>
+      <h1 class="hero-title">Bem-<br>vindo</h1>
+    </div>
+    <div class="hero-bottom">
+      <p class="hero-sub">Seja novo na fé, novo na área, ou à procura de uma comunidade para chamar de sua — temos muito prazer em receber-te.</p>
+      <div class="hero-btns">
+        <a href="congregacoes.html" class="btn btn-teal">Ver Congregações</a>
+        <a href="culto-online.html" class="btn btn-outline-white">Culto Online</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-item"><span class="ticker-dot"></span>Dom 16h00 — Culto Público</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>13 Localidades</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>Distrito de Setúbal</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>Área de Missão Beja</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>Culto Online — YouTube</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>6.ª Feira 20h30 — Estudo Bíblico</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>Dom 16h00 — Culto Público</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>13 Localidades</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>Distrito de Setúbal</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>Área de Missão Beja</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>Culto Online — YouTube</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>6.ª Feira 20h30 — Estudo Bíblico</span>
+    </div>
+  </div>
+
+  <!-- STATEMENT -->
+  <div class="statement">
+    <div class="fade-in">
+      <h2 class="statement-title">Uma Igreja,<br><span>Muitas</span><br>Famílias</h2>
+    </div>
+    <div class="statement-right fade-in">
+      <p class="statement-text">A AD Setúbal é uma comunidade cristã evangélica pentecostal com presença em 13 localidades entre o Distrito de Setúbal e o Alentejo.</p>
+      <p class="statement-text">Fundados no Evangelho, vivemos em comunidade, adoramos juntos e crescemos na fé — abertos a todos, independentemente de quem és ou de onde vens.</p>
+      <div><a href="quem-somos.html" class="btn btn-outline-teal">Quem Somos</a></div>
+    </div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div class="schedule-strip">
+    <div class="schedule-block fade-in">
+      <p class="schedule-day">Domingo</p>
+      <p class="schedule-service">Escola Dominical</p>
+      <p class="schedule-time">15h00 — Sede Setúbal</p>
+    </div>
+    <div class="schedule-block fade-in">
+      <p class="schedule-day">Domingo</p>
+      <p class="schedule-service">Culto Público</p>
+      <p class="schedule-time">16h00 — Sede Setúbal</p>
+    </div>
+    <div class="schedule-block fade-in">
+      <p class="schedule-day">4.ª Feira</p>
+      <p class="schedule-service">Reunião de Oração</p>
+      <p class="schedule-time">10h00 — Sede Setúbal</p>
+    </div>
+    <div class="schedule-block fade-in">
+      <p class="schedule-day">6.ª Feira</p>
+      <p class="schedule-service">Estudo Bíblico</p>
+      <p class="schedule-time">20h30 — Sede Setúbal</p>
+    </div>
+  </div>
+
+  <!-- PARTICIPA -->
+  <div class="participa-header fade-in">
+    <span class="eyebrow">Vive a Igreja Durante a Semana</span>
+    <h2 class="display-lg">Participa</h2>
+  </div>
+  <div class="participa-grid">
+    <a href="participa.html#connect" class="participa-card fade-in">
+      <p class="participa-tag">Jovens</p>
+      <h3 class="participa-name">Connect</h3>
+      <p class="participa-desc">O ministério de jovens da igreja. Louvor, Palavra e amizades para a vida.</p>
+      <span class="participa-link">Saber Mais →</span>
+    </a>
+    <a href="participa.html#mulheres" class="participa-card fade-in">
+      <p class="participa-tag">Mulheres</p>
+      <h3 class="participa-name">Ministério de Mulheres</h3>
+      <p class="participa-desc">Oração, formação e comunhão entre mulheres de todas as idades.</p>
+      <span class="participa-link">Saber Mais →</span>
+    </a>
+    <a href="participa.html#ebd" class="participa-card fade-in">
+      <p class="participa-tag">Ensino</p>
+      <h3 class="participa-name">Escola Bíblica Dominical</h3>
+      <p class="participa-desc">Ensino da Palavra para todas as idades, antes do culto de domingo.</p>
+      <span class="participa-link">Saber Mais →</span>
+    </a>
+    <a href="participa.html#beneficencia" class="participa-card fade-in">
+      <p class="participa-tag">Ação Social</p>
+      <h3 class="participa-name">Beneficência</h3>
+      <p class="participa-desc">O braço social da igreja, ao lado de quem mais precisa.</p>
+      <span class="participa-link">Saber Mais →</span>
+    </a>
+  </div>
+
+  <!-- LOCATIONS -->
+  <div class="locations-header fade-in">
+    <span class="eyebrow">Onde Estamos</span>
+    <h2 class="display-lg" style="color:#fff;">Junte-se<br>a Nós</h2>
+  </div>
+  <div class="locations-grid">
+    <div class="loc-card fade-in">
+      <img src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=900&q=80" alt="Setúbal" />
+      <div class="loc-card-body">
+        <p class="loc-card-tag">Sede Principal</p>
+        <h3 class="loc-card-name">Setúbal</h3>
+        <p class="loc-card-time">Dom 15h00 Escola · 16h00 Culto</p>
+        <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+      </div>
+    </div>
+    <div class="loc-card fade-in">
+      <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=900&q=80" alt="Barreiro" />
+      <div class="loc-card-body">
+        <p class="loc-card-tag">Congregação</p>
+        <h3 class="loc-card-name">Barreiro</h3>
+        <p class="loc-card-time">Dom 09h30 Culto · 11h30 Escola</p>
+        <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+      </div>
+    </div>
+    <div class="loc-card fade-in">
+      <img src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=900&q=80" alt="Pinhal Novo" />
+      <div class="loc-card-body">
+        <p class="loc-card-tag">Congregação</p>
+        <h3 class="loc-card-name">Pinhal Novo</h3>
+        <p class="loc-card-time">Dom 10h00 Culto · 11h30 Escola</p>
+        <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+      </div>
+    </div>
+  </div>
+  <div class="locations-footer">
+    <a href="congregacoes.html" class="btn btn-outline-white">Ver Todas as Congregações</a>
+  </div>
+
+  <!-- ONLINE -->
+  <div class="online-split">
+    <div class="online-img">
+      <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=900&q=80" alt="Culto Online" />
+      <div class="online-img-overlay">
+        <a href="https://www.youtube.com/@adsetubal" target="_blank" class="play-btn">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="online-text fade-in">
+      <span class="eyebrow">Em Direto</span>
+      <div class="teal-bar"></div>
+      <h2 class="display-lg">Culto<br>Online</h2>
+      <p>Transmitimos o culto dominical ao vivo no YouTube. Assiste de qualquer lugar do mundo, a qualquer hora.</p>
+      <div class="online-links">
+        <a href="https://www.youtube.com/@adsetubal" target="_blank" class="btn btn-teal">Ver no YouTube</a>
+        <a href="culto-online.html" class="btn btn-outline-white">Mais Informação</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="about-split">
+    <div class="about-img">
+      <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=900&q=80" alt="Quem Somos" />
+    </div>
+    <div class="about-text fade-in">
+      <span class="eyebrow">Quem Somos</span>
+      <div class="teal-bar"></div>
+      <h2 class="display-md">Décadas<br>de Fé e<br>Serviço</h2>
+      <p class="body-text">A Assembleia de Deus de Setúbal tem uma longa história de fé e serviço na região. Servimos congregações em Setúbal, Barreiro, Pinhal Novo, Moita, Aires, Montijo, Alcochete e em diversas localidades do Alentejo.</p>
+      <a href="quem-somos.html" class="btn btn-dark">Saber Mais</a>
+    </div>
+  </div>
+
+  <!-- MISSION -->
+  <div class="mission-band fade-in">
+    <div>
+      <h2>Área de Missão Beja</h2>
+      <p>O nosso compromisso missionário leva-nos ao Alentejo, com presença em Beja, Vidigueira, Ermidas, Alvalade do Sado, Ferreira do Alentejo e Ervidel.</p>
+    </div>
+    <a href="congregacoes.html" class="btn btn-white">Ver Missão Beja</a>
+  </div>
+
+  <!-- GALERIA -->
+  <div class="galeria-header fade-in">
+    <span class="eyebrow">Galeria</span>
+    <h2 class="display-lg" style="color:#fff;">Momentos<br>em Família</h2>
+  </div>
+  <div class="galeria-strip">
+    <div class="galeria-tile fade-in"><img src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=500&q=80" alt="Culto"></div>
+    <div class="galeria-tile fade-in"><img src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=500&q=80" alt="Comunidade"></div>
+    <div class="galeria-tile fade-in"><img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=500&q=80" alt="Louvor"></div>
+    <div class="galeria-tile fade-in"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=500&q=80" alt="Comunhão"></div>
+    <div class="galeria-tile fade-in"><img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=500&q=80" alt="Congregações"></div>
+    <div class="galeria-tile fade-in"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&q=80" alt="Missão"></div>
+  </div>
+  <div class="galeria-footer">
+    <a href="galeria.html" class="btn btn-outline-white">Ver Galeria Completa</a>
+  </div>
+
+  <script src="shared.js"></script>
+</body>
+</html>

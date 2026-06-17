@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Congregações | AD Setúbal</title>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    /* FILTER BAR */
+    .filter-bar {
+      background: var(--dark2);
+      padding: 1.5rem 3rem;
+      display: flex; gap: 0.6rem; flex-wrap: wrap;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .filter-btn {
+      padding: 0.5rem 1.4rem;
+      background: none;
+      border: 1px solid rgba(255,255,255,0.18);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: rgba(255,255,255,0.45); cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active { border-color: var(--teal); color: var(--teal); }
+
+    /* SEARCH BOX */
+    .filter-bar { justify-content: space-between; align-items: center; }
+    .filter-bar-group { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .cong-search {
+      display: flex; align-items: center; gap: 0.6rem;
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 0.45rem 1rem; min-width: 260px;
+      transition: border-color 0.2s;
+    }
+    .cong-search:focus-within { border-color: var(--teal); }
+    .cong-search svg { width: 15px; height: 15px; stroke: rgba(255,255,255,0.4); flex-shrink: 0; }
+    .cong-search input {
+      border: none; background: none; outline: none;
+      font-family: 'Barlow', sans-serif; font-size: 0.85rem;
+      color: #fff; width: 100%;
+    }
+    .cong-search input::placeholder { color: rgba(255,255,255,0.32); }
+    .cong-no-results { display: none; text-align: center; padding: 5rem 1.5rem; background: var(--dark); }
+    .cong-no-results p { color: rgba(255,255,255,0.45); font-size: 0.95rem; }
+    .cong-no-results .display-sm { color: #fff; margin-bottom: 0.6rem; }
+    @media (max-width: 900px) {
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .cong-search { min-width: 0; }
+    }
+
+    /* SECTION LABEL */
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--teal);
+      padding: 3rem 3rem 1.5rem;
+      display: flex; align-items: center; gap: 1.2rem;
+      background: var(--dark);
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+
+    /* CONG GRID */
+    .cong-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      background: var(--dark);
+    }
+    .cong-card {
+      border-right: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      overflow: hidden; display: flex; flex-direction: column;
+      transition: background 0.2s;
+    }
+    .cong-card:nth-child(3n) { border-right: none; }
+    .cong-card:hover { background: rgba(255,255,255,0.025); }
+    .cong-card.sede { border-top: 3px solid var(--teal); }
+    .cong-card.missao { border-top: 3px solid var(--orange); }
+
+    .cong-img { aspect-ratio: 16/9; overflow: hidden; }
+    .cong-img img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.65); transition: transform 0.55s, filter 0.3s; }
+    .cong-card:hover .cong-img img { transform: scale(1.05); filter: brightness(0.5); }
+
+    .cong-body { padding: 2rem 2.5rem; flex: 1; display: flex; flex-direction: column; }
+    .cong-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 0.5rem;
+    }
+    .cong-tag.missao { color: var(--orange); }
+    .cong-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.8rem; font-weight: 900;
+      color: #fff; text-transform: uppercase;
+      margin-bottom: 1.2rem; line-height: 1;
+    }
+    .cong-schedule { margin-bottom: 1.4rem; display: flex; flex-direction: column; gap: 0.3rem; }
+    .cong-row {
+      display: flex; justify-content: space-between;
+      align-items: baseline; gap: 1rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .cong-row:last-child { border-bottom: none; }
+    .cong-day {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.68rem; font-weight: 600;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+    }
+    .cong-time { font-size: 0.86rem; color: rgba(255,255,255,0.65); font-weight: 400; text-align: right; }
+    .cong-addr { font-size: 0.82rem; color: rgba(255,255,255,0.28); font-weight: 300; line-height: 1.65; margin-bottom: 1.2rem; flex: 1; }
+    .cong-map {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--teal); text-decoration: none; transition: color 0.2s;
+    }
+    .cong-map:hover { color: var(--orange); }
+
+    /* MISSION FULLBLEED */
+    .mission-full {
+      position: relative; min-height: 52vh;
+      display: flex; align-items: center; overflow: hidden;
+    }
+    .mission-full-bg {
+      position: absolute; inset: 0;
+      background: url('https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1600&q=80') center/cover no-repeat;
+    }
+    .mission-full-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.78); }
+    .mission-full-content { position: relative; z-index: 2; padding: 5rem 3rem; max-width: 650px; }
+    .mission-full-content .display-lg { color: #fff; margin-bottom: 1rem; }
+    .mission-full-content p { font-size: 1rem; color: rgba(255,255,255,0.55); font-weight: 400; line-height: 1.82; margin-bottom: 2rem; }
+
+    @media (max-width: 1000px) {
+      .cong-grid { grid-template-columns: 1fr 1fr; }
+      .cong-card:nth-child(3n) { border-right: 1px solid rgba(255,255,255,0.05); }
+      .cong-card:nth-child(2n) { border-right: none; }
+    }
+    @media (max-width: 900px) {
+      .filter-bar { padding: 1.2rem 1.5rem; }
+      .section-label { padding: 2rem 1.5rem 1.2rem; }
+      .cong-body { padding: 1.5rem; }
+      .mission-full-content { padding: 4rem 1.5rem; }
+    }
+    @media (max-width: 600px) {
+      .cong-grid { grid-template-columns: 1fr; }
+      .cong-card { border-right: none !important; }
+    }
+  </style>
+</head>
+<body data-nav-light="true">
+
+  <div class="page-header">
+    <div class="page-header-bg" style="background-image:url('https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1600&q=80');"></div>
+    <div class="page-header-overlay"></div>
+    <div class="page-header-content fade-in">
+      <span class="eyebrow">Distrito de Setúbal e Área de Missão Beja</span>
+      <h1>Congregações</h1>
+      <p>13 localidades entre o Distrito de Setúbal e a Área de Missão de Beja. Encontra a congregação mais perto de ti.</p>
+    </div>
+  </div>
+
+  <div class="dark-section">
+    <div class="filter-bar">
+      <div class="filter-bar-group">
+        <button class="filter-btn active" onclick="filterCards('all',this)">Todas</button>
+        <button class="filter-btn" onclick="filterCards('setubal',this)">Distrito de Setúbal</button>
+        <button class="filter-btn" onclick="filterCards('beja',this)">Área de Missão Beja</button>
+      </div>
+      <div class="cong-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="cong-search-input" placeholder="Procurar por cidade…" aria-label="Procurar congregação por cidade">
+      </div>
+    </div>
+
+    <div class="cong-no-results" id="cong-no-results">
+      <p class="display-sm">Nenhuma congregação encontrada</p>
+      <p>Tenta outro nome de cidade, ou <a href="contacto.html" style="color:var(--teal);">fala connosco</a>.</p>
+    </div>
+
+    <p class="section-label" data-group="setubal">Distrito de Setúbal</p>
+    <div class="cong-grid">
+      <div class="cong-card sede fade-in" data-group="setubal" data-city="Setúbal">
+        <div class="cong-img"><img src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=700&q=80" alt="Setúbal" /></div>
+        <div class="cong-body">
+          <p class="cong-tag">Sede Principal</p>
+          <h3 class="cong-name">Setúbal</h3>
+          <div class="cong-schedule">
+            <div class="cong-row"><span class="cong-day">Domingo</span><span class="cong-time">15h00 Escola · 16h00 Culto</span></div>
+            <div class="cong-row"><span class="cong-day">4.ª Feira</span><span class="cong-time">10h00 Oração</span></div>
+            <div class="cong-row"><span class="cong-day">6.ª Feira</span><span class="cong-time">20h30 Estudo Bíblico</span></div>
+          </div>
+          <p class="cong-addr">Rua Almeida Garrett, n.º 47-49, Setúbal</p>
+          <a href="https://goo.gl/maps/yotcbPMaXdjZt5YY8" target="_blank" class="cong-map">Ver no mapa →</a>
+        </div>
+      </div>
+      <div class="cong-card fade-in" data-group="setubal" data-city="Barreiro">
+        <div class="cong-img"><img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=700&q=80" alt="Barreiro" /></div>
+        <div class="cong-body">
+          <p class="cong-tag">Congregação</p>
+          <h3 class="cong-name">Barreiro</h3>
+          <div class="cong-schedule">
+            <div class="cong-row"><span class="cong-day">Domingo</span><span class="cong-time">09h30 Culto · 11h30 Escola</span></div>
+            <div class="cong-row"><span class="cong-day">3.ª Feira</span><span class="cong-time">20h30 Oração</span></div>
+            <div class="cong-row"><span class="cong-day">5.ª Feira</span><span class="cong-time">20h30 Estudo Bíblico</span></div>
+          </div>
+          <p class="cong-addr">Rua Dom Manuel de Melo, n.º 2, Barreiro</p>
+          <a href="https://goo.gl/maps/b2im9kiNQeQn8LhA6" target="_blank" class="cong-map">Ver no mapa →</a>
+        </div>
+      </div>
+      <div class="cong-card fade-in" data-group="setubal" data-city="Pinhal Novo">
+        <div class="cong-img"><img src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=700&q=80" alt="Pinhal Novo" /></div>
+        <div class="cong-body">
+          <p class="cong-tag">Congregação</p>
+          <h3 class="cong-name">Pinhal Novo</h3>
+          <div class="cong-schedule">
+            <div class="cong-row"><span class="cong-day">Domingo</span><span class="cong-time">10h00 Culto · 11h30 Escola</span></div>
+            <div class="cong-row"><span class="cong-day">3.ª Feira</span><span class="cong-time">15h30 Oração</span></div>
+            <div class="cong-row"><span class="cong-day">5.ª Feira</span><span class="cong-time">20h30 Estudo Bíblico</span></div>
+          </div>
+          <p class="cong-addr">Rua Jorge de Sena, n.º 7, Pinhal Novo</p>
+          <a href="https://goo.gl/maps/ieZqAQ46ZJuBiyvUA" target="_blank" class="cong-map">Ver no mapa →</a>
+        </div>
+      </div>
+      <div class="cong-card fade-in" data-group="setubal" data-city="Moita">
+        <div class="cong-img"><img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=700&q=80" alt="Moita" /></div>
+        <div class="cong-body">
+          <p class="cong-tag">Congregação</p>
+          <h3 class="cong-name">Moita</h3>
+          <div class="cong-schedule">
+            <div class="cong-row"><span class="cong-day">Domingo</span><span class="cong-time">10h00 Culto e Escola</span></div>
+            <div class="cong-row"><span class="cong-day">3.ª Feira</span><span class="cong-time">20h30 Estudo Bíblico</span></div>
+          </div>
+          <p class="cong-addr">Rua de São Sebastião, n.º 35, Moita</p>
+          <a href="https://goo.gl/maps/t9jwnyaWnKDuS9gY9" target="_blank" class="cong-map">Ver no mapa →</a>
+        </div>
+      </div>
+      <div class="cong-card fade-in" data-group="setubal" data-city="Aires">
+        <div class="cong-img"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=700&q=80" alt="Aires" /></div>
+        <div class="cong-body">
+          <p class="cong-tag">Congregação</p>
+          <h3 class="cong-name">Aires</h3>
+          <div class="cong-schedule">
+            <div class="cong-row"><span class="cong-day">Sábado</span><span class="cong-time">16h00 (inv.) · 17h00 (verão)</span></div>
+          </div>
+          <p class="cong-addr">Rua Heróis do Ultramar, Aires, Palmela</p>
+          <a href="https://goo.gl/maps/ghjw5RsWeTumek59A" target="_blank" class="cong-map">Ver no mapa →</a>
+        </div>
+      </div>
+      <div class="cong-card fade-in" data-group="setubal" data-city="Montijo">
+        <div class="cong-img"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=700&q=80" alt="Montijo" /></div>
+        <div class="cong-body">
+          <p class="cong-tag">Congregação</p>
+          <h3 class="cong-name">Montijo</h3>
+          <div class="cong-schedule">
+            <div class="cong-row"><span class="cong-day">Domingo</span><span class="cong-time">17h30 Culto Público</span></div>
+            <div class="cong-row"><span class="cong-day">4.ª Feira</span><span class="cong-time">20h30 Estudo Bíblico</span></div>
+          </div>
+          <p class="cong-addr">Rua Bulhão Pato, n.º 76, Montijo</p>
+          <a href="https://goo.gl/maps/uPaBN9ds8cubaiW28" target="_blank" class="cong-map">Ver no mapa →</a>
+        </div>
+      </div>
+      <div class="cong-card fade-in" data-group="setubal" data-city="Alcochete">
+        <div class="cong-img"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=700&q=80" alt="Alcochete" /></div>
+        <div class="cong-body">
+          <p class="cong-tag">Congregação</p>
+          <h3 class="cong-name">Alcochete</h3>
+          <div class="cong-schedule">
+            <div class="cong-row"><span class="cong-day">Domingo</span><span class="cong-time">16h00 Culto Público</span></div>
+            <div class="cong-row"><span class="cong-day">4.ª Feira</span><span class="cong-time">16h00 Estudo Bíblico</span></div>
+          </div>
+          <p class="cong-addr">Largo Coronel Ramos da Costa, n.º 50, Alcochete</p>
+          <a href="https://goo.gl/maps/eyStZ7LQZUHujWGv6" target="_blank" class="cong-map">Ver no mapa →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mission-full" data-group="beja">
+      <div class="mission-full-bg"></div>
+      <div class="mission-full-overlay"></div>
+      <div class="mission-full-content fade-in">
+        <span class="eyebrow orange">Área de Missão</span>
+        <h2 class="display-lg">Beja</h2>
+        <p>O nosso compromisso missionário leva-nos ao Alentejo, com presença ativa em 6 localidades da área de Beja.</p>
+      </div>
+    </div>
+
+    <p class="section-label" data-group="beja">Área de Missão — Beja</p>
+    <div class="cong-grid">
+      <div class="cong-card missao fade-in" data-group="beja" data-city="Beja">
+        <div class="cong-img"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=700&q=80" alt="Beja" /></div>
+        <div class="cong-body">
+          <p class="cong-tag missao">Missão</p>
+          <h3 class="cong-name">Beja</h3>
+          <div class="cong-schedule">
+            <div class="cong-row"><span class="cong-day">Domingo</span><span class="cong-time">15h00 Culto Público</span></div>
+          </div>
+          <p class="cong-addr">Rua Camilo Castelo Branco, n.º 11, Beja</p>
+          <a href="https://goo.gl/maps/Hsae9LpTbRqtzmvy8" target="_blank" class="cong-map">Ver no mapa →</a>
+        </div>
+      </div>
+      <div class="cong-card missao fade-in" data-group="beja" data-city="Vidigueira">
+        <div class="cong-img"><img src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=700&q=80" alt="Vidigueira" /></div>
+        <div class="cong-body">
+          <p class="cong-tag missao">Missão</p>
+          <h3 class="cong-name">Vidigueira</h3>
+          <div class="cong-schedule">
+            <div class="cong-row"><span class="cong-day">Domingo</span><span class="cong-time">18h00 Culto Público</span></div>
+          </div>
+          <p class="cong-addr">R. da Boavista 20, Vidigueira</p>
+          <a href="https://goo.gl/maps/6MPGaNxVrqtjKgVV6" target="_blank" class="cong-map">Ver no mapa →</a>
+        </div>
+      </div>
+      <div class="cong-card missao fade-in" data-group="beja" data-city="Ermidas">
+        <div class="cong-img"><img src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=700&q=80" alt="Ermidas" /></div>
+        <div class="cong-body">
+          <p class="cong-tag missao">Missão</p>
+          <h3 class="cong-name">Ermidas</h3>
+          <div class="cong-schedule">
+            <div class="cong-row"><span class="cong-day">Domingo</span><span class="cong-time">09h30 Culto Público</span></div>
+            <div class="cong-row"><span class="cong-day">5.ª Feira</span><span class="cong-time">13h30 Oração</span></div>
+          </div>
+          <p class="cong-addr">Av. Manuel Joaquim Pereira, n.º 70, Ermidas</p>
+          <a href="https://goo.gl/maps/hQo4auQ24SvQib5S8" target="_blank" class="cong-map">Ver no mapa →</a>
+        </div>
+      </div>
+      <div class="cong-card missao fade-in" data-group="beja" data-city="Alvalade do Sado">
+        <div class="cong-img"><img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=700&q=80" alt="Alvalade do Sado" /></div>
+        <div class="cong-body">
+          <p class="cong-tag missao">Missão</p>
+          <h3 class="cong-name">Alvalade do Sado</h3>
+          <div class="cong-schedule">
+            <div class="cong-row"><span class="cong-day">4.ª Feira</span><span class="cong-time">19h30 (inv.) · 20h30 (verão)</span></div>
+          </div>
+          <p class="cong-addr">Rua 31 de Maio, n.º 18, Alvalade do Sado</p>
+          <a href="https://goo.gl/maps/oJXPw4v2LAJ2" target="_blank" class="cong-map">Ver no mapa →</a>
+        </div>
+      </div>
+      <div class="cong-card missao fade-in" data-group="beja" data-city="Ferreira do Alentejo">
+        <div class="cong-img"><img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=700&q=80" alt="Ferreira do Alentejo" /></div>
+        <div class="cong-body">
+          <p class="cong-tag missao">Missão</p>
+          <h3 class="cong-name">Ferreira do Alentejo</h3>
+          <div class="cong-schedule">
+            <div class="cong-row"><span class="cong-day">6.ª Feira</span><span class="cong-time">20h30 Culto Público</span></div>
+          </div>
+          <p class="cong-addr">Rua Mestre de Aviz, n.º 41, Ferreira do Alentejo</p>
+          <a href="https://goo.gl/maps/fcacsn3DRrthpQLf8" target="_blank" class="cong-map">Ver no mapa →</a>
+        </div>
+      </div>
+      <div class="cong-card missao fade-in" data-group="beja" data-city="Ervidel">
+        <div class="cong-img"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=700&q=80" alt="Ervidel" /></div>
+        <div class="cong-body">
+          <p class="cong-tag missao">Missão</p>
+          <h3 class="cong-name">Ervidel</h3>
+          <div class="cong-schedule">
+            <div class="cong-row"><span class="cong-day">3.ª Feira</span><span class="cong-time">20h30 Culto Público</span></div>
+          </div>
+          <p class="cong-addr">R. 5 de Outubro, n.º 8, Ervidel</p>
+          <a href="https://goo.gl/maps/JX5aDYuN16hxpNgu7" target="_blank" class="cong-map">Ver no mapa →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="shared.js"></script>
+  <script>
+    let currentGroup = 'all';
+    const searchInput = document.getElementById('cong-search-input');
+    const noResults = document.getElementById('cong-no-results');
+
+    function normalize(s) {
+      return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    }
+
+    function applyFilters() {
+      const term = normalize(searchInput.value);
+      let totalVisible = 0;
+
+      document.querySelectorAll('.cong-card').forEach(card => {
+        const groupMatch = currentGroup === 'all' || card.dataset.group === currentGroup;
+        const city = card.dataset.city || '';
+        const textMatch = term === '' || normalize(city).includes(term);
+        const show = groupMatch && textMatch;
+        card.style.display = show ? '' : 'none';
+        if (show) totalVisible++;
+      });
+
+      document.querySelectorAll('[data-group]').forEach(el => {
+        if (el.classList.contains('cong-card')) return;
+        const group = el.dataset.group;
+        const groupMatch = currentGroup === 'all' || group === currentGroup;
+        const groupHasVisible = Array.from(document.querySelectorAll('.cong-card[data-group="' + group + '"]'))
+          .some(c => c.style.display !== 'none');
+        el.style.display = (groupMatch && groupHasVisible) ? '' : 'none';
+      });
+
+      noResults.style.display = totalVisible === 0 ? '' : 'none';
+    }
+
+    function filterCards(group, btn) {
+      currentGroup = group;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilters();
+    }
+
+    searchInput.addEventListener('input', applyFilters);
+  </script>
+</body>
+</html>
