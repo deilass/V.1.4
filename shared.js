@@ -107,7 +107,7 @@ function buildFooter() {
         <div class="footer-contact">
           <p>Rua Almeida Garrett, n.º 47-49</p>
           <p>Setúbal, Portugal</p>
-          <p style="margin-top:0.6rem;"><a href="mailto:GeralADSetubal@gmail.com" style="color:rgba(255,255,255,0.4);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#29A8AB'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">GeralADSetubal@gmail.com</a></p>
+          <p style="margin-top:0.6rem;"><a href="mailto:geraladsetubal@gmail.com" style="color:rgba(255,255,255,0.4);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#29A8AB'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">GeralADSetubal@gmail.com</a></p>
         </div>
       </div>
       <div>
@@ -116,7 +116,7 @@ function buildFooter() {
           <p>Dom 15h00 — Escola Dominical</p>
           <p>Dom 16h00 — Culto Público</p>
           <p>4.ª Feira 10h00 — Oração</p>
-          <p>6.ª Feira 20h30 — Estudo Bíblico</p>
+          <p>6.ª Feira 20h00 — Estudo Bíblico</p>
         </div>
       </div>
     </div>
