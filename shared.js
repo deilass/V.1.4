@@ -114,7 +114,7 @@ function buildFooter() {
         <p class="footer-heading">Horários — Sede</p>
         <div class="footer-contact">
           <p>Dom 15h00 — Escola Dominical</p>
-          <p>Dom 16h00 — Culto Público</p>
+          <p>Dom 16h00 — Culto de Celebração</p>
           <p>4.ª Feira 10h00 — Oração</p>
           <p>6.ª Feira 20h00 — Estudo Bíblico</p>
         </div>
