@@ -36,6 +36,7 @@
     .form-submit { width: 100%; padding: 1rem; background: var(--dark); color: #fff; border: none; font-family: 'Barlow Condensed', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; margin-top: 1.2rem; }
     .form-submit:hover { background: var(--teal); }
     .success-msg { display: none; padding: 1rem 1.4rem; border-left: 3px solid var(--teal); background: rgba(41,168,171,0.07); font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; color: var(--teal); margin-top: 1rem; text-transform: uppercase; }
+    .error-msg { display: none; padding: 1rem 1.4rem; border-left: 3px solid #dc2626; background: rgba(220,38,38,0.07); font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; color: #dc2626; margin-top: 1rem; text-transform: uppercase; }
     .faq-grid { display: grid; grid-template-columns: repeat(2,1fr); }
     .faq-item { padding: 3.5rem 3.5rem; border-right: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.2s; }
     .faq-item:hover { background: rgba(255,255,255,0.03); }
@@ -108,25 +109,27 @@
     <div class="contact-form-col fade-in">
       <h2 class="form-title">Envia uma<br>Mensagem</h2>
       <p class="form-sub">Preenche o formulário e entraremos em contacto em breve. Podes também escrever diretamente para info@adsetubal.pt.</p>
-      <form id="contact-form" onsubmit="handleSubmit(event)">
+      <form id="contact-form" action="https://formspree.io/f/xlgkyarj" method="POST" onsubmit="handleSubmit(event)">
+        <input type="hidden" name="_subject" value="Novo contacto — AD Setúbal" />
+        <input type="hidden" name="_language" value="pt" />
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Nome</label>
-            <input class="form-input" type="text" placeholder="O seu nome" required />
+            <input class="form-input" type="text" name="nome" placeholder="O seu nome" required />
           </div>
           <div class="form-group">
             <label class="form-label">Apelido</label>
-            <input class="form-input" type="text" placeholder="O seu apelido" required />
+            <input class="form-input" type="text" name="apelido" placeholder="O seu apelido" required />
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input class="form-input" type="email" placeholder="o.seu@email.com" required />
+          <input class="form-input" type="email" name="email" placeholder="o.seu@email.com" required />
         </div>
         <div class="form-group">
           <label class="form-label">Congregação de interesse</label>
           <div class="form-select-wrap">
-            <select class="form-select">
+            <select class="form-select" name="congregacao">
               <option value="">Seleciona uma congregação</option>
               <optgroup label="Distrito de Setúbal">
                 <option>Setúbal — Sede</option><option>Barreiro</option>
@@ -147,7 +150,7 @@
         <div class="form-group">
           <label class="form-label">Assunto</label>
           <div class="form-select-wrap">
-            <select class="form-select">
+            <select class="form-select" name="assunto">
               <option value="">Seleciona um assunto</option>
               <option>Informações Gerais</option><option>Primeira Visita</option>
               <option>Batismo</option><option>Casamento</option>
@@ -158,16 +161,17 @@
         </div>
         <div class="form-group">
           <label class="form-label">Mensagem</label>
-          <textarea class="form-textarea" placeholder="Escreve a tua mensagem aqui..."></textarea>
+          <textarea class="form-textarea" name="mensagem" placeholder="Escreve a tua mensagem aqui..."></textarea>
         </div>
         <div class="form-group">
           <div class="form-check-group">
-            <input class="form-check" type="checkbox" id="privacy" required />
+            <input class="form-check" type="checkbox" id="privacy" name="privacidade" value="aceite" required />
             <label class="form-check-label" for="privacy">Aceito a política de privacidade e consinto o tratamento dos meus dados para resposta ao pedido.</label>
           </div>
         </div>
         <button class="form-submit" type="submit">Enviar Mensagem</button>
         <div class="success-msg" id="success-msg">✓ Mensagem enviada com sucesso.</div>
+        <div class="error-msg" id="error-msg">✗ Erro ao enviar. Tenta novamente ou escreve para info@adsetubal.pt.</div>
       </form>
     </div>
   </div>
@@ -215,11 +219,38 @@
 
   <script src="shared.js"></script>
   <script>
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
       e.preventDefault();
-      document.getElementById('success-msg').style.display = 'block';
-      e.target.reset();
-      setTimeout(() => { document.getElementById('success-msg').style.display = 'none'; }, 5000);
+      var form = e.target;
+      var btn = form.querySelector('.form-submit');
+      var successEl = document.getElementById('success-msg');
+      var errorEl = document.getElementById('error-msg');
+
+      btn.textContent = 'A enviar...';
+      btn.disabled = true;
+      successEl.style.display = 'none';
+      errorEl.style.display = 'none';
+
+      try {
+        var res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (res.ok) {
+          successEl.style.display = 'block';
+          form.reset();
+          setTimeout(function() { successEl.style.display = 'none'; }, 6000);
+        } else {
+          errorEl.style.display = 'block';
+        }
+      } catch (err) {
+        errorEl.style.display = 'block';
+      }
+
+      btn.textContent = 'Enviar Mensagem';
+      btn.disabled = false;
     }
   </script>
 </body>
