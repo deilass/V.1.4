@@ -211,20 +211,30 @@
 
     /* ===== ONLINE SPLIT ===== */
     .online-split { display: grid; grid-template-columns: 1fr 1fr; }
-    .online-img { position: relative; overflow: hidden; min-height: 540px; background: #000; }
+    .online-img { position: relative; overflow: hidden; min-height: 420px; background: #000; }
     .online-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5); transition: opacity 0.3s; }
-    .online-img iframe {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      border: none; display: none;
-    }
-    .online-img.playing img { opacity: 0; pointer-events: none; }
-    .online-img.playing iframe { display: block; }
-    .online-img.playing .online-img-overlay { opacity: 0; pointer-events: none; }
     .online-img-overlay {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
       transition: opacity 0.3s;
     }
+    .online-img.playing .online-img-overlay { opacity: 0; pointer-events: none; }
+    /* Embed container — centered box inside the panel */
+    .yt-embed-box {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 88%; max-width: 420px;
+      aspect-ratio: 16/9;
+      display: none;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+      border: 2px solid rgba(41,168,171,0.5);
+    }
+    .yt-embed-box iframe {
+      width: 100%; height: 100%; border: none; display: block;
+    }
+    .online-img.playing img { filter: brightness(0.18); }
+    .online-img.playing .yt-embed-box { display: block; }
     .play-btn {
       width: 80px; height: 80px;
       border: 2px solid rgba(255,255,255,0.5);
@@ -580,12 +590,14 @@
   <div class="online-split">
     <div class="online-img" id="online-media">
       <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=900&q=80" alt="Culto Online" />
-      <iframe
-        id="yt-embed"
-        src=""
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-      ></iframe>
+      <div class="yt-embed-box">
+        <iframe
+          id="yt-embed"
+          src=""
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
       <div class="online-img-overlay">
         <button class="play-btn" id="online-play-trigger" onclick="launchEmbed()" aria-label="Assistir ao vivo">
           <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -653,7 +665,7 @@
       iframe.src = 'https://www.youtube.com/embed/live_stream?channel=UCpDnP2y6vgTOnPcyh7wHmNw&autoplay=1&rel=0';
       wrap.classList.add('playing');
     }
- 
+
     // Carousel arrows
     function scrollCarousel(dir) {
       var c = document.getElementById('loc-carousel');
