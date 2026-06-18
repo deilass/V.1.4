@@ -127,8 +127,29 @@
       background: var(--dark);
       padding: 5rem 3rem 3rem;
     }
-    .locations-grid { display: grid; grid-template-columns: repeat(3,1fr); }
-    .loc-card { position: relative; overflow: hidden; aspect-ratio: 2/3; }
+    /* Carousel wrapper */
+    .locations-carousel-wrap {
+      background: var(--dark);
+      position: relative;
+      overflow: hidden;
+    }
+    .locations-carousel {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      gap: 0;
+    }
+    .locations-carousel::-webkit-scrollbar { display: none; }
+    .loc-card {
+      position: relative;
+      overflow: hidden;
+      flex: 0 0 280px;
+      height: 480px;
+      scroll-snap-align: start;
+      cursor: default;
+    }
     .loc-card img {
       width: 100%; height: 100%; object-fit: cover; display: block;
       filter: brightness(0.55);
@@ -138,33 +159,49 @@
     .loc-card-body {
       position: absolute; inset: 0;
       display: flex; flex-direction: column; justify-content: flex-end;
-      padding: 2.5rem 2rem;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);
+      padding: 2rem 1.6rem;
+      background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 55%);
     }
     .loc-card-tag {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 0.65rem; font-weight: 700;
+      font-size: 0.62rem; font-weight: 700;
       letter-spacing: 0.24em; text-transform: uppercase;
-      color: var(--teal); margin-bottom: 0.4rem;
+      color: var(--teal); margin-bottom: 0.35rem;
     }
     .loc-card-name {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 2.4rem; font-weight: 900;
+      font-size: 2rem; font-weight: 900;
       color: #fff; text-transform: uppercase;
-      line-height: 0.92; margin-bottom: 0.5rem;
+      line-height: 0.92; margin-bottom: 0.45rem;
     }
     .loc-card-time {
-      font-size: 0.85rem; color: rgba(255,255,255,0.6);
-      font-weight: 400; margin-bottom: 1.2rem;
+      font-size: 0.8rem; color: rgba(255,255,255,0.55);
+      font-weight: 400; margin-bottom: 1rem;
+      line-height: 1.5;
     }
     .loc-card-link {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 0.75rem; font-weight: 700;
+      font-size: 0.72rem; font-weight: 700;
       letter-spacing: 0.18em; text-transform: uppercase;
-      color: rgba(255,255,255,0.6); text-decoration: none;
+      color: rgba(255,255,255,0.55); text-decoration: none;
       transition: color 0.2s;
     }
     .loc-card:hover .loc-card-link { color: var(--teal); }
+    /* Carousel arrow buttons */
+    .carousel-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 48px; height: 48px;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff; font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 10;
+      transition: background 0.2s, border-color 0.2s;
+      user-select: none;
+    }
+    .carousel-btn:hover { background: var(--teal); border-color: var(--teal); }
+    .carousel-btn.prev { left: 1rem; }
+    .carousel-btn.next { right: 1rem; }
     .locations-footer {
       background: var(--dark);
       padding: 3rem;
@@ -174,17 +211,26 @@
 
     /* ===== ONLINE SPLIT ===== */
     .online-split { display: grid; grid-template-columns: 1fr 1fr; }
-    .online-img { position: relative; overflow: hidden; min-height: 540px; }
-    .online-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5); }
+    .online-img { position: relative; overflow: hidden; min-height: 540px; background: #000; }
+    .online-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5); transition: opacity 0.3s; }
+    .online-img iframe {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      border: none; display: none;
+    }
+    .online-img.playing img { opacity: 0; pointer-events: none; }
+    .online-img.playing iframe { display: block; }
+    .online-img.playing .online-img-overlay { opacity: 0; pointer-events: none; }
     .online-img-overlay {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.3s;
     }
     .play-btn {
       width: 80px; height: 80px;
       border: 2px solid rgba(255,255,255,0.5);
       display: flex; align-items: center; justify-content: center;
       text-decoration: none; transition: border-color 0.2s, background 0.2s;
+      cursor: pointer; background: none;
     }
     .play-btn:hover { border-color: var(--teal); background: rgba(41,168,171,0.2); }
     .play-btn svg { width: 26px; height: 26px; fill: #fff; margin-left: 5px; }
@@ -281,9 +327,8 @@
       .schedule-strip { grid-template-columns: 1fr 1fr; }
       .schedule-block { border-bottom: 1px solid rgba(255,255,255,0.06); }
       .locations-header { padding: 4rem 1.5rem 2rem; }
-      .locations-grid { grid-template-columns: 1fr; }
-      .loc-card { aspect-ratio: 16/10; }
-      .locations-footer { padding: 2rem 1.5rem; }
+      .loc-card { flex: 0 0 240px; height: 380px; }
+      .carousel-btn { display: none; }
       .online-split, .about-split { grid-template-columns: 1fr; }
       .online-img, .about-img { min-height: 320px; position: relative; }
       .online-img img, .about-img img { position: relative; }
@@ -404,34 +449,128 @@
     <span class="eyebrow">Onde Estamos</span>
     <h2 class="display-lg" style="color:#fff;">Junta-te<br>a Nós</h2>
   </div>
-  <div class="locations-grid">
-    <div class="loc-card fade-in">
-      <img src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=900&q=80" alt="Setúbal" />
-      <div class="loc-card-body">
-        <p class="loc-card-tag">Sede Principal</p>
-        <h3 class="loc-card-name">Setúbal</h3>
-        <p class="loc-card-time">Dom 15h00 EBD · 16h00 Culto de Celebração</p>
-        <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+  <div class="locations-carousel-wrap">
+    <button class="carousel-btn prev" onclick="scrollCarousel(-1)" aria-label="Anterior">&#8592;</button>
+    <div class="locations-carousel" id="loc-carousel">
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=600&q=80" alt="Setúbal" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag">Sede Principal</p>
+          <h3 class="loc-card-name">Setúbal</h3>
+          <p class="loc-card-time">Dom 15h00 EBD<br>Dom 16h00 Culto</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600&q=80" alt="Barreiro" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag">Congregação</p>
+          <h3 class="loc-card-name">Barreiro</h3>
+          <p class="loc-card-time">Dom 09h30 Culto<br>Dom 11h30 EBD</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&q=80" alt="Pinhal Novo" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag">Congregação</p>
+          <h3 class="loc-card-name">Pinhal Novo</h3>
+          <p class="loc-card-time">Dom 10h00 Culto<br>Dom 11h30 EBD</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=600&q=80" alt="Moita" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag">Congregação</p>
+          <h3 class="loc-card-name">Moita</h3>
+          <p class="loc-card-time">Dom 10h00 Culto e EBD<br>3.ª 20h30 Estudo Bíblico</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600&q=80" alt="Aires" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag">Congregação</p>
+          <h3 class="loc-card-name">Aires</h3>
+          <p class="loc-card-time">Dom 10h00 Culto</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80" alt="Montijo" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag">Congregação</p>
+          <h3 class="loc-card-name">Montijo</h3>
+          <p class="loc-card-time">Dom 17h30 Culto<br>4.ª 20h30 Estudo Bíblico</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80" alt="Alcochete" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag">Congregação</p>
+          <h3 class="loc-card-name">Alcochete</h3>
+          <p class="loc-card-time">Dom 10h00 Culto</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80" alt="Palmela" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag">Congregação</p>
+          <h3 class="loc-card-name">Palmela</h3>
+          <p class="loc-card-time">Dom 10h00 Culto</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600&q=80" alt="Beja" style="filter:brightness(0.45) sepia(0.3);" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag" style="color:var(--orange);">Missão Beja</p>
+          <h3 class="loc-card-name">Beja</h3>
+          <p class="loc-card-time">Área de Missão<br>Ver horários</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=600&q=80" alt="Vidigueira" style="filter:brightness(0.45) sepia(0.3);" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag" style="color:var(--orange);">Missão Beja</p>
+          <h3 class="loc-card-name">Vidigueira</h3>
+          <p class="loc-card-time">Área de Missão<br>Ver horários</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&q=80" alt="Ermidas" style="filter:brightness(0.45) sepia(0.3);" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag" style="color:var(--orange);">Missão Beja</p>
+          <h3 class="loc-card-name">Ermidas</h3>
+          <p class="loc-card-time">Área de Missão<br>Ver horários</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=600&q=80" alt="Ferreira do Alentejo" style="filter:brightness(0.45) sepia(0.3);" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag" style="color:var(--orange);">Missão Beja</p>
+          <h3 class="loc-card-name">Ferreira do Alentejo</h3>
+          <p class="loc-card-time">Área de Missão<br>Ver horários</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600&q=80" alt="Ervidel" style="filter:brightness(0.45) sepia(0.3);" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag" style="color:var(--orange);">Missão Beja</p>
+          <h3 class="loc-card-name">Ervidel</h3>
+          <p class="loc-card-time">Área de Missão<br>Ver horários</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
       </div>
     </div>
-    <div class="loc-card fade-in">
-      <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=900&q=80" alt="Barreiro" />
-      <div class="loc-card-body">
-        <p class="loc-card-tag">Congregação</p>
-        <h3 class="loc-card-name">Barreiro</h3>
-        <p class="loc-card-time">Dom 09h30 Culto · 11h30 EBD</p>
-        <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
-      </div>
-    </div>
-    <div class="loc-card fade-in">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8lgJW3a4VgBUAhcl3Z_HKQ_s_YPqZguw5qA&s" alt="Pinhal Novo" />
-      <div class="loc-card-body">
-        <p class="loc-card-tag">Congregação</p>
-        <h3 class="loc-card-name">Pinhal Novo</h3>
-        <p class="loc-card-time">Dom 10h00 Culto · 11h30 EBD</p>
-        <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
-      </div>
-    </div>
+    <button class="carousel-btn next" onclick="scrollCarousel(1)" aria-label="Próximo">&#8594;</button>
   </div>
   <div class="locations-footer">
     <a href="congregacoes.html" class="btn btn-outline-white">Ver Todas as Congregações</a>
@@ -439,12 +578,18 @@
 
   <!-- ONLINE -->
   <div class="online-split">
-    <div class="online-img">
+    <div class="online-img" id="online-media">
       <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=900&q=80" alt="Culto Online" />
+      <iframe
+        id="yt-embed"
+        src=""
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
       <div class="online-img-overlay">
-        <a href="https://www.youtube.com/@adsetubal/live" target="_blank" class="play-btn" id="online-play-trigger">
+        <button class="play-btn" id="online-play-trigger" onclick="launchEmbed()" aria-label="Assistir ao vivo">
           <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </a>
+        </button>
       </div>
     </div>
     <div class="online-text fade-in">
@@ -500,5 +645,20 @@
   </div>
 
   <script src="shared.js"></script>
+  <script>
+    // YouTube live embed
+    function launchEmbed() {
+      var wrap = document.getElementById('online-media');
+      var iframe = document.getElementById('yt-embed');
+      iframe.src = 'https://www.youtube.com/embed/live_stream?channel=UCpDnP2y6vgTOnPcyh7wHmNw&autoplay=1&rel=0';
+      wrap.classList.add('playing');
+    }
+ 
+    // Carousel arrows
+    function scrollCarousel(dir) {
+      var c = document.getElementById('loc-carousel');
+      c.scrollBy({ left: dir * 300, behavior: 'smooth' });
+    }
+  </script>
 </body>
 </html>
