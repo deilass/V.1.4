@@ -107,7 +107,7 @@ function buildFooter() {
         <div class="footer-contact">
           <p>Rua Almeida Garrett, n.º 47-49</p>
           <p>Setúbal, Portugal</p>
-          <p style="margin-top:0.6rem;"><a href="mailto:geraladsetubal@gmail.com" style="color:rgba(255,255,255,0.4);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#29A8AB'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">GeralADSetubal@gmail.com</a></p>
+          <p style="margin-top:0.6rem;"><a href="mailto:info@adsetubal.pt" style="color:rgba(255,255,255,0.4);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#29A8AB'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">info@adsetubal.pt</a></p>
         </div>
       </div>
       <div>
