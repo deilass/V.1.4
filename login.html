@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Área Reservada | AD Setúbal</title>
+  <link rel="stylesheet" href="shared.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { background: var(--dark); }
+
+    .login-wrap {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 100px 1.5rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-bg {
+      position: absolute; inset: 0;
+      background: url('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1600&q=80') center/cover no-repeat;
+      filter: brightness(0.12);
+    }
+    .login-card {
+      position: relative; z-index: 2;
+      background: var(--dark2);
+      border: 1px solid rgba(255,255,255,0.08);
+      width: 100%; max-width: 440px;
+      padding: 3rem;
+    }
+    .login-logo {
+      display: flex; align-items: center; gap: 0.8rem;
+      margin-bottom: 2.5rem; text-decoration: none;
+    }
+    .login-logo img { height: 38px; }
+    .login-logo-text-main {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.1rem; font-weight: 800;
+      color: #fff; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .login-logo-text-sub {
+      font-size: 0.55rem; color: rgba(255,255,255,0.35);
+      letter-spacing: 0.14em; text-transform: uppercase;
+    }
+    .login-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 0.5rem; display: block;
+    }
+    .login-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 2.4rem; font-weight: 900;
+      color: #fff; text-transform: uppercase;
+      line-height: 0.95; margin-bottom: 2rem;
+    }
+    .form-group { margin-bottom: 1.1rem; }
+    .form-label {
+      display: block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.4); margin-bottom: 0.5rem;
+    }
+    .form-input {
+      width: 100%; padding: 0.85rem 1rem;
+      border: 1.5px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.9rem; color: #fff;
+      outline: none; transition: border-color 0.2s;
+    }
+    .form-input::placeholder { color: rgba(255,255,255,0.2); }
+    .form-input:focus { border-color: var(--teal); }
+    .login-btn {
+      width: 100%; padding: 1rem;
+      background: var(--teal); color: #fff;
+      border: none; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s;
+      margin-top: 0.5rem;
+    }
+    .login-btn:hover { background: var(--orange); }
+    .login-btn:disabled { background: rgba(255,255,255,0.1); cursor: not-allowed; }
+    .login-error {
+      display: none;
+      padding: 0.85rem 1rem;
+      border-left: 3px solid #dc2626;
+      background: rgba(220,38,38,0.08);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 0.06em; color: #f87171;
+      margin-top: 1rem; text-transform: uppercase;
+    }
+    .login-footer-note {
+      margin-top: 2rem;
+      font-size: 0.82rem; color: rgba(255,255,255,0.25);
+      text-align: center; line-height: 1.6;
+    }
+    .login-footer-note a { color: var(--teal); text-decoration: none; }
+
+    /* Nav reserved style */
+    .nav-reserved {
+      font-size: 0.75rem !important;
+      color: rgba(255,255,255,0.45) !important;
+      border: 1px solid rgba(255,255,255,0.12) !important;
+      padding: 0.35rem 0.9rem !important;
+      transition: border-color 0.2s, color 0.2s !important;
+    }
+    .nav-reserved:hover { border-color: var(--teal) !important; color: var(--teal) !important; }
+    nav.light-nav .nav-reserved { color: rgba(0,0,0,0.45) !important; border-color: rgba(0,0,0,0.15) !important; }
+  </style>
+</head>
+<body>
+
+  <div class="login-wrap">
+    <div class="login-bg"></div>
+    <div class="login-card">
+      <a href="index.html" class="login-logo">
+        <img src="logo.png" alt="AD Setúbal" />
+        <div>
+          <div class="login-logo-text-main">AD Setúbal</div>
+          <div class="login-logo-text-sub">Assembleia de Deus</div>
+        </div>
+      </a>
+
+      <span class="login-eyebrow">Acesso Restrito</span>
+      <h1 class="login-title">Área<br>Reservada</h1>
+
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" id="login-email" placeholder="o.teu@email.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Palavra-passe</label>
+          <input class="form-input" type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <button class="login-btn" type="submit" id="login-btn">Entrar</button>
+        <div class="login-error" id="login-error"></div>
+      </form>
+
+      <p class="login-footer-note">
+        Acesso reservado à equipa da AD Setúbal.<br>
+        Problemas? Fala com o administrador.
+      </p>
+    </div>
+  </div>
+
+  <script src="shared.js"></script>
+  <script>
+    // ── SUPABASE CONFIG ──────────────────────────────────────────────
+    // Substitui os valores abaixo pelos do teu projeto Supabase
+    const SUPABASE_URL  = 'https://SUBSTITUI.supabase.co';
+    const SUPABASE_ANON = 'SUBSTITUI_ANON_KEY';
+    // ────────────────────────────────────────────────────────────────
+
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    // Se já está autenticado, vai direto ao dashboard
+    sb.auth.getSession().then(({ data }) => {
+      if (data.session) window.location.href = 'dashboard.html';
+    });
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn   = document.getElementById('login-btn');
+      const errEl = document.getElementById('login-error');
+      const email = document.getElementById('login-email').value.trim();
+      const pass  = document.getElementById('login-password').value;
+
+      btn.textContent = 'A entrar...';
+      btn.disabled = true;
+      errEl.style.display = 'none';
+
+      const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+      if (error) {
+        errEl.textContent = 'Email ou palavra-passe incorretos.';
+        errEl.style.display = 'block';
+        btn.textContent = 'Entrar';
+        btn.disabled = false;
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    }
+  </script>
+</body>
+</html>
