@@ -632,8 +632,14 @@
             </div>
           </div>
 
+          <!-- PROGRAMA -->
+          <p class="f-section">Programa</p>
+          <p class="form-card-sub" style="margin-bottom:1rem;">Adiciona cada momento do culto pela ordem em que acontece (ex.: música, MC, oferta, pregação…). Estes dados são usados para gerar o PDF do programa.</p>
+          <div id="programa-list" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
+          <button class="f-submit" type="button" style="margin-top:0;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12);font-size:0.75rem;padding:0.7rem 1.5rem;" onclick="addProgramaField()">+ Adicionar Campo</button>
+
           <!-- EQUIPA DE LOUVOR (same pattern as escala tab) -->
-          <p class="f-section">Equipa de Louvor</p>
+          <p class="f-section" style="margin-top:2rem;">Equipa de Louvor</p>
           <div class="f-row">
             <div class="f-group">
               <label class="f-label">Piano</label>
@@ -752,6 +758,12 @@
           <p class="f-section" style="margin-top:2rem;">Other Times</p>
           <div id="other-times-list" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
           <button class="f-submit" type="button" style="margin-top:0;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12);font-size:0.75rem;padding:0.7rem 1.5rem;" onclick="addProdField('other-times-list')">+ Adicionar Campo</button>
+
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.07);">
+            <button class="f-submit" type="button" id="programa-pdf-btn" onclick="gerarProgramaPDF()" style="margin-top:0;background:var(--dark);border:1.5px solid rgba(255,255,255,0.15);">
+              ↓ Gerar PDF
+            </button>
+          </div>
 
         </div>
       </div><!-- end tab-producao -->
@@ -1120,23 +1132,33 @@
     // cannot be selected in another.
     var PROD_TECNICA_IDS = ['prod-som', 'prod-online', 'prod-multimédia'];
 
-    function onProdChange() {
-      // Collect used values in the tecnica group
-      var usedTecnica = new Set();
-      PROD_TECNICA_IDS.forEach(function(id) {
-        var v = document.getElementById(id).value;
-        if (v) usedTecnica.add(v);
-      });
+    // Louvor (Músicos): uma pessoa só pode estar atribuída a um instrumento.
+    var PROD_INSTRUMENTO_IDS = ['prod-piano', 'prod-gt-acustica', 'prod-gt-eletrica', 'prod-baixo', 'prod-bateria'];
 
-      // Re-render disabled state for each tecnica select
-      PROD_TECNICA_IDS.forEach(function(id) {
+    // Louvor (Vozes): uma pessoa só pode estar atribuída a uma voz.
+    var PROD_VOZ_IDS = ['prod-dirigente', 'prod-back1', 'prod-back2', 'prod-back3', 'prod-back4'];
+
+    function refreshProdGroup(ids) {
+      var used = new Set();
+      ids.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el && el.value) used.add(el.value);
+      });
+      ids.forEach(function(id) {
         var sel = document.getElementById(id);
+        if (!sel) return;
         var cur = sel.value;
         Array.from(sel.options).forEach(function(opt) {
           if (!opt.value) return;
-          opt.disabled = usedTecnica.has(opt.value) && opt.value !== cur;
+          opt.disabled = used.has(opt.value) && opt.value !== cur;
         });
       });
+    }
+
+    function onProdChange() {
+      refreshProdGroup(PROD_TECNICA_IDS);
+      refreshProdGroup(PROD_INSTRUMENTO_IDS);
+      refreshProdGroup(PROD_VOZ_IDS);
     }
 
     // ── PRODUÇÃO: ADICIONAR CAMPO DINÂMICO ────────────────────────
@@ -1153,31 +1175,31 @@
         '<div class="pfc-grid">' +
           '<div class="f-group pfc-full">' +
             '<label class="f-label">Título</label>' +
-            '<input class="f-input" type="text" placeholder="Ex.: Soundcheck Músicos" />' +
+            '<input class="f-input pf-titulo" type="text" placeholder="Ex.: Soundcheck Músicos" />' +
           '</div>' +
           '<div class="f-group pfc-full">' +
             '<label class="f-label">Descrição</label>' +
-            '<input class="f-input" type="text" placeholder="Descrição opcional" />' +
+            '<input class="f-input pf-desc" type="text" placeholder="Descrição opcional" />' +
           '</div>' +
           '<div class="f-group">' +
             '<label class="f-label">Data</label>' +
-            '<input class="f-input" type="date" />' +
+            '<input class="f-input pf-data" type="date" />' +
           '</div>' +
           '<div class="f-group">' +
             '<label class="f-label">Hora</label>' +
-            '<input class="f-input" type="time" />' +
+            '<input class="f-input pf-hora" type="time" />' +
           '</div>' +
           '<div class="f-group">' +
             '<label class="f-label">Duração (min)</label>' +
-            '<input class="f-input" type="number" min="0" placeholder="Ex.: 60" />' +
+            '<input class="f-input pf-duracao" type="number" min="0" placeholder="Ex.: 60" />' +
           '</div>' +
           '<div class="f-group">' +
             '<label class="f-label">Link</label>' +
-            '<input class="f-input" type="url" placeholder="https://…" />' +
+            '<input class="f-input pf-link" type="url" placeholder="https://…" />' +
           '</div>' +
           '<div class="f-group pfc-full">' +
             '<label class="f-label">Ficheiro</label>' +
-            '<input class="f-input" type="file" style="padding:0.6rem 1rem;cursor:pointer;" />' +
+            '<input class="f-input pf-ficheiro" type="file" style="padding:0.6rem 1rem;cursor:pointer;" />' +
           '</div>' +
         '</div>';
 
@@ -1187,6 +1209,396 @@
     function removeProdField(id) {
       var el = document.getElementById(id);
       if (el) el.remove();
+    }
+
+    // ── PROGRAMA: ADICIONAR CAMPO DINÂMICO ────────────────────────
+    function addProgramaField() {
+      prodFieldCounter++;
+      var id = 'pgc-' + prodFieldCounter;
+      var card = document.createElement('div');
+      card.className = 'prod-field-card';
+      card.id = id;
+      card.innerHTML =
+        '<button class="pfc-remove" type="button" onclick="removeProdField(\'' + id + '\')" title="Remover">✕</button>' +
+        '<div class="pfc-grid">' +
+          '<div class="pfc-full" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.9rem;">' +
+            '<div class="f-group">' +
+              '<label class="f-label">Hora</label>' +
+              '<input class="f-input pg-hora" type="text" placeholder="Ex.: 11:30a" />' +
+            '</div>' +
+            '<div class="f-group">' +
+              '<label class="f-label">Duração (m:ss)</label>' +
+              '<input class="f-input pg-duracao" type="text" placeholder="Ex.: 5:54" />' +
+            '</div>' +
+            '<div class="f-group">' +
+              '<label class="f-label">Tipo</label>' +
+              '<select class="f-select pg-tipo">' +
+                '<option value="item">Item / Momento</option>' +
+                '<option value="musica">Música</option>' +
+              '</select>' +
+            '</div>' +
+          '</div>' +
+          '<div class="f-group pfc-full">' +
+            '<label class="f-label">Título</label>' +
+            '<input class="f-input pg-titulo" type="text" placeholder="Ex.: Good Grace / MC: Oração" />' +
+          '</div>' +
+          '<div class="f-group pfc-full">' +
+            '<label class="f-label">Detalhe (entre parênteses, opcional)</label>' +
+            '<input class="f-input pg-detalhe" type="text" placeholder="Ex.: Portuguese - PT in D" />' +
+          '</div>' +
+          '<div class="f-group pfc-full">' +
+            '<label class="f-label">Notas (uma por linha)</label>' +
+            '<textarea class="f-textarea pg-notas" style="min-height:70px;" placeholder="Ex.: Termina no minuto 6"></textarea>' +
+          '</div>' +
+          '<div class="f-group">' +
+            '<label class="f-label">Audio/Visual</label>' +
+            '<input class="f-input pg-av" type="text" placeholder="Ex.: Versículos, Formas de dar" />' +
+          '</div>' +
+          '<div class="f-group">' +
+            '<label class="f-label">Band</label>' +
+            '<input class="f-input pg-band" type="text" placeholder="Ex.: Suporte" />' +
+          '</div>' +
+          '<div class="f-group">' +
+            '<label class="f-label">PersonVocals</label>' +
+            '<input class="f-input pg-person" type="text" />' +
+          '</div>' +
+        '</div>';
+
+      document.getElementById('programa-list').appendChild(card);
+    }
+
+    function selVal(id) {
+      var el = document.getElementById(id);
+      return el ? el.value : '';
+    }
+
+    function getProgramaItems() {
+      var cards = document.querySelectorAll('#programa-list .prod-field-card');
+      var items = [];
+      cards.forEach(function(card) {
+        var notasRaw = (card.querySelector('.pg-notas') || {}).value || '';
+        items.push({
+          hora:    (card.querySelector('.pg-hora') || {}).value || '',
+          duracao: (card.querySelector('.pg-duracao') || {}).value || '',
+          tipo:    (card.querySelector('.pg-tipo') || {}).value || 'item',
+          titulo:  (card.querySelector('.pg-titulo') || {}).value || '',
+          detalhe: (card.querySelector('.pg-detalhe') || {}).value || '',
+          notas:   notasRaw.split('\n').map(function(s){ return s.trim(); }).filter(Boolean),
+          av:      (card.querySelector('.pg-av') || {}).value || '',
+          band:    (card.querySelector('.pg-band') || {}).value || '',
+          person:  (card.querySelector('.pg-person') || {}).value || ''
+        });
+      });
+      return items;
+    }
+
+    function getGenericFieldItems(containerId) {
+      var cards = document.querySelectorAll('#' + containerId + ' .prod-field-card');
+      var items = [];
+      cards.forEach(function(card) {
+        items.push({
+          titulo:  (card.querySelector('.pf-titulo') || {}).value || '',
+          desc:    (card.querySelector('.pf-desc') || {}).value || '',
+          data:    (card.querySelector('.pf-data') || {}).value || '',
+          hora:    (card.querySelector('.pf-hora') || {}).value || '',
+          duracao: (card.querySelector('.pf-duracao') || {}).value || ''
+        });
+      });
+      return items;
+    }
+
+    // ── HELPERS DE FORMATAÇÃO (PROGRAMA PDF) ───────────────────────
+    function formatDDMM(dateStr) {
+      if (!dateStr) return '';
+      var parts = dateStr.split('-'); // yyyy-mm-dd
+      if (parts.length !== 3) return dateStr;
+      return parts[2] + '/' + parts[1];
+    }
+
+    function formatHourAMPM(timeStr) {
+      if (!timeStr) return '';
+      var parts = timeStr.split(':');
+      var h = parseInt(parts[0], 10);
+      if (isNaN(h)) return '';
+      var m = parts[1] || '00';
+      var suffix = h >= 12 ? 'P' : 'A';
+      var h12 = h % 12;
+      if (h12 === 0) h12 = 12;
+      return h12 + ':' + m + suffix;
+    }
+
+    function parseDurToSec(str) {
+      if (!str) return 0;
+      var parts = String(str).split(':').map(function(s){ return parseInt(s, 10) || 0; });
+      if (parts.length === 2) return parts[0] * 60 + parts[1];
+      if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      if (parts.length === 1) return parts[0] * 60;
+      return 0;
+    }
+
+    function secToMMSS(sec) {
+      sec = Math.max(0, Math.round(sec));
+      var m = Math.floor(sec / 60);
+      var s = sec % 60;
+      return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    // ── GERAÇÃO DE PDF DO PROGRAMA (réplica do modelo) ──────────────
+    function gerarProgramaPDF() {
+      var congEl = document.getElementById('prod-congregacao');
+      var congLabel = congEl.options[congEl.selectedIndex] ? congEl.options[congEl.selectedIndex].text : '';
+      var dataVal = document.getElementById('prod-data').value;
+
+      if (!congLabel) {
+        alert('Seleciona uma congregação primeiro.');
+        return;
+      }
+
+      var programa  = getProgramaItems();
+      var rehearsal = getGenericFieldItems('rehearsal-list');
+      var outros    = getGenericFieldItems('other-times-list');
+
+      var musicos = [
+        { label: 'Piano',              value: selVal('prod-piano') },
+        { label: 'Guitarra Acústica',  value: selVal('prod-gt-acustica') },
+        { label: 'Guitarra Elétrica',  value: selVal('prod-gt-eletrica') },
+        { label: 'Baixo',              value: selVal('prod-baixo') },
+        { label: 'Bateria',            value: selVal('prod-bateria') }
+      ];
+      var vozes = [
+        { label: 'Back 1', value: selVal('prod-back1') },
+        { label: 'Back 2', value: selVal('prod-back2') },
+        { label: 'Back 3', value: selVal('prod-back3') },
+        { label: 'Back 4', value: selVal('prod-back4') }
+      ];
+      var lider = selVal('prod-dirigente');
+      var tecnica = [
+        { label: 'Técnico de Som',       value: selVal('prod-som') },
+        { label: 'Técnico Online',       value: selVal('prod-online') },
+        { label: 'Técnico Multimédia',   value: selVal('prod-multimédia') }
+      ];
+
+      var { jsPDF } = window.jspdf;
+      var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      var pageW = 210, pageH = 297;
+      var marginOuter = 10;
+      var marginContent = 15;
+      var leftX = marginContent;
+      var rightX = pageW - marginContent;
+      var contentW = rightX - leftX;
+      var maxY = pageH - marginOuter - 12;
+
+      function drawFrame() {
+        doc.setDrawColor(0, 0, 0);
+        doc.setLineWidth(0.4);
+        doc.rect(marginOuter, marginOuter, pageW - marginOuter * 2, pageH - marginOuter * 2);
+      }
+      function newPage() {
+        doc.addPage();
+        drawFrame();
+        return marginContent + 10;
+      }
+
+      drawFrame();
+
+      var y = 22;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(26);
+      doc.setTextColor(0, 0, 0);
+      doc.text(congLabel, pageW / 2, y, { align: 'center' });
+      y += 8;
+
+      var dateLabel = '';
+      if (dataVal) {
+        var d = new Date(dataVal + 'T00:00:00');
+        dateLabel = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+      }
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text(dateLabel, pageW / 2, y, { align: 'center' });
+      y += 12;
+
+      // Colunas
+      var colHoraEnd = leftX + 24;
+      var colDur = colHoraEnd + 2;
+      var colDurEnd = colDur + 16;
+      var colTitulo = colDurEnd + 4;
+      var colAV = leftX + contentW * 0.56;
+      var colBand = leftX + contentW * 0.73;
+      var colPV = rightX;
+      var maxTitleWidth = colAV - colTitulo - 2;
+
+      // Cabeçalho da tabela
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(0, 0, 0);
+      if (programa.length) {
+        var firstLabel = (formatDDMM(dataVal) + ' ' + (programa[0].hora || '')).trim();
+        doc.text(firstLabel, colHoraEnd, y, { align: 'right' });
+      }
+      doc.text('Length', colDur, y);
+      doc.text('in mins', colDur, y + 3.4);
+      doc.text('Audio/Visual', colAV, y);
+      doc.text('Band', colBand, y);
+      doc.text('PersonVocals', colPV, y, { align: 'right' });
+      y += 7;
+
+      // Linhas do programa
+      programa.forEach(function(item, idx) {
+        doc.setFont('helvetica', item.tipo === 'musica' ? 'bolditalic' : 'bold');
+        doc.setFontSize(8.5);
+        var tituloLine = item.titulo || '';
+        if (item.detalhe) tituloLine += '  [ ' + item.detalhe + ' ]';
+        var titleLines = doc.splitTextToSize(tituloLine || ' ', maxTitleWidth);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.3);
+        var notesLines = [];
+        item.notas.forEach(function(n) {
+          notesLines = notesLines.concat(doc.splitTextToSize(n, maxTitleWidth));
+        });
+
+        var extraLines = (titleLines.length - 1) + notesLines.length;
+        var rowH = 9 + extraLines * 3.6;
+        if (rowH < 9) rowH = 9;
+
+        if (y + rowH > maxY) { y = newPage(); }
+
+        var bg = idx % 2 === 0 ? [243, 243, 243] : [255, 255, 255];
+        doc.setFillColor(bg[0], bg[1], bg[2]);
+        doc.rect(leftX, y, contentW, rowH, 'F');
+
+        var textY = y + 5;
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(40, 40, 40);
+        doc.text(item.hora || '', colHoraEnd, textY, { align: 'right' });
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(0, 0, 0);
+        doc.text(item.duracao || '', colDur, textY);
+
+        doc.setFont('helvetica', item.tipo === 'musica' ? 'bolditalic' : 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(item.tipo === 'musica' ? 60 : 0, item.tipo === 'musica' ? 70 : 0, item.tipo === 'musica' ? 130 : 0);
+        titleLines.forEach(function(line, i2) {
+          doc.text(line, colTitulo, textY + 3.6 * i2);
+        });
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.3);
+        doc.setTextColor(70, 70, 70);
+        notesLines.forEach(function(line, i2) {
+          doc.text(line, colTitulo, textY + 3.6 * (titleLines.length + i2));
+        });
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(30, 30, 30);
+        if (item.av) doc.text(doc.splitTextToSize(item.av, colBand - colAV - 2), colAV, textY);
+        if (item.band) doc.text(doc.splitTextToSize(item.band, colPV - colBand - 2), colBand, textY);
+        if (item.person) doc.text(item.person, colPV, textY, { align: 'right' });
+
+        y += rowH;
+      });
+
+      // Linha de totais
+      if (y + 14 > maxY) { y = newPage(); }
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.6);
+      doc.line(leftX, y, rightX, y);
+      y += 5;
+      var totalSec = programa.reduce(function(acc, it) { return acc + parseDurToSec(it.duracao); }, 0);
+      var lastHora = programa.length ? programa[programa.length - 1].hora : '';
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      doc.text(lastHora || '', colHoraEnd, y, { align: 'right' });
+      doc.text(secToMMSS(totalSec), colDur, y);
+      y += 11;
+
+      // Secção inferior em duas colunas
+      if (y + 20 > maxY) { y = newPage(); }
+      var bottomTop = y;
+      var dividerX = leftX + contentW * 0.40;
+      var leftColX = leftX;
+      var rightColX = dividerX + 6;
+      var leftY = bottomTop;
+      var rightY = bottomTop;
+
+      function sectionHeading(x, yy, text) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        doc.text(text, x, yy);
+        return yy + 5;
+      }
+      function entryBoldThenSmall(x, yy, boldText, smallText) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(0, 0, 0);
+        doc.text(boldText, x, yy);
+        yy += 3.8;
+        if (smallText) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7.5);
+          doc.setTextColor(90, 90, 90);
+          doc.text(smallText, x, yy);
+          yy += 4.2;
+        } else {
+          yy += 1;
+        }
+        return yy + 1.5;
+      }
+
+      leftY = sectionHeading(leftColX, leftY, 'Rehearsal Times');
+      rehearsal.forEach(function(it) {
+        var timeLabel = (formatDDMM(it.data) + ' ' + formatHourAMPM(it.hora)).trim();
+        leftY = entryBoldThenSmall(leftColX, leftY, it.titulo || '—', timeLabel);
+      });
+      leftY += 3;
+      leftY = sectionHeading(leftColX, leftY, 'Other Times');
+      outros.forEach(function(it) {
+        var timeLabel = (formatDDMM(it.data) + ' ' + formatHourAMPM(it.hora)).trim();
+        leftY = entryBoldThenSmall(leftColX, leftY, it.titulo || '—', timeLabel);
+      });
+
+      rightY = sectionHeading(rightColX, rightY, 'Audio');
+      tecnica.forEach(function(it) {
+        rightY = entryBoldThenSmall(rightColX, rightY, it.label, it.value || '—');
+      });
+      rightY += 2;
+      rightY = sectionHeading(rightColX, rightY, 'Líder de Louvor');
+      rightY = entryBoldThenSmall(rightColX, rightY, 'Líder', lider || '—');
+      rightY += 2;
+      rightY = sectionHeading(rightColX, rightY, 'Louvor (Vozes)');
+      vozes.forEach(function(it) {
+        rightY = entryBoldThenSmall(rightColX, rightY, it.label, it.value || '—');
+      });
+      rightY += 2;
+      rightY = sectionHeading(rightColX, rightY, 'Louvor (Músicos)');
+      musicos.forEach(function(it) {
+        rightY = entryBoldThenSmall(rightColX, rightY, it.label, it.value || '—');
+      });
+
+      // Divisória pontilhada entre colunas
+      var dividerBottom = Math.max(leftY, rightY);
+      doc.setLineDashPattern([0.6, 0.8], 0);
+      doc.setDrawColor(150, 150, 150);
+      doc.setLineWidth(0.2);
+      doc.line(dividerX, bottomTop - 4, dividerX, dividerBottom);
+      doc.setLineDashPattern([], 0);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(140, 140, 140);
+      doc.text('AD Setúbal — Documento gerado automaticamente', pageW / 2, pageH - marginOuter - 4, { align: 'center' });
+
+      var fname = 'programa-' + congLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + (dataVal || new Date().toISOString().slice(0, 10)) + '.pdf';
+      doc.save(fname);
     }
   </script>
 </html>
