@@ -199,7 +199,30 @@
       margin-top: 1rem; text-transform: uppercase;
     }
 
-    /* ── RESPONSIVE ───────────────────────────── */
+    /* ── PROD FIELD CARD ──────────────────────────── */
+    .prod-field-card {
+      background: rgba(255,255,255,0.03);
+      border: 1.5px solid rgba(255,255,255,0.08);
+      padding: 1.25rem 1.5rem;
+      position: relative;
+    }
+    .prod-field-card .pfc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.9rem;
+    }
+    .prod-field-card .pfc-full { grid-column: 1 / -1; }
+    .prod-field-card .pfc-remove {
+      position: absolute; top: 0.75rem; right: 1rem;
+      background: none; border: none;
+      color: rgba(255,255,255,0.22);
+      font-size: 1rem; cursor: pointer;
+      transition: color 0.2s;
+      font-family: 'Barlow Condensed', sans-serif;
+    }
+    .prod-field-card .pfc-remove:hover { color: #f87171; }
+
+    /* ── RESPONSIVE ───────────────────────────────── */
     @media (max-width: 900px) {
       .dash-wrap { grid-template-columns: 1fr; padding-top: 60px; }
       .dash-sidebar {
@@ -245,6 +268,12 @@
           <a href="#" onclick="switchTab('escala', this); return false;">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
             Criação de Escala
+          </a>
+        </li>
+        <li>
+          <a href="#" onclick="switchTab('producao', this); return false;">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 8h.01M12 8h.01"/><circle cx="17" cy="8" r="1"/></svg>
+            Produção
           </a>
         </li>
       </ul>
@@ -557,10 +586,175 @@
             </div>
           </form>
         </div>
-      </div>
+      </div><!-- end tab-escala -->
 
-    </main>
-  </div>
+      <!-- TAB: PRODUÇÃO -->
+      <div class="tab-panel" id="tab-producao">
+        <div class="panel-header">
+          <span class="eyebrow">Equipa Técnica</span>
+          <h1 class="panel-title">Produção</h1>
+          <p class="panel-desc">Preenche os detalhes da equipa de produção para cada culto. Uma pessoa selecionada numa área fica indisponível nas restantes.</p>
+        </div>
+
+        <div class="form-card" style="max-width:860px;">
+          <p class="form-card-title">Ficha de Produção</p>
+          <p class="form-card-sub">Seleciona a congregação e a data antes de atribuir as funções.</p>
+
+          <!-- CONGREGAÇÃO + DATA -->
+          <p class="f-section">Identificação</p>
+          <div class="f-row">
+            <div class="f-group">
+              <label class="f-label" for="prod-congregacao">Congregação *</label>
+              <select class="f-select" id="prod-congregacao" required>
+                <option value="">Seleciona a congregação…</option>
+                <optgroup label="Distrito de Setúbal">
+                  <option>Setúbal — Sede</option>
+                  <option>Barreiro</option>
+                  <option>Pinhal Novo</option>
+                  <option>Moita</option>
+                  <option>Aires (Palmela)</option>
+                  <option>Montijo</option>
+                  <option>Alcochete</option>
+                </optgroup>
+                <optgroup label="Área de Missão Beja">
+                  <option>Beja</option>
+                  <option>Vidigueira</option>
+                  <option>Ermidas</option>
+                  <option>Alvalade do Sado</option>
+                  <option>Ferreira do Alentejo</option>
+                  <option>Ervidel</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="f-group">
+              <label class="f-label" for="prod-data">Data *</label>
+              <input class="f-input" type="date" id="prod-data" required />
+            </div>
+          </div>
+
+          <!-- EQUIPA DE LOUVOR (same pattern as escala tab) -->
+          <p class="f-section">Equipa de Louvor</p>
+          <div class="f-row">
+            <div class="f-group">
+              <label class="f-label">Piano</label>
+              <select class="f-select prod-select" id="prod-piano" data-pgroup="louvor" onchange="onProdChange()">
+                <option value="">— Ninguém —</option>
+                <option>Maria Catarina</option><option>João Amaral</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label class="f-label">Guitarra Acústica</label>
+              <select class="f-select prod-select" id="prod-gt-acustica" data-pgroup="louvor" onchange="onProdChange()">
+                <option value="">— Ninguém —</option>
+                <option>David Lucero</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label class="f-label">Guitarra Elétrica</label>
+              <select class="f-select prod-select" id="prod-gt-eletrica" data-pgroup="louvor" onchange="onProdChange()">
+                <option value="">— Ninguém —</option>
+                <option>David Lucero</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label class="f-label">Baixo</label>
+              <select class="f-select prod-select" id="prod-baixo" data-pgroup="louvor" onchange="onProdChange()">
+                <option value="">— Ninguém —</option>
+                <option>Arão Caville</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label class="f-label">Bateria</label>
+              <select class="f-select prod-select" id="prod-bateria" data-pgroup="louvor" onchange="onProdChange()">
+                <option value="">— Ninguém —</option>
+                <option>João Amaral</option><option>Arão Caville</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label class="f-label">Dirigente</label>
+              <select class="f-select prod-select" id="prod-dirigente" data-pgroup="louvor" onchange="onProdChange()">
+                <option value="">— Ninguém —</option>
+                <option>Marta Lucero</option><option>Raquel Sousa</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label class="f-label">Back 1</label>
+              <select class="f-select prod-select" id="prod-back1" data-pgroup="louvor" onchange="onProdChange()">
+                <option value="">— Ninguém —</option>
+                <option>Ana Maria</option><option>Macarena Caville</option><option>David Lucero</option><option>Marta Lucero</option><option>Raquel Sousa</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label class="f-label">Back 2</label>
+              <select class="f-select prod-select" id="prod-back2" data-pgroup="louvor" onchange="onProdChange()">
+                <option value="">— Ninguém —</option>
+                <option>Ana Maria</option><option>Macarena Caville</option><option>David Lucero</option><option>Marta Lucero</option><option>Raquel Sousa</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label class="f-label">Back 3</label>
+              <select class="f-select prod-select" id="prod-back3" data-pgroup="louvor" onchange="onProdChange()">
+                <option value="">— Ninguém —</option>
+                <option>Ana Maria</option><option>Macarena Caville</option><option>David Lucero</option><option>Marta Lucero</option><option>Raquel Sousa</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label class="f-label">Back 4</label>
+              <select class="f-select prod-select" id="prod-back4" data-pgroup="louvor" onchange="onProdChange()">
+                <option value="">— Ninguém —</option>
+                <option>Ana Maria</option><option>Macarena Caville</option><option>David Lucero</option><option>Marta Lucero</option><option>Raquel Sousa</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- SOM -->
+          <p class="f-section">Som</p>
+          <div class="f-row">
+            <div class="f-group">
+              <label class="f-label">Técnico de Som</label>
+              <select class="f-select prod-select" id="prod-som" data-pgroup="tecnica" onchange="onProdChange()">
+                <option value="">— Ninguém —</option>
+                <option>Tito Lucero</option><option>Paulo Sacramento</option><option>Enzo Trega</option><option>Edmanuel</option><option>Samuel de Andrade</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ONLINE / TRANSMISSÃO -->
+          <p class="f-section">Online (Transmissão em Direto)</p>
+          <div class="f-row">
+            <div class="f-group">
+              <label class="f-label">Técnico Online</label>
+              <select class="f-select prod-select" id="prod-online" data-pgroup="tecnica" onchange="onProdChange()">
+                <option value="">— Ninguém —</option>
+                <option>Tito Lucero</option><option>Paulo Sacramento</option><option>Enzo Trega</option><option>Edmanuel</option><option>Samuel de Andrade</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- MULTIMÉDIA -->
+          <p class="f-section">Multimédia</p>
+          <div class="f-row">
+            <div class="f-group">
+              <label class="f-label">Técnico Multimédia</label>
+              <select class="f-select prod-select" id="prod-multimédia" data-pgroup="tecnica" onchange="onProdChange()">
+                <option value="">— Ninguém —</option>
+                <option>Tito Lucero</option><option>Paulo Sacramento</option><option>Enzo Trega</option><option>Edmanuel</option><option>Samuel de Andrade</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- REHEARSAL TIMES -->
+          <p class="f-section">Rehearsal Times</p>
+          <div id="rehearsal-list" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
+          <button class="f-submit" type="button" style="margin-top:0;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12);font-size:0.75rem;padding:0.7rem 1.5rem;" onclick="addProdField('rehearsal-list')">+ Adicionar Campo</button>
+
+          <!-- OTHER TIMES -->
+          <p class="f-section" style="margin-top:2rem;">Other Times</p>
+          <div id="other-times-list" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
+          <button class="f-submit" type="button" style="margin-top:0;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12);font-size:0.75rem;padding:0.7rem 1.5rem;" onclick="addProdField('other-times-list')">+ Adicionar Campo</button>
+
+        </div>
+      </div><!-- end tab-producao -->
 
   <script src="shared.js"></script>
   <script>
@@ -921,6 +1115,78 @@
       btn.textContent = 'Enviar Escala';
       btn.disabled = false;
     }
+    // ── PRODUÇÃO: EXCLUSÃO CRUZADA ─────────────────────────────────
+    // Som, Online, Multimédia share the same pool — a person selected in one
+    // cannot be selected in another.
+    var PROD_TECNICA_IDS = ['prod-som', 'prod-online', 'prod-multimédia'];
+
+    function onProdChange() {
+      // Collect used values in the tecnica group
+      var usedTecnica = new Set();
+      PROD_TECNICA_IDS.forEach(function(id) {
+        var v = document.getElementById(id).value;
+        if (v) usedTecnica.add(v);
+      });
+
+      // Re-render disabled state for each tecnica select
+      PROD_TECNICA_IDS.forEach(function(id) {
+        var sel = document.getElementById(id);
+        var cur = sel.value;
+        Array.from(sel.options).forEach(function(opt) {
+          if (!opt.value) return;
+          opt.disabled = usedTecnica.has(opt.value) && opt.value !== cur;
+        });
+      });
+    }
+
+    // ── PRODUÇÃO: ADICIONAR CAMPO DINÂMICO ────────────────────────
+    var prodFieldCounter = 0;
+
+    function addProdField(containerId) {
+      prodFieldCounter++;
+      var id = 'pfc-' + prodFieldCounter;
+      var card = document.createElement('div');
+      card.className = 'prod-field-card';
+      card.id = id;
+      card.innerHTML =
+        '<button class="pfc-remove" type="button" onclick="removeProdField(\'' + id + '\')" title="Remover">✕</button>' +
+        '<div class="pfc-grid">' +
+          '<div class="f-group pfc-full">' +
+            '<label class="f-label">Título</label>' +
+            '<input class="f-input" type="text" placeholder="Ex.: Soundcheck Músicos" />' +
+          '</div>' +
+          '<div class="f-group pfc-full">' +
+            '<label class="f-label">Descrição</label>' +
+            '<input class="f-input" type="text" placeholder="Descrição opcional" />' +
+          '</div>' +
+          '<div class="f-group">' +
+            '<label class="f-label">Data</label>' +
+            '<input class="f-input" type="date" />' +
+          '</div>' +
+          '<div class="f-group">' +
+            '<label class="f-label">Hora</label>' +
+            '<input class="f-input" type="time" />' +
+          '</div>' +
+          '<div class="f-group">' +
+            '<label class="f-label">Duração (min)</label>' +
+            '<input class="f-input" type="number" min="0" placeholder="Ex.: 60" />' +
+          '</div>' +
+          '<div class="f-group">' +
+            '<label class="f-label">Link</label>' +
+            '<input class="f-input" type="url" placeholder="https://…" />' +
+          '</div>' +
+          '<div class="f-group pfc-full">' +
+            '<label class="f-label">Ficheiro</label>' +
+            '<input class="f-input" type="file" style="padding:0.6rem 1rem;cursor:pointer;" />' +
+          '</div>' +
+        '</div>';
+
+      document.getElementById(containerId).appendChild(card);
+    }
+
+    function removeProdField(id) {
+      var el = document.getElementById(id);
+      if (el) el.remove();
+    }
   </script>
-</body>
 </html>
