@@ -19,8 +19,8 @@ const pages = [
   { href: 'galeria.html', label: 'Galeria' },
   { href: 'contacto.html', label: 'Contacto' },
   { href: 'oferta.html', label: 'Oferta', cta: true },
+  { href: 'login.html', label: '&#9679; Área Reservada', reserved: true },
 ];
-
 const LOGO = 'logo.png';
 
 function buildNavItem(p) {
@@ -42,6 +42,7 @@ function buildNavItem(p) {
       </li>`;
   }
 
+  if (p.reserved) return `<li><a href="${p.href}" class="nav-reserved${active}">${p.label}</a></li>`;
   if (p.cta) return `<li><a href="${p.href}" class="nav-cta${active}">${p.label}</a></li>`;
   return `<li><a href="${p.href}" class="${active.trim()}">${p.label}</a></li>`;
 }
@@ -108,8 +109,6 @@ function buildFooter() {
           <p>Rua Almeida Garrett, n.º 47-49</p>
           <p>Setúbal, Portugal</p>
           <p style="margin-top:0.6rem;"><a href="mailto:info@adsetubal.pt" style="color:rgba(255,255,255,0.4);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#29A8AB'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">info@adsetubal.pt</a></p>
-          <p style="margin-top:0.6rem;"><a href="tel:+351961376094" style="color:rgba(255,255,255,0.4);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#29A8AB'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">961 376 094</a></p>
-
         </div>
       </div>
       <div>
