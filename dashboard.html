@@ -5,14 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | AD Setúbal</title>
   <link rel="stylesheet" href="shared.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body { background: var(--dark); min-height: 100vh; }
 
     /* ── LAYOUT ───────────────────────────────── */
     .dash-wrap {
       display: grid;
-      grid-template-columns: 260px 1fr;
+      grid-template-columns: 240px 1fr;
       min-height: 100vh;
       padding-top: 68px;
     }
@@ -50,32 +49,8 @@
     .sidebar-nav li a.active { color: var(--teal); border-left-color: var(--teal); background: rgba(41,168,171,0.06); }
     .sidebar-nav li a svg { width: 16px; height: 16px; stroke: currentColor; flex-shrink: 0; }
 
-    .sidebar-user {
-      margin-top: auto;
-      padding: 1.5rem 1.8rem;
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-    .sidebar-user-email {
-      font-size: 0.8rem; color: rgba(255,255,255,0.35);
-      margin-bottom: 0.8rem; word-break: break-all;
-    }
-    .logout-btn {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 0.72rem; font-weight: 700;
-      letter-spacing: 0.16em; text-transform: uppercase;
-      color: rgba(255,255,255,0.3); background: none;
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 0.45rem 1rem; cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
-      width: 100%;
-    }
-    .logout-btn:hover { color: #f87171; border-color: rgba(248,113,113,0.4); }
-
     /* ── MAIN CONTENT ─────────────────────────── */
-    .dash-main {
-      padding: 3rem;
-      overflow-y: auto;
-    }
+    .dash-main { padding: 3rem; overflow-y: auto; }
 
     /* ── TAB PANELS ───────────────────────────── */
     .tab-panel { display: none; }
@@ -94,10 +69,7 @@
 
     /* ── WELCOME PANEL ────────────────────────── */
     .welcome-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: rgba(255,255,255,0.06); margin-bottom: 2rem; }
-    .welcome-stat {
-      background: var(--dark2);
-      padding: 2rem 1.8rem;
-    }
+    .welcome-stat { background: var(--dark2); padding: 2rem 1.8rem; }
     .welcome-stat-val {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 2.8rem; font-weight: 900; color: var(--teal);
@@ -113,12 +85,12 @@
     }
     .welcome-notice strong { color: #fff; font-weight: 600; }
 
-    /* ── FORM (Pedido de Conteúdo) ────────────── */
+    /* ── FORMULÁRIO ───────────────────────────── */
     .form-card {
       background: var(--dark2);
       border: 1px solid rgba(255,255,255,0.07);
       padding: 2.5rem;
-      max-width: 720px;
+      max-width: 760px;
     }
     .form-card-title {
       font-family: 'Barlow Condensed', sans-serif;
@@ -128,14 +100,25 @@
     }
     .form-card-sub { font-size: 0.88rem; color: rgba(255,255,255,0.38); margin-bottom: 2rem; line-height: 1.65; }
 
-    .f-group { margin-bottom: 1.2rem; }
+    /* Separador de secção dentro do formulário */
+    .f-section {
+      margin: 2rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.24em; text-transform: uppercase;
+      color: var(--teal);
+    }
+
+    .f-group { margin-bottom: 1.3rem; }
     .f-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .f-label {
       display: block;
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 0.65rem; font-weight: 700;
       letter-spacing: 0.18em; text-transform: uppercase;
-      color: rgba(255,255,255,0.35); margin-bottom: 0.5rem;
+      color: rgba(255,255,255,0.35); margin-bottom: 0.7rem;
     }
     .f-input, .f-select, .f-textarea {
       width: 100%; padding: 0.82rem 1rem;
@@ -148,9 +131,42 @@
     }
     .f-input::placeholder, .f-textarea::placeholder { color: rgba(255,255,255,0.18); }
     .f-input:focus, .f-select:focus, .f-textarea:focus { border-color: var(--teal); }
-    .f-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2329A8AB' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
+    .f-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2329A8AB' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 1rem center;
+      padding-right: 2.5rem; cursor: pointer;
+    }
     .f-select option { background: var(--dark2); color: #fff; }
-    .f-textarea { resize: vertical; min-height: 120px; }
+    .f-textarea { resize: vertical; min-height: 110px; }
+
+    /* Checkboxes / radio em grelha */
+    .f-check-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+    .f-check-item {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .f-check-item:hover { border-color: rgba(41,168,171,0.4); background: rgba(41,168,171,0.04); }
+    .f-check-item input[type="checkbox"],
+    .f-check-item input[type="radio"] {
+      width: 16px; height: 16px;
+      accent-color: var(--teal);
+      flex-shrink: 0; cursor: pointer;
+    }
+    .f-check-item input:checked ~ .f-check-label { color: #fff; }
+    .f-check-item:has(input:checked) { border-color: var(--teal); background: rgba(41,168,171,0.07); }
+    .f-check-label {
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.9rem; color: rgba(255,255,255,0.55);
+      font-weight: 400; transition: color 0.2s;
+    }
+
+    /* Campo "informações adicionais" oculto por defeito */
+    .extra-info-wrap { display: none; margin-top: 0.8rem; }
+
+    /* Botão de envio */
     .f-submit {
       padding: 0.95rem 2.5rem;
       background: var(--teal); color: #fff;
@@ -158,10 +174,11 @@
       font-size: 0.82rem; font-weight: 700;
       letter-spacing: 0.2em; text-transform: uppercase;
       cursor: pointer; transition: background 0.2s;
-      margin-top: 0.5rem;
+      margin-top: 1.5rem;
     }
     .f-submit:hover { background: var(--orange); }
     .f-submit:disabled { background: rgba(255,255,255,0.1); cursor: not-allowed; }
+
     .f-success {
       display: none; padding: 1rem 1.2rem;
       border-left: 3px solid var(--teal);
@@ -184,26 +201,23 @@
     /* ── RESPONSIVE ───────────────────────────── */
     @media (max-width: 900px) {
       .dash-wrap { grid-template-columns: 1fr; padding-top: 60px; }
-      .dash-sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; padding: 1rem; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+      .dash-sidebar {
+        position: static; height: auto;
+        flex-direction: row; flex-wrap: wrap;
+        padding: 0.8rem 1rem; border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+      }
       .sidebar-section-label { display: none; }
       .sidebar-nav { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0; }
-      .sidebar-nav li a { padding: 0.5rem 1rem; border-left: none; border-bottom: 2px solid transparent; font-size: 0.8rem; }
+      .sidebar-nav li a {
+        padding: 0.5rem 1rem; border-left: none;
+        border-bottom: 2px solid transparent; font-size: 0.8rem;
+      }
       .sidebar-nav li a.active { border-bottom-color: var(--teal); border-left-color: transparent; }
-      .sidebar-user { padding: 0.8rem 1rem; border-top: none; border-left: 1px solid rgba(255,255,255,0.06); margin-top: 0; }
       .dash-main { padding: 2rem 1.2rem; }
       .welcome-grid { grid-template-columns: 1fr 1fr; }
       .f-row { grid-template-columns: 1fr; }
     }
-
-    /* Nav reserved link style (injected via shared.js) */
-    .nav-reserved {
-      font-size: 0.75rem !important;
-      color: rgba(255,255,255,0.45) !important;
-      border: 1px solid rgba(255,255,255,0.12) !important;
-      padding: 0.35rem 0.9rem !important;
-    }
-    .nav-reserved:hover { border-color: var(--teal) !important; color: var(--teal) !important; }
-    nav.light-nav .nav-reserved { color: rgba(0,0,0,0.45) !important; border-color: rgba(0,0,0,0.15) !important; }
   </style>
 </head>
 <body>
@@ -215,23 +229,18 @@
       <p class="sidebar-section-label">Menu</p>
       <ul class="sidebar-nav">
         <li>
-          <a href="#" class="active" data-tab="inicio" onclick="switchTab('inicio', this)">
+          <a href="#" class="active" onclick="switchTab('inicio', this); return false;">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
             Início
           </a>
         </li>
         <li>
-          <a href="#" data-tab="pedido-conteudo" onclick="switchTab('pedido-conteudo', this)">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+          <a href="#" onclick="switchTab('pedido-conteudo', this); return false;">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             Pedido de Conteúdo
           </a>
         </li>
       </ul>
-
-      <div class="sidebar-user">
-        <p class="sidebar-user-email" id="user-email">—</p>
-        <button class="logout-btn" onclick="handleLogout()">Terminar Sessão</button>
-      </div>
     </aside>
 
     <!-- MAIN -->
@@ -241,8 +250,8 @@
       <div class="tab-panel active" id="tab-inicio">
         <div class="panel-header">
           <span class="eyebrow">Dashboard</span>
-          <h1 class="panel-title">Bem-vindo,<br><span id="welcome-name" style="color:var(--teal);">—</span></h1>
-          <p class="panel-desc">Área reservada à equipa da AD Setúbal. Usa o menu lateral para navegar.</p>
+          <h1 class="panel-title">Bem-vindo,<br><span style="color:var(--teal);">AD Setúbal</span></h1>
+          <p class="panel-desc">Área da equipa AD Setúbal. Usa o menu lateral para navegar.</p>
         </div>
         <div class="welcome-grid">
           <div class="welcome-stat">
@@ -268,50 +277,159 @@
         <div class="panel-header">
           <span class="eyebrow">Formulário</span>
           <h1 class="panel-title">Pedido de<br>Conteúdo</h1>
-          <p class="panel-desc">Preenche o formulário abaixo para solicitar publicações, alterações ou novos conteúdos. O pedido será enviado por email à equipa responsável.</p>
+          <p class="panel-desc">Preenche o formulário para solicitar cartazes, imagens ou vídeos. O pedido será enviado à equipa responsável.</p>
         </div>
 
         <div class="form-card">
           <p class="form-card-title">Novo Pedido</p>
-          <p class="form-card-sub">Todos os campos marcados são obrigatórios. O teu email de sessão é incluído automaticamente.</p>
+          <p class="form-card-sub">Todos os campos são obrigatórios, salvo indicação contrária.</p>
 
-          <!-- Formspree endpoint: substitui SUBSTITUI_AQUI pelo teu form ID -->
-          <form id="content-form" action="https://formspree.io/f/mzdqnrzk" method="POST" onsubmit="handleContentSubmit(event)">
-
-            <!-- Campo oculto com email do utilizador autenticado -->
+          <form id="content-form" action="https://formspree.io/f/mzdqnrzk" method="POST" onsubmit="handleSubmit(event)">
             <input type="hidden" name="_subject" value="Pedido de Conteúdo — AD Setúbal" />
-            <input type="hidden" name="email_remetente" id="form-user-email" value="" />
 
-            <!-- ── AS PERGUNTAS DO FORMULÁRIO VÃO AQUI ── -->
-            <!-- Exemplo de estrutura a usar:
-
+            <!-- 1. FINALIDADE -->
+            <p class="f-section">1 — Finalidade do Evento</p>
             <div class="f-group">
-              <label class="f-label">Pergunta *</label>
-              <input class="f-input" type="text" name="nome_campo" placeholder="..." required />
+              <label class="f-label">Este evento é para que finalidade? *</label>
+              <div class="f-check-grid">
+                <label class="f-check-item">
+                  <input type="checkbox" name="finalidade" value="AD Setúbal (Geral)">
+                  <span class="f-check-label">AD Setúbal (Geral)</span>
+                </label>
+                <label class="f-check-item">
+                  <input type="checkbox" name="finalidade" value="Connect">
+                  <span class="f-check-label">Connect</span>
+                </label>
+              </div>
             </div>
 
+            <!-- 2. ÂMBITO -->
+            <p class="f-section">2 — Âmbito</p>
             <div class="f-group">
-              <label class="f-label">Select</label>
-              <select class="f-select" name="nome_campo">
-                <option value="">Seleciona...</option>
-                <option>Opção A</option>
+              <label class="f-label">Este evento é: *</label>
+              <div class="f-check-grid">
+                <label class="f-check-item">
+                  <input type="radio" name="ambito" value="Geral" required>
+                  <span class="f-check-label">Geral</span>
+                </label>
+                <label class="f-check-item">
+                  <input type="radio" name="ambito" value="Local">
+                  <span class="f-check-label">Local</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- 3. CONGREGAÇÃO -->
+            <p class="f-section">3 — Congregação</p>
+            <div class="f-group">
+              <label class="f-label" for="congregacao">Indica a congregação *</label>
+              <select class="f-select" name="congregacao" id="congregacao" required>
+                <option value="">Seleciona a congregação…</option>
+                <optgroup label="Distrito de Setúbal">
+                  <option>Setúbal — Sede</option>
+                  <option>Barreiro</option>
+                  <option>Pinhal Novo</option>
+                  <option>Moita</option>
+                  <option>Aires (Palmela)</option>
+                  <option>Montijo</option>
+                  <option>Alcochete</option>
+                </optgroup>
+                <optgroup label="Área de Missão Beja">
+                  <option>Beja</option>
+                  <option>Vidigueira</option>
+                  <option>Ermidas</option>
+                  <option>Alvalade do Sado</option>
+                  <option>Ferreira do Alentejo</option>
+                  <option>Ervidel</option>
+                </optgroup>
+                <option>Todas as congregações</option>
               </select>
             </div>
 
+            <!-- 4. TIPO DE CONTEÚDO -->
+            <p class="f-section">4 — Conteúdo Necessário</p>
             <div class="f-group">
-              <label class="f-label">Textarea</label>
-              <textarea class="f-textarea" name="nome_campo" placeholder="..."></textarea>
+              <label class="f-label">Que conteúdo precisas? (podes escolher mais do que uma opção) *</label>
+              <div class="f-check-grid">
+                <label class="f-check-item">
+                  <input type="checkbox" name="conteudo" value="Cartaz Anúncio">
+                  <span class="f-check-label">Cartaz Anúncio</span>
+                </label>
+                <label class="f-check-item">
+                  <input type="checkbox" name="conteudo" value="Cartaz Bem-Vindo">
+                  <span class="f-check-label">Cartaz "Bem-Vindo"</span>
+                </label>
+                <label class="f-check-item">
+                  <input type="checkbox" name="conteudo" value="Imagem Facebook/Instagram">
+                  <span class="f-check-label">Imagem de Facebook/Instagram</span>
+                </label>
+                <label class="f-check-item">
+                  <input type="checkbox" name="conteudo" value="Story Facebook/Instagram">
+                  <span class="f-check-label">Story de Facebook/Instagram</span>
+                </label>
+                <label class="f-check-item">
+                  <input type="checkbox" name="conteudo" value="Vídeo Redes Sociais">
+                  <span class="f-check-label">Vídeo (Redes Sociais)</span>
+                </label>
+                <label class="f-check-item">
+                  <input type="checkbox" name="conteudo" value="Vídeo Projeção">
+                  <span class="f-check-label">Vídeo Projeção</span>
+                </label>
+              </div>
             </div>
 
-            -->
+            <!-- 5. DETALHES DO EVENTO -->
+            <p class="f-section">5 — Detalhes do Evento</p>
+            <div class="f-group">
+              <label class="f-label" for="tema">Tema *</label>
+              <input class="f-input" type="text" name="tema" id="tema" placeholder="Ex.: Conferência de Jovens, Culto de Páscoa…" required />
+            </div>
 
-            <div class="f-group" style="background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);padding:2rem;text-align:center;">
-              <p style="font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.25);">As perguntas do formulário serão adicionadas aqui</p>
+            <div class="f-row">
+              <div class="f-group">
+                <label class="f-label" for="data-evento">Data do Evento *</label>
+                <input class="f-input" type="date" name="data_evento" id="data-evento" required />
+              </div>
+              <div class="f-group">
+                <label class="f-label" for="hora-evento">Hora do Evento *</label>
+                <input class="f-input" type="time" name="hora_evento" id="hora-evento" required />
+              </div>
+            </div>
+
+            <div class="f-group">
+              <label class="f-label" for="local-evento">Local *</label>
+              <input class="f-input" type="text" name="local" id="local-evento" placeholder="Ex.: Igreja Sede, Setúbal" required />
+            </div>
+
+            <!-- 6. DATA DE DIVULGAÇÃO -->
+            <p class="f-section">6 — Divulgação</p>
+            <div class="f-group">
+              <label class="f-label" for="data-divulgacao">Qual a data que pretendes divulgar o evento? *</label>
+              <input class="f-input" type="date" name="data_divulgacao" id="data-divulgacao" required />
+            </div>
+
+            <!-- 7. INFORMAÇÕES ADICIONAIS -->
+            <p class="f-section">7 — Informações Adicionais</p>
+            <div class="f-group">
+              <label class="f-label">Tens informações adicionais?</label>
+              <div class="f-check-grid">
+                <label class="f-check-item">
+                  <input type="radio" name="tem_info_adicional" value="Não" checked onchange="toggleExtraInfo(this)">
+                  <span class="f-check-label">Não</span>
+                </label>
+                <label class="f-check-item">
+                  <input type="radio" name="tem_info_adicional" value="Sim" onchange="toggleExtraInfo(this)">
+                  <span class="f-check-label">Sim</span>
+                </label>
+              </div>
+              <div class="extra-info-wrap" id="extra-info-wrap">
+                <textarea class="f-textarea" name="info_adicional" id="info-adicional" placeholder="Escreve aqui as informações adicionais que queres incluir no conteúdo…"></textarea>
+              </div>
             </div>
 
             <button class="f-submit" type="submit" id="content-submit">Enviar Pedido</button>
-            <div class="f-success" id="content-success">✓ Pedido enviado com sucesso.</div>
-            <div class="f-error" id="content-error">✗ Erro ao enviar. Tenta novamente.</div>
+            <div class="f-success" id="content-success">✓ Pedido enviado com sucesso. A equipa entrará em contacto em breve.</div>
+            <div class="f-error" id="content-error">✗ Erro ao enviar. Verifica a ligação e tenta novamente.</div>
           </form>
         </div>
       </div>
@@ -321,61 +439,40 @@
 
   <script src="shared.js"></script>
   <script>
-    // ── SUPABASE CONFIG ──────────────────────────────────────────────
-    // Usa os mesmos valores do login.html
-    const SUPABASE_URL  = 'https://dfdvgcfpkqpydffocjcd.supabase.co';
-    const SUPABASE_ANON = 'sb_publishable_4DqvbbbtCZS86y96QijrHA_DWJAZzvY';
-    // ────────────────────────────────────────────────────────────────
-
-    const { createClient } = supabase;
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
-
-    // Verificar sessão ao carregar — redireciona se não estiver autenticado
-    sb.auth.getSession().then(({ data }) => {
-      if (!data.session) {
-        window.location.href = 'login.html';
-        return;
-      }
-      const user = data.session.user;
-      const email = user.email || '';
-      const name  = email.split('@')[0];
-
-      document.getElementById('user-email').textContent  = email;
-      document.getElementById('welcome-name').textContent = name;
-      document.getElementById('form-user-email').value   = email;
-    });
-
-    // ── TAB SWITCHING ────────────────────────────────────────────────
+    // ── NAVEGAÇÃO ENTRE TABS ────────────────────────────────────────
     function switchTab(tabId, linkEl) {
-      // Hide all panels
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      // Deactivate all nav links
       document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
-      // Show target panel
       document.getElementById('tab-' + tabId).classList.add('active');
-      // Activate clicked link
       if (linkEl) linkEl.classList.add('active');
-      return false;
     }
 
-    // ── LOGOUT ───────────────────────────────────────────────────────
-    async function handleLogout() {
-      await sb.auth.signOut();
-      window.location.href = 'login.html';
+    // ── INFORMAÇÕES ADICIONAIS ─────────────────────────────────────
+    function toggleExtraInfo(radio) {
+      var wrap = document.getElementById('extra-info-wrap');
+      var textarea = document.getElementById('info-adicional');
+      if (radio.value === 'Sim') {
+        wrap.style.display = 'block';
+        textarea.required = true;
+      } else {
+        wrap.style.display = 'none';
+        textarea.required = false;
+        textarea.value = '';
+      }
     }
 
-    // ── CONTENT FORM SUBMIT ──────────────────────────────────────────
-    async function handleContentSubmit(e) {
+    // ── ENVIO DO FORMULÁRIO ────────────────────────────────────────
+    async function handleSubmit(e) {
       e.preventDefault();
-      var form    = e.target;
-      var btn     = document.getElementById('content-submit');
+      var form = e.target;
+      var btn = document.getElementById('content-submit');
       var successEl = document.getElementById('content-success');
-      var errorEl   = document.getElementById('content-error');
+      var errorEl = document.getElementById('content-error');
 
-      btn.textContent = 'A enviar...';
+      btn.textContent = 'A enviar…';
       btn.disabled = true;
       successEl.style.display = 'none';
-      errorEl.style.display   = 'none';
+      errorEl.style.display = 'none';
 
       try {
         var res = await fetch(form.action, {
@@ -383,15 +480,11 @@
           body: new FormData(form),
           headers: { 'Accept': 'application/json' }
         });
-
         if (res.ok) {
           successEl.style.display = 'block';
           form.reset();
-          // Repõe o email oculto após reset
-          sb.auth.getSession().then(({ data }) => {
-            if (data.session) document.getElementById('form-user-email').value = data.session.user.email;
-          });
-          setTimeout(function() { successEl.style.display = 'none'; }, 6000);
+          document.getElementById('extra-info-wrap').style.display = 'none';
+          setTimeout(function() { successEl.style.display = 'none'; }, 7000);
         } else {
           errorEl.style.display = 'block';
         }
