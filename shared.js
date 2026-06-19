@@ -19,7 +19,6 @@ const pages = [
   { href: 'galeria.html', label: 'Galeria' },
   { href: 'contacto.html', label: 'Contacto' },
   { href: 'oferta.html', label: 'Oferta', cta: true },
-  { href: 'login.html', label: '&#9679; Área Reservada', reserved: true },
 ];
 const LOGO = 'logo.png';
 
