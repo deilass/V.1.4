@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | AD Setúbal</title>
   <link rel="stylesheet" href="shared.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { background: var(--dark); min-height: 100vh; }
 
@@ -548,7 +549,12 @@
                 </div>
               </div>
 
-              <button class="f-submit" type="submit" id="escala-submit">Enviar Escala</button>
+              <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem;">
+                <button class="f-submit" type="button" id="escala-pdf-btn" onclick="gerarEscalaPDF()" style="margin-top:0;background:var(--dark);border:1.5px solid rgba(255,255,255,0.15);">
+                  ↓ Gerar PDF
+                </button>
+                <button class="f-submit" type="submit" id="escala-submit" style="margin-top:0;">Enviar Escala</button>
+              </div>
               <div class="f-success" id="escala-success">✓ Escala enviada com sucesso.</div>
               <div class="f-error" id="escala-error">✗ Erro ao enviar. Tenta novamente.</div>
             </div>
@@ -733,6 +739,154 @@
       refreshGroup(VOZ_MAP, usedVozes);
     }
 
+    // ── RECOLHA DOS VALORES DA ESCALA ─────────────────────────────
+    function getEscalaValues() {
+      var cong = document.getElementById('esc-congregacao');
+      var congLabel = cong.options[cong.selectedIndex] ? cong.options[cong.selectedIndex].text : '';
+      return {
+        congregacao: congLabel,
+        instrumentos: {
+          'Piano':             document.getElementById('esc-piano').value,
+          'Guitarra Acústica': document.getElementById('esc-gt-acustica').value,
+          'Guitarra Elétrica': document.getElementById('esc-gt-eletrica').value,
+          'Baixo':             document.getElementById('esc-baixo').value,
+          'Bateria':           document.getElementById('esc-bateria').value
+        },
+        vozes: {
+          'Dirigente': document.getElementById('esc-dirigente').value,
+          'Back 1':    document.getElementById('esc-back1').value,
+          'Back 2':    document.getElementById('esc-back2').value,
+          'Back 3':    document.getElementById('esc-back3').value,
+          'Back 4':    document.getElementById('esc-back4').value
+        }
+      };
+    }
+
+    // ── GERAÇÃO DE PDF ─────────────────────────────────────────────
+    function gerarEscalaPDF() {
+      var data = getEscalaValues();
+      if (!data.congregacao) {
+        alert('Seleciona uma congregação primeiro.');
+        return;
+      }
+
+      var { jsPDF } = window.jspdf;
+      var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      var pageW = 210;
+      var pageH = 297;
+      var margin = 18;
+      var colW = pageW - margin * 2;
+      var y = 0;
+
+      // ── HEADER BAND (dark background) ──
+      doc.setFillColor(14, 14, 14); // --dark
+      doc.rect(0, 0, pageW, 42, 'F');
+
+      // Teal accent bar top
+      doc.setFillColor(41, 168, 171); // --teal
+      doc.rect(0, 0, pageW, 3, 'F');
+
+      // Title
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.setTextColor(255, 255, 255);
+      doc.text('ESCALA DE LOUVOR', margin, 18);
+
+      // Congregation name
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(41, 168, 171);
+      doc.text(data.congregacao.toUpperCase(), margin, 27);
+
+      // Date
+      var now = new Date();
+      var dateStr = now.toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' });
+      doc.setTextColor(180, 180, 180);
+      doc.setFontSize(8.5);
+      doc.text(dateStr, margin, 35);
+
+      // AD Setúbal branding right side
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(255, 255, 255);
+      doc.text('AD SETÚBAL', pageW - margin, 18, { align: 'right' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(120, 120, 120);
+      doc.text('Assembleia de Deus', pageW - margin, 25, { align: 'right' });
+
+      y = 52;
+
+      // ── SECTION RENDERER ──
+      function drawSection(title, rows, accentColor) {
+        // Section header
+        doc.setFillColor(accentColor[0], accentColor[1], accentColor[2]);
+        doc.rect(margin, y, colW, 8, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(255, 255, 255);
+        doc.text(title.toUpperCase(), margin + 4, y + 5.5);
+        y += 8;
+
+        // Rows
+        rows.forEach(function(row, i) {
+          var bg = i % 2 === 0 ? [30, 30, 30] : [22, 22, 22];
+          doc.setFillColor(bg[0], bg[1], bg[2]);
+          doc.rect(margin, y, colW, 10, 'F');
+
+          // Left accent line
+          doc.setFillColor(accentColor[0], accentColor[1], accentColor[2]);
+          doc.rect(margin, y, 2, 10, 'F');
+
+          // Role label
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(8.5);
+          doc.setTextColor(200, 200, 200);
+          doc.text(row.label, margin + 6, y + 6.5);
+
+          // Value
+          var val = row.value || '—';
+          var valColor = row.value ? [255, 255, 255] : [100, 100, 100];
+          doc.setFont('helvetica', row.value ? 'bold' : 'normal');
+          doc.setFontSize(9);
+          doc.setTextColor(valColor[0], valColor[1], valColor[2]);
+          doc.text(val, margin + colW * 0.42, y + 6.5);
+
+          y += 10;
+        });
+
+        y += 6; // gap after section
+      }
+
+      // Instrumentos
+      var instrRows = Object.entries(data.instrumentos).map(function(e) {
+        return { label: e[0], value: e[1] };
+      });
+      drawSection('Instrumentos', instrRows, [41, 168, 171]); // teal
+
+      // Vozes
+      var vozRows = Object.entries(data.vozes).map(function(e) {
+        return { label: e[0], value: e[1] };
+      });
+      drawSection('Vozes', vozRows, [245, 130, 31]); // orange
+
+      // ── FOOTER ──
+      doc.setFillColor(14, 14, 14);
+      doc.rect(0, pageH - 14, pageW, 14, 'F');
+      doc.setFillColor(41, 168, 171);
+      doc.rect(0, pageH - 2, pageW, 2, 'F');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 100, 100);
+      doc.text('AD Setúbal — Assembleia de Deus de Setúbal', margin, pageH - 6);
+      doc.text('Documento gerado automaticamente', pageW - margin, pageH - 6, { align: 'right' });
+
+      // ── SAVE ──
+      var fileName = 'escala-' + data.congregacao.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + now.toISOString().slice(0, 10) + '.pdf';
+      doc.save(fileName);
+    }
+
     // ── ENVIO DA ESCALA ────────────────────────────────────────────
     async function handleEscalaSubmit(e) {
       e.preventDefault();
@@ -745,6 +899,9 @@
       btn.disabled = true;
       successEl.style.display = 'none';
       errorEl.style.display = 'none';
+
+      // Also generate PDF automatically on send
+      gerarEscalaPDF();
 
       try {
         var res = await fetch(form.action, {
