@@ -1225,6 +1225,8 @@
       var card = document.createElement('div');
       card.className = 'prod-field-card';
       card.id = id;
+      card._fileDataUrl = '';
+      card._fileName = '';
       card.innerHTML =
         '<button class="pfc-remove" type="button" onclick="removeProdField(\'' + id + '\')" title="Remover">✕</button>' +
         '<div class="pfc-grid">' +
@@ -1259,6 +1261,17 @@
         '</div>';
 
       document.getElementById(containerId).appendChild(card);
+
+      // When a file is chosen, read it as a data URL and store on the card element
+      var fileInput = card.querySelector('.pf-ficheiro');
+      fileInput.addEventListener('change', function() {
+        var file = fileInput.files[0];
+        if (!file) { card._fileDataUrl = ''; card._fileName = ''; return; }
+        card._fileName = file.name;
+        var reader = new FileReader();
+        reader.onload = function(e) { card._fileDataUrl = e.target.result; };
+        reader.readAsDataURL(file);
+      });
     }
 
     function removeProdField(id) {
@@ -1276,11 +1289,14 @@
       var items = [];
       cards.forEach(function(card) {
         items.push({
-          titulo:  (card.querySelector('.pf-titulo') || {}).value || '',
-          desc:    (card.querySelector('.pf-desc') || {}).value || '',
-          data:    (card.querySelector('.pf-data') || {}).value || '',
-          hora:    (card.querySelector('.pf-hora') || {}).value || '',
-          duracao: (card.querySelector('.pf-duracao') || {}).value || ''
+          titulo:      (card.querySelector('.pf-titulo')  || {}).value || '',
+          desc:        (card.querySelector('.pf-desc')    || {}).value || '',
+          data:        (card.querySelector('.pf-data')    || {}).value || '',
+          hora:        (card.querySelector('.pf-hora')    || {}).value || '',
+          duracao:     (card.querySelector('.pf-duracao') || {}).value || '',
+          link:        (card.querySelector('.pf-link')    || {}).value || '',
+          fileDataUrl: card._fileDataUrl || '',
+          fileName:    card._fileName    || ''
         });
       });
       return items;
@@ -1503,12 +1519,48 @@
       rehearsal.forEach(function(it) {
         var timeLabel = (formatDDMM(it.data) + ' ' + formatHourAMPM(it.hora)).trim();
         leftY = entryBoldThenSmall(leftColX, leftY, it.titulo || '—', timeLabel);
+        // Link as hyperlink
+        if (it.link) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7);
+          doc.setTextColor(0, 80, 180);
+          doc.textWithLink(it.link.length > 38 ? it.link.slice(0, 38) + '…' : it.link, leftColX, leftY, { url: it.link });
+          doc.setTextColor(0, 0, 0);
+          leftY += 5;
+        }
+        // File as download icon + name
+        if (it.fileDataUrl && it.fileName) {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(7.5);
+          doc.setTextColor(30, 30, 30);
+          doc.text('\u2193 ' + it.fileName, leftColX, leftY);
+          doc.link(leftColX, leftY - 3.5, 60, 4.5, { url: it.fileDataUrl });
+          leftY += 5.5;
+        }
       });
       leftY += 3;
       leftY = sectionHeading(leftColX, leftY, 'Other Times');
       outros.forEach(function(it) {
         var timeLabel = (formatDDMM(it.data) + ' ' + formatHourAMPM(it.hora)).trim();
         leftY = entryBoldThenSmall(leftColX, leftY, it.titulo || '—', timeLabel);
+        // Link as hyperlink
+        if (it.link) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7);
+          doc.setTextColor(0, 80, 180);
+          doc.textWithLink(it.link.length > 38 ? it.link.slice(0, 38) + '…' : it.link, leftColX, leftY, { url: it.link });
+          doc.setTextColor(0, 0, 0);
+          leftY += 5;
+        }
+        // File as download icon + name
+        if (it.fileDataUrl && it.fileName) {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(7.5);
+          doc.setTextColor(30, 30, 30);
+          doc.text('\u2193 ' + it.fileName, leftColX, leftY);
+          doc.link(leftColX, leftY - 3.5, 60, 4.5, { url: it.fileDataUrl });
+          leftY += 5.5;
+        }
       });
 
       rightY = sectionHeading(rightColX, rightY, 'Audio');
