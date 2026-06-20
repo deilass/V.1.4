@@ -598,31 +598,31 @@
 
         <div class="form-card" style="max-width:860px;">
           <p class="form-card-title">Ficha de Produção</p>
-          <p class="form-card-sub">Seleciona a congregação e a data antes de atribuir as funções.</p>
+          <p class="form-card-sub">Seleciona a congregação e a data — a Equipa de Louvor, Som, Online e Multimédia só aparecem depois, com as pessoas dessa congregação. Uma pessoa selecionada numa função fica indisponível nas restantes da mesma área.</p>
 
           <!-- CONGREGAÇÃO + DATA -->
           <p class="f-section">Identificação</p>
           <div class="f-row">
             <div class="f-group">
               <label class="f-label" for="prod-congregacao">Congregação *</label>
-              <select class="f-select" id="prod-congregacao" required>
+              <select class="f-select" id="prod-congregacao" required onchange="onProdCongregacaoChange()">
                 <option value="">Seleciona a congregação…</option>
                 <optgroup label="Distrito de Setúbal">
-                  <option>Setúbal — Sede</option>
-                  <option>Barreiro</option>
-                  <option>Pinhal Novo</option>
-                  <option>Moita</option>
-                  <option>Aires (Palmela)</option>
-                  <option>Montijo</option>
-                  <option>Alcochete</option>
+                  <option value="setubal">Setúbal — Sede</option>
+                  <option value="barreiro">Barreiro</option>
+                  <option value="pinhal-novo">Pinhal Novo</option>
+                  <option value="moita">Moita</option>
+                  <option value="aires">Aires (Palmela)</option>
+                  <option value="montijo">Montijo</option>
+                  <option value="alcochete">Alcochete</option>
                 </optgroup>
                 <optgroup label="Área de Missão Beja">
-                  <option>Beja</option>
-                  <option>Vidigueira</option>
-                  <option>Ermidas</option>
-                  <option>Alvalade do Sado</option>
-                  <option>Ferreira do Alentejo</option>
-                  <option>Ervidel</option>
+                  <option value="beja">Beja</option>
+                  <option value="vidigueira">Vidigueira</option>
+                  <option value="ermidas">Ermidas</option>
+                  <option value="alvalade">Alvalade do Sado</option>
+                  <option value="ferreira">Ferreira do Alentejo</option>
+                  <option value="ervidel">Ervidel</option>
                 </optgroup>
               </select>
             </div>
@@ -638,77 +638,68 @@
           <div id="programa-list" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
           <button class="f-submit" type="button" style="margin-top:0;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12);font-size:0.75rem;padding:0.7rem 1.5rem;" onclick="addProdField('programa-list')">+ Adicionar Campo</button>
 
-          <!-- EQUIPA DE LOUVOR (same pattern as escala tab) -->
+          <!-- EQUIPA DE LOUVOR, SOM, ONLINE, MULTIMÉDIA (depende da congregação) -->
+          <div id="prod-fields" style="display:none;">
           <p class="f-section" style="margin-top:2rem;">Equipa de Louvor</p>
           <div class="f-row">
             <div class="f-group">
               <label class="f-label">Piano</label>
               <select class="f-select prod-select" id="prod-piano" data-pgroup="louvor" onchange="onProdChange()">
                 <option value="">— Ninguém —</option>
-                <option>Maria Catarina</option><option>João Amaral</option>
               </select>
             </div>
             <div class="f-group">
               <label class="f-label">Guitarra Acústica</label>
               <select class="f-select prod-select" id="prod-gt-acustica" data-pgroup="louvor" onchange="onProdChange()">
                 <option value="">— Ninguém —</option>
-                <option>David Lucero</option>
               </select>
             </div>
             <div class="f-group">
               <label class="f-label">Guitarra Elétrica</label>
               <select class="f-select prod-select" id="prod-gt-eletrica" data-pgroup="louvor" onchange="onProdChange()">
                 <option value="">— Ninguém —</option>
-                <option>David Lucero</option>
               </select>
             </div>
             <div class="f-group">
               <label class="f-label">Baixo</label>
               <select class="f-select prod-select" id="prod-baixo" data-pgroup="louvor" onchange="onProdChange()">
                 <option value="">— Ninguém —</option>
-                <option>Arão Caville</option>
               </select>
             </div>
             <div class="f-group">
               <label class="f-label">Bateria</label>
               <select class="f-select prod-select" id="prod-bateria" data-pgroup="louvor" onchange="onProdChange()">
                 <option value="">— Ninguém —</option>
-                <option>João Amaral</option><option>Arão Caville</option>
               </select>
             </div>
             <div class="f-group">
               <label class="f-label">Dirigente</label>
               <select class="f-select prod-select" id="prod-dirigente" data-pgroup="louvor" onchange="onProdChange()">
                 <option value="">— Ninguém —</option>
-                <option>Marta Lucero</option><option>Raquel Sousa</option>
               </select>
             </div>
             <div class="f-group">
               <label class="f-label">Back 1</label>
               <select class="f-select prod-select" id="prod-back1" data-pgroup="louvor" onchange="onProdChange()">
                 <option value="">— Ninguém —</option>
-                <option>Ana Maria</option><option>Macarena Caville</option><option>David Lucero</option><option>Marta Lucero</option><option>Raquel Sousa</option>
               </select>
             </div>
             <div class="f-group">
               <label class="f-label">Back 2</label>
               <select class="f-select prod-select" id="prod-back2" data-pgroup="louvor" onchange="onProdChange()">
                 <option value="">— Ninguém —</option>
-                <option>Ana Maria</option><option>Macarena Caville</option><option>David Lucero</option><option>Marta Lucero</option><option>Raquel Sousa</option>
               </select>
             </div>
             <div class="f-group">
               <label class="f-label">Back 3</label>
               <select class="f-select prod-select" id="prod-back3" data-pgroup="louvor" onchange="onProdChange()">
                 <option value="">— Ninguém —</option>
-                <option>Ana Maria</option><option>Macarena Caville</option><option>David Lucero</option><option>Marta Lucero</option><option>Raquel Sousa</option>
               </select>
             </div>
             <div class="f-group">
               <label class="f-label">Back 4</label>
               <select class="f-select prod-select" id="prod-back4" data-pgroup="louvor" onchange="onProdChange()">
                 <option value="">— Ninguém —</option>
-                <option>Ana Maria</option><option>Macarena Caville</option><option>David Lucero</option><option>Marta Lucero</option><option>Raquel Sousa</option>
               </select>
             </div>
           </div>
@@ -720,7 +711,6 @@
               <label class="f-label">Técnico de Som</label>
               <select class="f-select prod-select" id="prod-som" data-pgroup="tecnica" onchange="onProdChange()">
                 <option value="">— Ninguém —</option>
-                <option>Tito Lucero</option><option>Paulo Sacramento</option><option>Enzo Trega</option><option>Edmanuel</option><option>Samuel de Andrade</option>
               </select>
             </div>
           </div>
@@ -732,7 +722,6 @@
               <label class="f-label">Técnico Online</label>
               <select class="f-select prod-select" id="prod-online" data-pgroup="tecnica" onchange="onProdChange()">
                 <option value="">— Ninguém —</option>
-                <option>Tito Lucero</option><option>Paulo Sacramento</option><option>Enzo Trega</option><option>Edmanuel</option><option>Samuel de Andrade</option>
               </select>
             </div>
           </div>
@@ -744,10 +733,10 @@
               <label class="f-label">Técnico Multimédia</label>
               <select class="f-select prod-select" id="prod-multimédia" data-pgroup="tecnica" onchange="onProdChange()">
                 <option value="">— Ninguém —</option>
-                <option>Tito Lucero</option><option>Paulo Sacramento</option><option>Enzo Trega</option><option>Edmanuel</option><option>Samuel de Andrade</option>
               </select>
             </div>
           </div>
+          </div><!-- end prod-fields -->
 
           <!-- REHEARSAL TIMES -->
           <p class="f-section">Rehearsal Times</p>
@@ -827,7 +816,7 @@
       btn.disabled = false;
     }
 
-    // ── DADOS DA ESCALA ────────────────────────────────────────────
+    // ── DADOS DA ESCALA (também usados na aba Produção) ─────────────
     var ESCALA_DATA = {
       setubal: {
         instrumentos: {
@@ -843,10 +832,12 @@
           back2:     ['Ana Maria', 'Macarena Caville', 'David Lucero', 'Marta Lucero', 'Raquel Sousa'],
           back3:     ['Ana Maria', 'Macarena Caville', 'David Lucero', 'Marta Lucero', 'Raquel Sousa'],
           back4:     ['Ana Maria', 'Macarena Caville', 'David Lucero', 'Marta Lucero', 'Raquel Sousa']
-        }
+        },
+        // Pool partilhado por Som, Online e Multimédia — exclusivo desta congregação.
+        tecnica: ['Tito Lucero', 'Paulo Sacramento', 'Enzo Trega', 'Edmanuel', 'Samuel de Andrade']
       }
       // Adiciona aqui outras congregações com o mesmo formato quando necessário:
-      // barreiro: { instrumentos: { ... }, vozes: { ... } }
+      // barreiro: { instrumentos: { ... }, vozes: { ... }, tecnica: [ ... ] }
     };
 
     // Mapeamento select id -> chave nos dados
@@ -1159,6 +1150,71 @@
       refreshProdGroup(PROD_TECNICA_IDS);
       refreshProdGroup(PROD_INSTRUMENTO_IDS);
       refreshProdGroup(PROD_VOZ_IDS);
+    }
+
+    // Mapeamento select id -> chave nos dados (mesma fonte de dados da aba Escala)
+    var PROD_INSTR_KEY = {
+      'prod-piano':       'piano',
+      'prod-gt-acustica': 'guitarra_acustica',
+      'prod-gt-eletrica': 'guitarra_eletrica',
+      'prod-baixo':       'baixo',
+      'prod-bateria':     'bateria'
+    };
+    var PROD_VOZ_KEY = {
+      'prod-dirigente': 'dirigente',
+      'prod-back1':     'back1',
+      'prod-back2':     'back2',
+      'prod-back3':     'back3',
+      'prod-back4':     'back4'
+    };
+
+    function onProdCongregacaoChange() {
+      var cong = document.getElementById('prod-congregacao').value;
+      var fieldsWrap = document.getElementById('prod-fields');
+
+      // Reset all selects
+      document.querySelectorAll('.prod-select').forEach(function(sel) {
+        sel.innerHTML = '<option value="">— Ninguém —</option>';
+        sel.disabled = false;
+      });
+
+      if (!cong || !ESCALA_DATA[cong]) {
+        fieldsWrap.style.display = 'none';
+        return;
+      }
+
+      fieldsWrap.style.display = 'block';
+      var data = ESCALA_DATA[cong];
+
+      function populate(map, bucket) {
+        Object.keys(map).forEach(function(selId) {
+          var key = map[selId];
+          var sel = document.getElementById(selId);
+          var members = (data[bucket] && data[bucket][key]) || [];
+          members.forEach(function(name) {
+            var opt = document.createElement('option');
+            opt.value = name; opt.textContent = name;
+            sel.appendChild(opt);
+          });
+          if (members.length === 0) sel.disabled = true;
+        });
+      }
+
+      populate(PROD_INSTR_KEY, 'instrumentos');
+      populate(PROD_VOZ_KEY, 'vozes');
+
+      PROD_TECNICA_IDS.forEach(function(selId) {
+        var sel = document.getElementById(selId);
+        var members = data.tecnica || [];
+        members.forEach(function(name) {
+          var opt = document.createElement('option');
+          opt.value = name; opt.textContent = name;
+          sel.appendChild(opt);
+        });
+        if (members.length === 0) sel.disabled = true;
+      });
+
+      onProdChange();
     }
 
     // ── PRODUÇÃO: ADICIONAR CAMPO DINÂMICO ────────────────────────
