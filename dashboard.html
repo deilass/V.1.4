@@ -781,26 +781,78 @@
       }
     }
 
-    // ── ENVIO DO FORMULÁRIO ────────────────────────────────────────
+    // ── ENVIO DO FORMULÁRIO → DISCORD WEBHOOK ─────────────────────
+    // Cola aqui o teu Webhook URL do Discord
+    var DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1517840979913211914/zsHqZ4RRavxsEZLQNRYduJCr9Mh9OpqQvXXK3YwjSLe_RSeGu77vPtZ6meOXy1iOYdTh';
+
     async function handleSubmit(e) {
       e.preventDefault();
-      var form = e.target;
-      var btn = document.getElementById('content-submit');
+      var form      = e.target;
+      var btn       = document.getElementById('content-submit');
       var successEl = document.getElementById('content-success');
-      var errorEl = document.getElementById('content-error');
+      var errorEl   = document.getElementById('content-error');
 
       btn.textContent = 'A enviar…';
-      btn.disabled = true;
+      btn.disabled    = true;
       successEl.style.display = 'none';
-      errorEl.style.display = 'none';
+      errorEl.style.display   = 'none';
+
+      // Recolher os dados do formulário
+      var fd = new FormData(form);
+
+      var finalidade  = fd.get('finalidade')        || '—';
+      var ambito      = fd.get('ambito')             || '—';
+      var congregacao = fd.get('congregacao')        || '—';
+      var tema        = fd.get('tema')               || '—';
+      var dataEvento  = fd.get('data_evento')        || '—';
+      var horaEvento  = fd.get('hora_evento')        || '—';
+      var local       = fd.get('local')              || '—';
+      var dataDivulg  = fd.get('data_divulgacao')    || '—';
+      var infoAdic    = fd.get('info_adicional')     || '';
+
+      // Checkboxes de conteúdo (podem ser múltiplos)
+      var conteudos = fd.getAll('conteudo');
+      var conteudoStr = conteudos.length ? conteudos.join(', ') : '—';
+
+      // Formatar datas PT
+      function fmtDate(s) {
+        if (!s || s === '—') return '—';
+        var p = s.split('-');
+        return p.length === 3 ? p[2]+'/'+p[1]+'/'+p[0] : s;
+      }
+
+      var embed = {
+        title: '\uD83C\uDFA8 Novo Pedido de Conteúdo',
+        color: 0x29A8AB, // teal da AD Setúbal
+        fields: [
+          { name: '\uD83C\uDFDB\uFE0F Congregação', value: congregacao, inline: true },
+          { name: '\uD83C\uDFAF Finalidade',         value: finalidade,  inline: true },
+          { name: '\uD83C\uDF0D Âmbito',             value: ambito,      inline: true },
+          { name: '\uD83D\uDCCC Tipo de Conteúdo',   value: conteudoStr, inline: false },
+          { name: '\uD83D\uDCDD Tema / Título',       value: tema,        inline: false },
+          { name: '\uD83D\uDCC5 Data do Evento',      value: fmtDate(dataEvento) + ' às ' + horaEvento, inline: true },
+          { name: '\uD83D\uDCCD Local',               value: local,       inline: true },
+          { name: '\uD83D\uDCC6 Data de Divulgação',  value: fmtDate(dataDivulg), inline: true }
+        ],
+        timestamp: new Date().toISOString(),
+        footer: { text: 'AD Setúbal — Dashboard' }
+      };
+
+      if (infoAdic) {
+        embed.fields.push({ name: '\u2139\uFE0F Informação Adicional', value: infoAdic, inline: false });
+      }
 
       try {
-        var res = await fetch(form.action, {
+        if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL === 'COLE_AQUI_O_WEBHOOK_URL') {
+          throw new Error('Webhook URL não configurado.');
+        }
+        var res = await fetch(DISCORD_WEBHOOK_URL, {
           method: 'POST',
-          body: new FormData(form),
-          headers: { 'Accept': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ embeds: [embed] })
         });
-        if (res.ok) {
+        // Discord devolve 204 No Content em sucesso
+        if (res.ok || res.status === 204) {
           successEl.style.display = 'block';
           form.reset();
           document.getElementById('extra-info-wrap').style.display = 'none';
@@ -809,11 +861,12 @@
           errorEl.style.display = 'block';
         }
       } catch (err) {
+        console.error('Discord Webhook error:', err);
         errorEl.style.display = 'block';
       }
 
       btn.textContent = 'Enviar Pedido';
-      btn.disabled = false;
+      btn.disabled    = false;
     }
 
     // ── DADOS DA ESCALA (também usados na aba Produção) ─────────────
