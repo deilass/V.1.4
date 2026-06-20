@@ -310,6 +310,17 @@
             </div>
 
             <div id="escala-fields" style="display:none;">
+              <p class="f-section">Direção Musical</p>
+              <div class="f-row">
+                <div class="f-group">
+                  <label class="f-label" for="esc-diretor">Diretor Musical</label>
+                  <select class="f-select" id="esc-diretor" name="diretor_musical">
+                    <option value="">— Ninguém —</option>
+                    <option value="João Amaral">João Amaral</option>
+                  </select>
+                </div>
+              </div>
+
               <p class="f-section">Instrumentos</p>
               <div class="f-row">
                 <div class="f-group">
@@ -441,6 +452,15 @@
           <!-- EQUIPA DE LOUVOR, SOM, ONLINE, MULTIMÉDIA (depende da congregação) -->
           <div id="prod-fields" style="display:none;">
           <p class="f-section" style="margin-top:2rem;">Equipa de Louvor</p>
+          <div class="f-row">
+            <div class="f-group">
+              <label class="f-label">Diretor Musical</label>
+              <select class="f-select" id="prod-diretor" name="diretor_musical">
+                <option value="">— Ninguém —</option>
+                <option value="João Amaral">João Amaral</option>
+              </select>
+            </div>
+          </div>
           <div class="f-row">
             <div class="f-group">
               <label class="f-label">Piano</label>
@@ -694,6 +714,9 @@
       var congLabel = cong.options[cong.selectedIndex] ? cong.options[cong.selectedIndex].text : '';
       return {
         congregacao: congLabel,
+        direcao: {
+          'Diretor Musical': document.getElementById('esc-diretor').value
+        },
         instrumentos: {
           'Piano':             document.getElementById('esc-piano').value,
           'Guitarra Acústica': document.getElementById('esc-gt-acustica').value,
@@ -807,6 +830,12 @@
 
         y += 6; // gap after section
       }
+
+      // Direção Musical
+      var direcaoRows = Object.entries(data.direcao).map(function(e) {
+        return { label: e[0], value: e[1] };
+      });
+      drawSection('Direção Musical', direcaoRows, [120, 80, 200]); // purple
 
       // Instrumentos
       var instrRows = Object.entries(data.instrumentos).map(function(e) {
@@ -1102,6 +1131,7 @@
         { label: 'Back 4',       value: selVal('prod-back4') }
       ];
       var lider  = selVal('prod-dirigente');
+      var diretor = selVal('prod-diretor');
       var tecsom = selVal('prod-som');
       var tecnol = selVal('prod-online');
       var tecmul = selVal('prod-multimedia') || selVal('prod-multim\u00e9dia');
@@ -1307,6 +1337,7 @@
 
       // ── RIGHT: Líderes de Louvor ──
       rightY = secHead(rightColX, rightY, 'L\u00edderes de Louvor');
+      rightY = entry(rightColX, rightY, 'Dir. Musical', diretor||'\u2014');
       rightY = entry(rightColX, rightY, 'a) L\u00edder Louvor', lider||'\u2014');
       rightY += 2;
 
