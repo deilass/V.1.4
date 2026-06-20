@@ -636,7 +636,7 @@
           <p class="f-section">Programa</p>
           <p class="form-card-sub" style="margin-bottom:1rem;">Adiciona cada momento do culto pela ordem em que acontece (ex.: música, MC, oferta, pregação…). Estes dados são usados para gerar o PDF do programa.</p>
           <div id="programa-list" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
-          <button class="f-submit" type="button" style="margin-top:0;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12);font-size:0.75rem;padding:0.7rem 1.5rem;" onclick="addProgramaField()">+ Adicionar Campo</button>
+          <button class="f-submit" type="button" style="margin-top:0;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12);font-size:0.75rem;padding:0.7rem 1.5rem;" onclick="addProdField('programa-list')">+ Adicionar Campo</button>
 
           <!-- EQUIPA DE LOUVOR (same pattern as escala tab) -->
           <p class="f-section" style="margin-top:2rem;">Equipa de Louvor</p>
@@ -1211,85 +1211,9 @@
       if (el) el.remove();
     }
 
-    // ── PROGRAMA: ADICIONAR CAMPO DINÂMICO ────────────────────────
-    function addProgramaField() {
-      prodFieldCounter++;
-      var id = 'pgc-' + prodFieldCounter;
-      var card = document.createElement('div');
-      card.className = 'prod-field-card';
-      card.id = id;
-      card.innerHTML =
-        '<button class="pfc-remove" type="button" onclick="removeProdField(\'' + id + '\')" title="Remover">✕</button>' +
-        '<div class="pfc-grid">' +
-          '<div class="pfc-full" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.9rem;">' +
-            '<div class="f-group">' +
-              '<label class="f-label">Hora</label>' +
-              '<input class="f-input pg-hora" type="text" placeholder="Ex.: 11:30a" />' +
-            '</div>' +
-            '<div class="f-group">' +
-              '<label class="f-label">Duração (m:ss)</label>' +
-              '<input class="f-input pg-duracao" type="text" placeholder="Ex.: 5:54" />' +
-            '</div>' +
-            '<div class="f-group">' +
-              '<label class="f-label">Tipo</label>' +
-              '<select class="f-select pg-tipo">' +
-                '<option value="item">Item / Momento</option>' +
-                '<option value="musica">Música</option>' +
-              '</select>' +
-            '</div>' +
-          '</div>' +
-          '<div class="f-group pfc-full">' +
-            '<label class="f-label">Título</label>' +
-            '<input class="f-input pg-titulo" type="text" placeholder="Ex.: Good Grace / MC: Oração" />' +
-          '</div>' +
-          '<div class="f-group pfc-full">' +
-            '<label class="f-label">Detalhe (entre parênteses, opcional)</label>' +
-            '<input class="f-input pg-detalhe" type="text" placeholder="Ex.: Portuguese - PT in D" />' +
-          '</div>' +
-          '<div class="f-group pfc-full">' +
-            '<label class="f-label">Notas (uma por linha)</label>' +
-            '<textarea class="f-textarea pg-notas" style="min-height:70px;" placeholder="Ex.: Termina no minuto 6"></textarea>' +
-          '</div>' +
-          '<div class="f-group">' +
-            '<label class="f-label">Audio/Visual</label>' +
-            '<input class="f-input pg-av" type="text" placeholder="Ex.: Versículos, Formas de dar" />' +
-          '</div>' +
-          '<div class="f-group">' +
-            '<label class="f-label">Band</label>' +
-            '<input class="f-input pg-band" type="text" placeholder="Ex.: Suporte" />' +
-          '</div>' +
-          '<div class="f-group">' +
-            '<label class="f-label">PersonVocals</label>' +
-            '<input class="f-input pg-person" type="text" />' +
-          '</div>' +
-        '</div>';
-
-      document.getElementById('programa-list').appendChild(card);
-    }
-
     function selVal(id) {
       var el = document.getElementById(id);
       return el ? el.value : '';
-    }
-
-    function getProgramaItems() {
-      var cards = document.querySelectorAll('#programa-list .prod-field-card');
-      var items = [];
-      cards.forEach(function(card) {
-        var notasRaw = (card.querySelector('.pg-notas') || {}).value || '';
-        items.push({
-          hora:    (card.querySelector('.pg-hora') || {}).value || '',
-          duracao: (card.querySelector('.pg-duracao') || {}).value || '',
-          tipo:    (card.querySelector('.pg-tipo') || {}).value || 'item',
-          titulo:  (card.querySelector('.pg-titulo') || {}).value || '',
-          detalhe: (card.querySelector('.pg-detalhe') || {}).value || '',
-          notas:   notasRaw.split('\n').map(function(s){ return s.trim(); }).filter(Boolean),
-          av:      (card.querySelector('.pg-av') || {}).value || '',
-          band:    (card.querySelector('.pg-band') || {}).value || '',
-          person:  (card.querySelector('.pg-person') || {}).value || ''
-        });
-      });
-      return items;
     }
 
     function getGenericFieldItems(containerId) {
@@ -1327,22 +1251,6 @@
       return h12 + ':' + m + suffix;
     }
 
-    function parseDurToSec(str) {
-      if (!str) return 0;
-      var parts = String(str).split(':').map(function(s){ return parseInt(s, 10) || 0; });
-      if (parts.length === 2) return parts[0] * 60 + parts[1];
-      if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
-      if (parts.length === 1) return parts[0] * 60;
-      return 0;
-    }
-
-    function secToMMSS(sec) {
-      sec = Math.max(0, Math.round(sec));
-      var m = Math.floor(sec / 60);
-      var s = sec % 60;
-      return m + ':' + (s < 10 ? '0' : '') + s;
-    }
-
     // ── GERAÇÃO DE PDF DO PROGRAMA (réplica do modelo) ──────────────
     function gerarProgramaPDF() {
       var congEl = document.getElementById('prod-congregacao');
@@ -1354,7 +1262,7 @@
         return;
       }
 
-      var programa  = getProgramaItems();
+      var programa  = getGenericFieldItems('programa-list');
       var rehearsal = getGenericFieldItems('rehearsal-list');
       var outros    = getGenericFieldItems('other-times-list');
 
@@ -1422,44 +1330,33 @@
       // Colunas
       var colHoraEnd = leftX + 24;
       var colDur = colHoraEnd + 2;
-      var colDurEnd = colDur + 16;
+      var colDurEnd = colDur + 18;
       var colTitulo = colDurEnd + 4;
-      var colAV = leftX + contentW * 0.56;
-      var colBand = leftX + contentW * 0.73;
-      var colPV = rightX;
-      var maxTitleWidth = colAV - colTitulo - 2;
+      var maxTitleWidth = rightX - colTitulo - 2;
 
       // Cabeçalho da tabela
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(8);
       doc.setTextColor(0, 0, 0);
       if (programa.length) {
-        var firstLabel = (formatDDMM(dataVal) + ' ' + (programa[0].hora || '')).trim();
+        var firstLabel = (formatDDMM(dataVal) + ' ' + formatHourAMPM(programa[0].hora)).trim();
         doc.text(firstLabel, colHoraEnd, y, { align: 'right' });
       }
       doc.text('Length', colDur, y);
       doc.text('in mins', colDur, y + 3.4);
-      doc.text('Audio/Visual', colAV, y);
-      doc.text('Band', colBand, y);
-      doc.text('PersonVocals', colPV, y, { align: 'right' });
       y += 7;
 
       // Linhas do programa
       programa.forEach(function(item, idx) {
-        doc.setFont('helvetica', item.tipo === 'musica' ? 'bolditalic' : 'bold');
+        doc.setFont('helvetica', 'bold');
         doc.setFontSize(8.5);
-        var tituloLine = item.titulo || '';
-        if (item.detalhe) tituloLine += '  [ ' + item.detalhe + ' ]';
-        var titleLines = doc.splitTextToSize(tituloLine || ' ', maxTitleWidth);
+        var titleLines = doc.splitTextToSize(item.titulo || ' ', maxTitleWidth);
 
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7.3);
-        var notesLines = [];
-        item.notas.forEach(function(n) {
-          notesLines = notesLines.concat(doc.splitTextToSize(n, maxTitleWidth));
-        });
+        var descLines = item.desc ? doc.splitTextToSize(item.desc, maxTitleWidth) : [];
 
-        var extraLines = (titleLines.length - 1) + notesLines.length;
+        var extraLines = (titleLines.length - 1) + descLines.length;
         var rowH = 9 + extraLines * 3.6;
         if (rowH < 9) rowH = 9;
 
@@ -1474,16 +1371,16 @@
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(8);
         doc.setTextColor(40, 40, 40);
-        doc.text(item.hora || '', colHoraEnd, textY, { align: 'right' });
+        doc.text(formatHourAMPM(item.hora), colHoraEnd, textY, { align: 'right' });
 
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8.5);
         doc.setTextColor(0, 0, 0);
-        doc.text(item.duracao || '', colDur, textY);
+        doc.text(item.duracao ? (item.duracao + ' min') : '', colDur, textY);
 
-        doc.setFont('helvetica', item.tipo === 'musica' ? 'bolditalic' : 'bold');
+        doc.setFont('helvetica', 'bold');
         doc.setFontSize(8.5);
-        doc.setTextColor(item.tipo === 'musica' ? 60 : 0, item.tipo === 'musica' ? 70 : 0, item.tipo === 'musica' ? 130 : 0);
+        doc.setTextColor(0, 0, 0);
         titleLines.forEach(function(line, i2) {
           doc.text(line, colTitulo, textY + 3.6 * i2);
         });
@@ -1491,16 +1388,9 @@
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7.3);
         doc.setTextColor(70, 70, 70);
-        notesLines.forEach(function(line, i2) {
+        descLines.forEach(function(line, i2) {
           doc.text(line, colTitulo, textY + 3.6 * (titleLines.length + i2));
         });
-
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(7.5);
-        doc.setTextColor(30, 30, 30);
-        if (item.av) doc.text(doc.splitTextToSize(item.av, colBand - colAV - 2), colAV, textY);
-        if (item.band) doc.text(doc.splitTextToSize(item.band, colPV - colBand - 2), colBand, textY);
-        if (item.person) doc.text(item.person, colPV, textY, { align: 'right' });
 
         y += rowH;
       });
@@ -1511,13 +1401,13 @@
       doc.setLineWidth(0.6);
       doc.line(leftX, y, rightX, y);
       y += 5;
-      var totalSec = programa.reduce(function(acc, it) { return acc + parseDurToSec(it.duracao); }, 0);
-      var lastHora = programa.length ? programa[programa.length - 1].hora : '';
+      var totalMin = programa.reduce(function(acc, it) { return acc + (parseInt(it.duracao, 10) || 0); }, 0);
+      var lastHora = programa.length ? formatHourAMPM(programa[programa.length - 1].hora) : '';
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(9);
       doc.setTextColor(0, 0, 0);
       doc.text(lastHora || '', colHoraEnd, y, { align: 'right' });
-      doc.text(secToMMSS(totalSec), colDur, y);
+      doc.text(totalMin + ' min', colDur, y);
       y += 11;
 
       // Secção inferior em duas colunas
