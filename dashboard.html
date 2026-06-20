@@ -663,6 +663,9 @@ function buildSidebar() {
     html += '</ul>';
   }
   if (r === 'g-louvor' || r === 'g-somimagem' || r === 'producao') {
+    html += '<p class="sidebar-section-label">A Minha Área</p><ul class="sidebar-nav">';
+    html += navItem('presenca', icoCalendar(), 'Marcar Presença');
+    html += '</ul>';
     html += '<p class="sidebar-section-label">Gestão</p><ul class="sidebar-nav">';
     html += navItem('disponibilidade', icoUsers(), 'Disponibilidade');
     html += '</ul>';
