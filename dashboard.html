@@ -530,6 +530,35 @@
         </div>
       </div>
 
+      <!-- ── GERIR ESCALAS (g-louvor / g-somimagem) ── -->
+      <div class="tab-panel" id="tab-gerir-escalas">
+        <div class="panel-header">
+          <span class="eyebrow">Gestão</span>
+          <h1 class="panel-title">Gerir<br>Escalas</h1>
+          <p class="panel-desc">Consulta, edita ou elimina as escalas que criaste.</p>
+        </div>
+        <div class="flex-gap" style="margin-bottom:1.8rem;">
+          <button class="f-submit" style="margin-top:0;" onclick="renderGerirEscalas()">↺ Atualizar</button>
+        </div>
+        <div id="gerir-escalas-container" style="max-width:860px;"></div>
+        <!-- Edit form inline (hidden by default) -->
+        <div id="gerir-edit-wrap" style="display:none;max-width:860px;margin-top:2rem;">
+          <div class="form-card">
+            <div class="flex-gap" style="margin-bottom:1.2rem;justify-content:space-between;">
+              <p class="form-card-title" id="gerir-edit-title">Editar Escala</p>
+              <button class="f-submit secondary" style="margin-top:0;" onclick="fecharEditEscala()">✕ Fechar</button>
+            </div>
+            <p class="form-card-sub" id="gerir-edit-sub"></p>
+            <div id="gerir-edit-fields"></div>
+            <div class="section-divider"></div>
+            <div class="flex-gap">
+              <button class="f-submit" onclick="guardarEdicaoEscala()">Guardar Alterações</button>
+            </div>
+            <div class="f-success" id="gerir-edit-ok">✓ Escala atualizada com sucesso.</div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div><!-- #app -->
@@ -626,27 +655,39 @@ function buildSidebar() {
   var html = '';
 
   if (r === 'm-louvor' || r === 'm-somimagem') {
-    html += sec('A Minha Área') + item('presenca', icoCalendar(), 'Marcar Presença');
+    html += '<p class="sidebar-section-label">A Minha Área</p><ul class="sidebar-nav">';
+    html += navItem('presenca', icoCalendar(), 'Marcar Presença');
+    html += '</ul>';
   }
   if (r === 'g-louvor' || r === 'g-somimagem' || r === 'producao') {
-    html += sec('Gestão') + item('disponibilidade', icoUsers(), 'Disponibilidade');
+    html += '<p class="sidebar-section-label">Gestão</p><ul class="sidebar-nav">';
+    html += navItem('disponibilidade', icoUsers(), 'Disponibilidade');
+    html += '</ul>';
   }
   if (r === 'g-louvor') {
-    html += sec('Louvor') + item('escala-louvor', icoMusic(), 'Escala de Louvor');
+    html += '<p class="sidebar-section-label">Louvor</p><ul class="sidebar-nav">';
+    html += navItem('escala-louvor', icoMusic(), 'Nova Escala');
+    html += navItem('gerir-escalas', icoList(), 'Gerir Escalas');
+    html += '</ul>';
   }
   if (r === 'g-somimagem') {
-    html += sec('Som & Imagem') + item('escala-som', icoHeadphones(), 'Escala Som/Imagem');
+    html += '<p class="sidebar-section-label">Som & Imagem</p><ul class="sidebar-nav">';
+    html += navItem('escala-som', icoHeadphones(), 'Nova Escala');
+    html += navItem('gerir-escalas', icoList(), 'Gerir Escalas');
+    html += '</ul>';
   }
   if (r === 'producao') {
-    html += sec('Produção');
-    html += item('producao', icoMonitor(), 'Relatório Escalas');
-    html += item('ficha-producao', icoClipboard(), 'Ficha de Produção');
+    html += '<p class="sidebar-section-label">Produção</p><ul class="sidebar-nav">';
+    html += navItem('producao', icoMonitor(), 'Relatório Escalas');
+    html += navItem('ficha-producao', icoClipboard(), 'Ficha de Produção');
+    html += '</ul>';
   }
   document.getElementById('sidebar').innerHTML = html;
 }
 
-function sec(label) { return '<p class="sidebar-section-label">'+label+'</p><ul class="sidebar-nav">'; }
-function item(id, ico, lbl) { return '<li><a href="#" onclick="switchTab(\''+id+'\',this);return false;">'+ico+lbl+'</a></li></ul>'; }
+function navItem(id, ico, lbl) {
+  return '<li><a href="#" onclick="switchTab(\''+id+'\',this);return false;">'+ico+lbl+'</a></li>';
+}
 
 function switchTab(id, el) {
   document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
@@ -658,6 +699,7 @@ function switchTab(id, el) {
   if (id === 'disponibilidade') renderDisponibilidade();
   if (id === 'producao')        renderReport();
   if (id === 'ficha-producao')  initFichaProducao();
+  if (id === 'gerir-escalas')   renderGerirEscalas();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -732,7 +774,19 @@ function toggleP(ds) {
 // DISPONIBILIDADE
 // ═══════════════════════════════════════════════════════════════════
 function renderDisponibilidade() {
-  var filtro = (document.getElementById('disp-filtro')||{value:'louvor'}).value;
+  var r = SESSION.role;
+  var filtroEl = document.getElementById('disp-filtro');
+  // Lock filter to own team for gestores
+  if (r === 'g-louvor') {
+    filtroEl.value = 'louvor';
+    filtroEl.disabled = true;
+  } else if (r === 'g-somimagem') {
+    filtroEl.value = 'somimagem';
+    filtroEl.disabled = true;
+  } else {
+    filtroEl.disabled = false;
+  }
+  var filtro = filtroEl.value || 'louvor';
   var members = USERS.filter(function(u){ return u.equipa===filtro; });
   var sundays = nextSundays(3);
   var escalas = getEscalas();
@@ -937,8 +991,180 @@ function getSetlist(id) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// RELATÓRIO
+// GERIR ESCALAS
 // ═══════════════════════════════════════════════════════════════════
+var _gerirEditDate = null;
+var _gerirEditTipo = null;
+
+function renderGerirEscalas() {
+  var r = SESSION.role;
+  var tipo = (r === 'g-somimagem') ? 'som' : 'louvor';
+  var escalas = getEscalas();
+  var dates = Object.keys(escalas).filter(function(ds) { return escalas[ds][tipo]; }).sort();
+  var el = document.getElementById('gerir-escalas-container');
+  fecharEditEscala();
+
+  if (!dates.length) {
+    el.innerHTML = '<div class="report-empty">Ainda não existem escalas guardadas.</div>';
+    return;
+  }
+
+  var html = '';
+  dates.forEach(function(ds) {
+    var esc = escalas[ds][tipo];
+    html += '<div class="report-card" style="margin-bottom:1rem;">';
+    html += '<div class="report-card-header" style="display:flex;align-items:center;justify-content:space-between;">';
+    html += '<div class="report-card-title">📅 ' + formatDatePT(ds) + '</div>';
+    html += '<div class="flex-gap" style="gap:.6rem;">';
+    html += '<button class="f-submit secondary" style="margin-top:0;font-size:.7rem;padding:.45rem 1rem;" onclick="abrirEditEscala(\'' + ds + '\',\'' + tipo + '\')">✎ Editar</button>';
+    html += '<button class="f-submit" style="margin-top:0;font-size:.7rem;padding:.45rem 1rem;background:var(--red);" onclick="eliminarEscala(\'' + ds + '\',\'' + tipo + '\')">✕ Eliminar</button>';
+    html += '</div></div>';
+
+    // Preview
+    html += '<div style="padding:1rem 1.4rem;display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;">';
+    if (tipo === 'louvor') {
+      var campos = [
+        ['Diretor', esc.diretor], ['Piano', esc.piano], ['Gt. Ac.', esc.gtAc],
+        ['Gt. El.', esc.gtEl], ['Baixo', esc.baixo], ['Bateria', esc.bateria],
+        ['Dirigente', esc.dirigente], ['Back 1', esc.back1], ['Back 2', esc.back2],
+        ['Back 3', esc.back3], ['Back 4', esc.back4]
+      ];
+      campos.forEach(function(c) {
+        if (!c[1]) return;
+        html += '<span style="font-size:.78rem;color:rgba(255,255,255,.45);">' + c[0] + ': <strong style="color:#fff;">' + c[1] + '</strong></span>';
+      });
+    } else {
+      [['Som', esc.tecsom], ['Online', esc.online], ['Multimédia', esc.multimedia]].forEach(function(c) {
+        if (!c[1]) return;
+        html += '<span style="font-size:.78rem;color:rgba(255,255,255,.45);">' + c[0] + ': <strong style="color:#fff;">' + c[1] + '</strong></span>';
+      });
+    }
+    if (esc.savedAt) {
+      var d = new Date(esc.savedAt);
+      html += '<span style="font-size:.7rem;color:rgba(255,255,255,.2);margin-left:auto;">Guardado ' + d.toLocaleDateString('pt-PT') + ' por ' + (esc.savedBy||'—') + '</span>';
+    }
+    html += '</div></div>';
+  });
+  el.innerHTML = html;
+}
+
+function eliminarEscala(ds, tipo) {
+  if (!confirm('Tens a certeza que queres eliminar a escala de ' + formatDatePT(ds) + '?')) return;
+  var all = getEscalas();
+  if (all[ds]) {
+    delete all[ds][tipo];
+    if (!Object.keys(all[ds]).length) delete all[ds];
+    ss('ads_escalas', all);
+  }
+  renderGerirEscalas();
+}
+
+function abrirEditEscala(ds, tipo) {
+  _gerirEditDate = ds;
+  _gerirEditTipo = tipo;
+  var esc = (getEscalas()[ds] || {})[tipo] || {};
+  var cong = esc.congregacao || 'setubal';
+
+  document.getElementById('gerir-edit-title').textContent = 'Editar Escala — ' + formatDatePT(ds);
+  document.getElementById('gerir-edit-sub').textContent = 'Congregação: ' + cong.charAt(0).toUpperCase() + cong.slice(1).replace('-',' ');
+
+  var fields = '';
+  if (tipo === 'louvor') {
+    var cd = (ESCALA_DATA[cong] || {});
+    var instrAll = cd.instrumentos || {};
+    var vozAll   = cd.vozes || {};
+
+    function sel(id, label, members, val) {
+      var opts = '<option value="">— Ninguém —</option>';
+      members.forEach(function(n) { opts += '<option value="'+n+'"'+(n===val?' selected':'')+'>'+n+'</option>'; });
+      return '<div class="f-group"><label class="f-label">'+label+'</label><select class="f-select" id="ge-'+id+'">'+opts+'</select></div>';
+    }
+
+    fields += '<p class="f-section">Direção Musical</p><div class="f-row">';
+    fields += '<div class="f-group"><label class="f-label">Diretor Musical</label><select class="f-select" id="ge-diretor"><option value="">— Ninguém —</option><option value="João Amaral"'+(esc.diretor==='João Amaral'?' selected':'')+'>João Amaral</option></select></div>';
+    fields += '</div>';
+    fields += '<p class="f-section">Instrumentos</p><div class="f-row">';
+    fields += sel('piano',   'Piano',            instrAll.piano||[],             esc.piano||'');
+    fields += sel('gt-ac',   'Guitarra Acústica', instrAll.guitarra_acustica||[], esc.gtAc||'');
+    fields += sel('gt-el',   'Guitarra Elétrica', instrAll.guitarra_eletrica||[], esc.gtEl||'');
+    fields += sel('baixo',   'Baixo',             instrAll.baixo||[],             esc.baixo||'');
+    fields += sel('bateria', 'Bateria',           instrAll.bateria||[],           esc.bateria||'');
+    fields += '</div>';
+    fields += '<p class="f-section">Vozes</p><div class="f-row">';
+    fields += sel('dirigente','Dirigente', vozAll.dirigente||[], esc.dirigente||'');
+    fields += sel('back1',   'Back 1',    vozAll.back1||[],     esc.back1||'');
+    fields += sel('back2',   'Back 2',    vozAll.back2||[],     esc.back2||'');
+    fields += sel('back3',   'Back 3',    vozAll.back3||[],     esc.back3||'');
+    fields += sel('back4',   'Back 4',    vozAll.back4||[],     esc.back4||'');
+    fields += '</div>';
+  } else {
+    var cd2 = (ESCALA_DATA[cong] || {});
+    var tec  = cd2.tecnica || {};
+
+    function selT(id, label, members, val) {
+      var opts = '<option value="">— Ninguém —</option>';
+      members.forEach(function(n) { opts += '<option value="'+n+'"'+(n===val?' selected':'')+'>'+n+'</option>'; });
+      return '<div class="f-group"><label class="f-label">'+label+'</label><select class="f-select" id="ge-'+id+'">'+opts+'</select></div>';
+    }
+    fields += '<p class="f-section">Som</p><div class="f-row">';
+    fields += selT('tecsom',    'Técnico de Som',  tec.som||[],        esc.tecsom||'');
+    fields += '</div><p class="f-section">Online</p><div class="f-row">';
+    fields += selT('online',    'Técnico Online',  tec.online||[],     esc.online||'');
+    fields += '</div><p class="f-section">Multimédia</p><div class="f-row">';
+    fields += selT('multimedia','Técnico Multimédia', tec.multimedia||[], esc.multimedia||'');
+    fields += '</div>';
+  }
+
+  document.getElementById('gerir-edit-fields').innerHTML = fields;
+  hide('gerir-edit-ok');
+  document.getElementById('gerir-edit-wrap').style.display = 'block';
+  document.getElementById('gerir-edit-wrap').scrollIntoView({behavior:'smooth'});
+}
+
+function fecharEditEscala() {
+  document.getElementById('gerir-edit-wrap').style.display = 'none';
+  _gerirEditDate = null;
+  _gerirEditTipo = null;
+}
+
+function guardarEdicaoEscala() {
+  if (!_gerirEditDate || !_gerirEditTipo) return;
+  var all = getEscalas();
+  var esc = (all[_gerirEditDate] || {})[_gerirEditTipo] || {};
+
+  function gev(id) { var el=document.getElementById('ge-'+id); return el?el.value:''; }
+
+  if (_gerirEditTipo === 'louvor') {
+    esc.diretor   = gev('diretor');
+    esc.piano     = gev('piano');
+    esc.gtAc      = gev('gt-ac');
+    esc.gtEl      = gev('gt-el');
+    esc.baixo     = gev('baixo');
+    esc.bateria   = gev('bateria');
+    esc.dirigente = gev('dirigente');
+    esc.back1     = gev('back1');
+    esc.back2     = gev('back2');
+    esc.back3     = gev('back3');
+    esc.back4     = gev('back4');
+  } else {
+    esc.tecsom    = gev('tecsom');
+    esc.online    = gev('online');
+    esc.multimedia= gev('multimedia');
+  }
+  esc.savedAt = new Date().toISOString();
+  esc.savedBy = SESSION.nome;
+
+  if (!all[_gerirEditDate]) all[_gerirEditDate] = {};
+  all[_gerirEditDate][_gerirEditTipo] = esc;
+  ss('ads_escalas', all);
+
+  show('gerir-edit-ok');
+  setTimeout(function() { hide('gerir-edit-ok'); }, 4000);
+  renderGerirEscalas();
+  fecharEditEscala();
+}
+
+
 function renderReport() {
   var escalas=getEscalas();
   var dates=Object.keys(escalas).sort();
@@ -1033,6 +1259,8 @@ function icoCalendar(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width
 function icoUsers(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>';}
 function icoMusic(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';}
 function icoHeadphones(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>';}
+function icoList(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>';}
+function icoMonitor(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>';}
 // ═══════════════════════════════════════════════════════════════════
 // FICHA DE PRODUÇÃO
 // ═══════════════════════════════════════════════════════════════════
