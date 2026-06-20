@@ -1226,7 +1226,7 @@
       card.className = 'prod-field-card';
       card.id = id;
       card._fileDataUrl = '';
-      card._fileName = '';
+      card._fileName    = '';
       card.innerHTML =
         '<button class="pfc-remove" type="button" onclick="removeProdField(\'' + id + '\')" title="Remover">✕</button>' +
         '<div class="pfc-grid">' +
@@ -1257,17 +1257,21 @@
           '<div class="f-group pfc-full">' +
             '<label class="f-label">Ficheiro</label>' +
             '<input class="f-input pf-ficheiro" type="file" style="padding:0.6rem 1rem;cursor:pointer;" />' +
+            '<span class="pf-fname" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:0.3rem;"></span>' +
           '</div>' +
         '</div>';
 
       document.getElementById(containerId).appendChild(card);
 
-      // When a file is chosen, read it as a data URL and store on the card element
+      // Read file into base64 data URL on the card element so PDF can embed/link it
       var fileInput = card.querySelector('.pf-ficheiro');
+      var fnameEl   = card.querySelector('.pf-fname');
       fileInput.addEventListener('change', function() {
         var file = fileInput.files[0];
-        if (!file) { card._fileDataUrl = ''; card._fileName = ''; return; }
+        if (!file) { card._fileDataUrl = ''; card._fileName = ''; fnameEl.style.display = 'none'; return; }
         card._fileName = file.name;
+        fnameEl.textContent = '\u2713 ' + file.name;
+        fnameEl.style.display = 'block';
         var reader = new FileReader();
         reader.onload = function(e) { card._fileDataUrl = e.target.result; };
         reader.readAsDataURL(file);
@@ -1328,21 +1332,18 @@
       var congLabel = congEl.options[congEl.selectedIndex] ? congEl.options[congEl.selectedIndex].text : '';
       var dataVal = document.getElementById('prod-data').value;
 
-      if (!congLabel) {
-        alert('Seleciona uma congregação primeiro.');
-        return;
-      }
+      if (!congLabel) { alert('Seleciona uma congregação primeiro.'); return; }
 
       var programa  = getGenericFieldItems('programa-list');
       var rehearsal = getGenericFieldItems('rehearsal-list');
       var outros    = getGenericFieldItems('other-times-list');
 
       var musicos = [
-        { label: 'Piano',              value: selVal('prod-piano') },
-        { label: 'Guitarra Acústica',  value: selVal('prod-gt-acustica') },
-        { label: 'Guitarra Elétrica',  value: selVal('prod-gt-eletrica') },
-        { label: 'Baixo',              value: selVal('prod-baixo') },
-        { label: 'Bateria',            value: selVal('prod-bateria') }
+        { label: 'Piano',             value: selVal('prod-piano') },
+        { label: 'Guitarra Acústica', value: selVal('prod-gt-acustica') },
+        { label: 'Guitarra Elétrica', value: selVal('prod-gt-eletrica') },
+        { label: 'Baixo',             value: selVal('prod-baixo') },
+        { label: 'Bateria',           value: selVal('prod-bateria') }
       ];
       var vozes = [
         { label: 'Back 1', value: selVal('prod-back1') },
@@ -1352,249 +1353,292 @@
       ];
       var lider = selVal('prod-dirigente');
       var tecnica = [
-        { label: 'Técnico de Som',       value: selVal('prod-som') },
-        { label: 'Técnico Online',       value: selVal('prod-online') },
-        { label: 'Técnico Multimédia',   value: selVal('prod-multimédia') }
+        { label: 'Técnico de Som',     value: selVal('prod-som') },
+        { label: 'Técnico Online',     value: selVal('prod-online') },
+        { label: 'Técnico Multimédia', value: selVal('prod-multimédia') }
       ];
 
       var { jsPDF } = window.jspdf;
       var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
       var pageW = 210, pageH = 297;
-      var marginOuter = 10;
-      var marginContent = 15;
-      var leftX = marginContent;
-      var rightX = pageW - marginContent;
-      var contentW = rightX - leftX;
-      var maxY = pageH - marginOuter - 12;
+      var mg = 10;
+      var cx = 15;
+      var cRight = 195;
+      var cW = cRight - cx;
+      var maxY = pageH - mg - 14;
+
+      // 40% left for programa, 60% right for escala — matching the reference image
+      var divX  = cx + cW * 0.40;
+      var rightX = divX + 5;
+      var rightW = cRight - rightX - 2;
+
+      // Programa sub-columns (within left side)
+      var colHoraEnd = cx + 24;
+      var colDur     = colHoraEnd + 2;
+      var colDurEnd  = colDur + 18;
+      var colTitle   = colDurEnd + 4;
+      var titleMaxW  = divX - colTitle - 3;
 
       function drawFrame() {
-        doc.setDrawColor(0, 0, 0);
+        doc.setDrawColor(0,0,0);
         doc.setLineWidth(0.4);
-        doc.rect(marginOuter, marginOuter, pageW - marginOuter * 2, pageH - marginOuter * 2);
+        doc.rect(mg, mg, pageW - mg*2, pageH - mg*2);
       }
       function newPage() {
         doc.addPage();
         drawFrame();
-        return marginContent + 10;
+        return mg + 12;
       }
 
       drawFrame();
 
+      // ── Header ──
       var y = 22;
-      doc.setFont('helvetica', 'bold');
+      doc.setFont('helvetica','bold');
       doc.setFontSize(26);
-      doc.setTextColor(0, 0, 0);
-      doc.text(congLabel, pageW / 2, y, { align: 'center' });
+      doc.setTextColor(0,0,0);
+      doc.text(congLabel, pageW/2, y, { align:'center' });
       y += 8;
-
       var dateLabel = '';
       if (dataVal) {
         var d = new Date(dataVal + 'T00:00:00');
-        dateLabel = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+        dateLabel = d.toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' });
       }
-      doc.setFont('helvetica', 'bold');
+      doc.setFont('helvetica','bold');
       doc.setFontSize(12);
-      doc.text(dateLabel, pageW / 2, y, { align: 'center' });
+      doc.text(dateLabel, pageW/2, y, { align:'center' });
       y += 12;
 
-      // Colunas
-      var colHoraEnd = leftX + 24;
-      var colDur = colHoraEnd + 2;
-      var colDurEnd = colDur + 18;
-      var colTitulo = colDurEnd + 4;
-      var maxTitleWidth = rightX - colTitulo - 2;
-
-      // Cabeçalho da tabela
-      doc.setFont('helvetica', 'bold');
+      // ── Table header row ──
+      doc.setFont('helvetica','bold');
       doc.setFontSize(8);
-      doc.setTextColor(0, 0, 0);
+      doc.setTextColor(0,0,0);
       if (programa.length) {
         var firstLabel = (formatDDMM(dataVal) + ' ' + formatHourAMPM(programa[0].hora)).trim();
-        doc.text(firstLabel, colHoraEnd, y, { align: 'right' });
+        doc.text(firstLabel, colHoraEnd, y, { align:'right' });
       }
-      doc.text('Length', colDur, y);
+      doc.text('Length',  colDur, y);
       doc.text('in mins', colDur, y + 3.4);
       y += 7;
 
-      // Linhas do programa
+      // ── Build right-column block list ──
+      var headings = ['Rehearsal Times','Other Times','Audio','Líderes de Louvor','Louvor (Vozes)','Louvor (Músicos)'];
+      var headingSet = {};
+      headings.forEach(function(h){ headingSet[h] = true; });
+
+      var rightBlocks = [];
+      function rBlock(bold, light, link, fdu, fn) {
+        rightBlocks.push({ bold: bold, light: light||'', link: link||'', fileDataUrl: fdu||'', fileName: fn||'' });
+      }
+
+      if (rehearsal.length) {
+        rBlock('Rehearsal Times');
+        rehearsal.forEach(function(it) {
+          var tl = (formatDDMM(it.data) + ' ' + formatHourAMPM(it.hora)).trim();
+          rBlock(it.titulo||'—', tl, it.link, it.fileDataUrl, it.fileName);
+        });
+      }
+      if (outros.length) {
+        rBlock('Other Times');
+        outros.forEach(function(it) {
+          var tl = (formatDDMM(it.data) + ' ' + formatHourAMPM(it.hora)).trim();
+          rBlock(it.titulo||'—', tl, it.link, it.fileDataUrl, it.fileName);
+        });
+      }
+      rBlock('Audio');
+      tecnica.forEach(function(it){ rBlock(it.label, it.value||'—'); });
+      rBlock('Líderes de Louvor');
+      rBlock('Líder', lider||'—');
+      rBlock('Louvor (Vozes)');
+      vozes.forEach(function(it){ rBlock(it.label, it.value||'—'); });
+      rBlock('Louvor (Músicos)');
+      musicos.forEach(function(it){ rBlock(it.label, it.value||'—'); });
+
+      function rightBlockH(blk) {
+        if (headingSet[blk.bold]) return 8;
+        var h = 9;
+        if (blk.link) h += 5;
+        if (blk.fileDataUrl && blk.fileName) h += 5.5;
+        return h;
+      }
+
+      function renderRightBlock(blk, ry) {
+        if (headingSet[blk.bold]) {
+          doc.setFont('helvetica','bold');
+          doc.setFontSize(9.5);
+          doc.setTextColor(0,0,0);
+          doc.text(blk.bold, rightX, ry + 5.5);
+          return ry + 8;
+        }
+        doc.setFont('helvetica','bold');
+        doc.setFontSize(8.2);
+        doc.setTextColor(0,0,0);
+        doc.text(blk.bold, rightX, ry + 4);
+        var ny = ry + 4 + 3.8;
+        if (blk.light) {
+          doc.setFont('helvetica','normal');
+          doc.setFontSize(7.5);
+          doc.setTextColor(90,90,90);
+          doc.text(blk.light, rightX, ny);
+          ny += 4.2;
+        }
+        if (blk.link) {
+          doc.setFont('helvetica','normal');
+          doc.setFontSize(7);
+          doc.setTextColor(0,80,180);
+          var lt = blk.link.length > 32 ? blk.link.slice(0,32)+'\u2026' : blk.link;
+          doc.textWithLink(lt, rightX, ny, { url: blk.link });
+          doc.setTextColor(0,0,0);
+          ny += 5;
+        }
+        if (blk.fileDataUrl && blk.fileName) {
+          doc.setFont('helvetica','bold');
+          doc.setFontSize(7.5);
+          doc.setTextColor(30,30,30);
+          var ft = '\u2193 ' + (blk.fileName.length > 28 ? blk.fileName.slice(0,28)+'\u2026' : blk.fileName);
+          doc.text(ft, rightX, ny);
+          doc.link(rightX, ny - 3.5, rightW, 4.5, { url: blk.fileDataUrl });
+          ny += 5.5;
+        }
+        return ry + rightBlockH(blk);
+      }
+
+      // ── Render programme rows + right blocks in parallel ──
+      var rIdx   = 0;
+      var rightY = y;
+      var headerY = y; // remember y after table header for divider
+
       programa.forEach(function(item, idx) {
-        doc.setFont('helvetica', 'bold');
+        doc.setFont('helvetica','bold');
         doc.setFontSize(8.5);
-        var titleLines = doc.splitTextToSize(item.titulo || ' ', maxTitleWidth);
-
-        doc.setFont('helvetica', 'normal');
+        var titleLines = doc.splitTextToSize(item.titulo || ' ', titleMaxW);
+        doc.setFont('helvetica','normal');
         doc.setFontSize(7.3);
-        var descLines = item.desc ? doc.splitTextToSize(item.desc, maxTitleWidth) : [];
+        var descLines = item.desc ? doc.splitTextToSize(item.desc, titleMaxW) : [];
 
-        var extraLines = (titleLines.length - 1) + descLines.length;
-        var rowH = 9 + extraLines * 3.6;
-        if (rowH < 9) rowH = 9;
+        var extraH = (titleLines.length - 1) * 3.6 + descLines.length * 3.6;
+        var linkH  = item.link ? 4.5 : 0;
+        var fileH  = (item.fileDataUrl && item.fileName) ? 5 : 0;
+        var rowH   = Math.max(9, 9 + extraH + linkH + fileH);
 
-        if (y + rowH > maxY) { y = newPage(); }
+        if (y + rowH > maxY) { y = newPage(); rightY = y; }
 
-        var bg = idx % 2 === 0 ? [243, 243, 243] : [255, 255, 255];
-        doc.setFillColor(bg[0], bg[1], bg[2]);
-        doc.rect(leftX, y, contentW, rowH, 'F');
+        // Left row background (only over left column)
+        var bg = idx % 2 === 0 ? [243,243,243] : [255,255,255];
+        doc.setFillColor(bg[0],bg[1],bg[2]);
+        doc.rect(cx, y, divX - cx - 2, rowH, 'F');
 
         var textY = y + 5;
 
-        doc.setFont('helvetica', 'normal');
+        // Hora
+        doc.setFont('helvetica','normal');
         doc.setFontSize(8);
-        doc.setTextColor(40, 40, 40);
-        doc.text(formatHourAMPM(item.hora), colHoraEnd, textY, { align: 'right' });
+        doc.setTextColor(40,40,40);
+        doc.text(formatHourAMPM(item.hora), colHoraEnd, textY, { align:'right' });
 
-        doc.setFont('helvetica', 'bold');
+        // Duração
+        doc.setFont('helvetica','bold');
         doc.setFontSize(8.5);
-        doc.setTextColor(0, 0, 0);
+        doc.setTextColor(0,0,0);
         doc.text(item.duracao ? (item.duracao + ' min') : '', colDur, textY);
 
-        doc.setFont('helvetica', 'bold');
+        // Título
+        doc.setFont('helvetica','bold');
         doc.setFontSize(8.5);
-        doc.setTextColor(0, 0, 0);
+        doc.setTextColor(0,0,0);
         titleLines.forEach(function(line, i2) {
-          doc.text(line, colTitulo, textY + 3.6 * i2);
+          doc.text(line, colTitle, textY + 3.6*i2);
         });
 
-        doc.setFont('helvetica', 'normal');
+        // Descrição
+        doc.setFont('helvetica','normal');
         doc.setFontSize(7.3);
-        doc.setTextColor(70, 70, 70);
+        doc.setTextColor(70,70,70);
+        var afterTitle = textY + 3.6 * titleLines.length;
         descLines.forEach(function(line, i2) {
-          doc.text(line, colTitulo, textY + 3.6 * (titleLines.length + i2));
+          doc.text(line, colTitle, afterTitle + 3.6*i2);
         });
+
+        var afterDesc = afterTitle + 3.6 * descLines.length;
+
+        // Link no programa
+        if (item.link) {
+          doc.setFont('helvetica','normal');
+          doc.setFontSize(7);
+          doc.setTextColor(0,80,180);
+          var lt = item.link.length > 45 ? item.link.slice(0,45)+'\u2026' : item.link;
+          doc.textWithLink(lt, colTitle, afterDesc, { url: item.link });
+          doc.setTextColor(0,0,0);
+          afterDesc += 4.5;
+        }
+
+        // Ficheiro no programa
+        if (item.fileDataUrl && item.fileName) {
+          doc.setFont('helvetica','bold');
+          doc.setFontSize(7.5);
+          doc.setTextColor(30,30,30);
+          var fn = '\u2193 ' + (item.fileName.length > 40 ? item.fileName.slice(0,40)+'\u2026' : item.fileName);
+          doc.text(fn, colTitle, afterDesc);
+          doc.link(colTitle, afterDesc - 3.5, titleMaxW, 4, { url: item.fileDataUrl });
+        }
+
+        // Fill right column alongside this row
+        var rowBottom = y + rowH;
+        while (rIdx < rightBlocks.length) {
+          var blk = rightBlocks[rIdx];
+          var bh  = rightBlockH(blk);
+          if (rightY + bh <= rowBottom + 1) {
+            rightY = renderRightBlock(blk, rightY);
+            rIdx++;
+          } else {
+            break;
+          }
+        }
+        if (rightY < rowBottom) rightY = rowBottom;
 
         y += rowH;
       });
 
-      // Linha de totais
+      // ── Totals line ──
       if (y + 14 > maxY) { y = newPage(); }
-      doc.setDrawColor(0, 0, 0);
+      doc.setDrawColor(0,0,0);
       doc.setLineWidth(0.6);
-      doc.line(leftX, y, rightX, y);
+      doc.line(cx, y, divX - 2, y);
       y += 5;
-      var totalMin = programa.reduce(function(acc, it) { return acc + (parseInt(it.duracao, 10) || 0); }, 0);
-      var lastHora = programa.length ? formatHourAMPM(programa[programa.length - 1].hora) : '';
-      doc.setFont('helvetica', 'bold');
+      var totalMin = programa.reduce(function(acc,it){ return acc + (parseInt(it.duracao,10)||0); }, 0);
+      var lastHora = programa.length ? formatHourAMPM(programa[programa.length-1].hora) : '';
+      doc.setFont('helvetica','bold');
       doc.setFontSize(9);
-      doc.setTextColor(0, 0, 0);
-      doc.text(lastHora || '', colHoraEnd, y, { align: 'right' });
+      doc.setTextColor(0,0,0);
+      doc.text(lastHora||'', colHoraEnd, y, { align:'right' });
       doc.text(totalMin + ' min', colDur, y);
       y += 11;
+      if (rightY < y) rightY = y;
 
-      // Secção inferior em duas colunas
-      if (y + 20 > maxY) { y = newPage(); }
-      var bottomTop = y;
-      var dividerX = leftX + contentW * 0.40;
-      var leftColX = leftX;
-      var rightColX = dividerX + 6;
-      var leftY = bottomTop;
-      var rightY = bottomTop;
-
-      function sectionHeading(x, yy, text) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
-        doc.text(text, x, yy);
-        return yy + 5;
-      }
-      function entryBoldThenSmall(x, yy, boldText, smallText) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8.5);
-        doc.setTextColor(0, 0, 0);
-        doc.text(boldText, x, yy);
-        yy += 3.8;
-        if (smallText) {
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(7.5);
-          doc.setTextColor(90, 90, 90);
-          doc.text(smallText, x, yy);
-          yy += 4.2;
-        } else {
-          yy += 1;
-        }
-        return yy + 1.5;
+      // ── Remaining right blocks after programme ──
+      while (rIdx < rightBlocks.length) {
+        var blk = rightBlocks[rIdx];
+        if (rightY + rightBlockH(blk) > maxY) { rightY = newPage(); }
+        rightY = renderRightBlock(blk, rightY);
+        rIdx++;
       }
 
-      leftY = sectionHeading(leftColX, leftY, 'Rehearsal Times');
-      rehearsal.forEach(function(it) {
-        var timeLabel = (formatDDMM(it.data) + ' ' + formatHourAMPM(it.hora)).trim();
-        leftY = entryBoldThenSmall(leftColX, leftY, it.titulo || '—', timeLabel);
-        // Link as hyperlink
-        if (it.link) {
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(7);
-          doc.setTextColor(0, 80, 180);
-          doc.textWithLink(it.link.length > 38 ? it.link.slice(0, 38) + '…' : it.link, leftColX, leftY, { url: it.link });
-          doc.setTextColor(0, 0, 0);
-          leftY += 5;
-        }
-        // File as download icon + name
-        if (it.fileDataUrl && it.fileName) {
-          doc.setFont('helvetica', 'bold');
-          doc.setFontSize(7.5);
-          doc.setTextColor(30, 30, 30);
-          doc.text('\u2193 ' + it.fileName, leftColX, leftY);
-          doc.link(leftColX, leftY - 3.5, 60, 4.5, { url: it.fileDataUrl });
-          leftY += 5.5;
-        }
-      });
-      leftY += 3;
-      leftY = sectionHeading(leftColX, leftY, 'Other Times');
-      outros.forEach(function(it) {
-        var timeLabel = (formatDDMM(it.data) + ' ' + formatHourAMPM(it.hora)).trim();
-        leftY = entryBoldThenSmall(leftColX, leftY, it.titulo || '—', timeLabel);
-        // Link as hyperlink
-        if (it.link) {
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(7);
-          doc.setTextColor(0, 80, 180);
-          doc.textWithLink(it.link.length > 38 ? it.link.slice(0, 38) + '…' : it.link, leftColX, leftY, { url: it.link });
-          doc.setTextColor(0, 0, 0);
-          leftY += 5;
-        }
-        // File as download icon + name
-        if (it.fileDataUrl && it.fileName) {
-          doc.setFont('helvetica', 'bold');
-          doc.setFontSize(7.5);
-          doc.setTextColor(30, 30, 30);
-          doc.text('\u2193 ' + it.fileName, leftColX, leftY);
-          doc.link(leftColX, leftY - 3.5, 60, 4.5, { url: it.fileDataUrl });
-          leftY += 5.5;
-        }
-      });
-
-      rightY = sectionHeading(rightColX, rightY, 'Audio');
-      tecnica.forEach(function(it) {
-        rightY = entryBoldThenSmall(rightColX, rightY, it.label, it.value || '—');
-      });
-      rightY += 2;
-      rightY = sectionHeading(rightColX, rightY, 'Líder de Louvor');
-      rightY = entryBoldThenSmall(rightColX, rightY, 'Líder', lider || '—');
-      rightY += 2;
-      rightY = sectionHeading(rightColX, rightY, 'Louvor (Vozes)');
-      vozes.forEach(function(it) {
-        rightY = entryBoldThenSmall(rightColX, rightY, it.label, it.value || '—');
-      });
-      rightY += 2;
-      rightY = sectionHeading(rightColX, rightY, 'Louvor (Músicos)');
-      musicos.forEach(function(it) {
-        rightY = entryBoldThenSmall(rightColX, rightY, it.label, it.value || '—');
-      });
-
-      // Divisória pontilhada entre colunas
-      var dividerBottom = Math.max(leftY, rightY);
-      doc.setLineDashPattern([0.6, 0.8], 0);
-      doc.setDrawColor(150, 150, 150);
+      // ── Dotted divider (full height) ──
+      var divBottom = Math.max(y, rightY) + 4;
+      doc.setLineDashPattern([0.6,0.8], 0);
+      doc.setDrawColor(150,150,150);
       doc.setLineWidth(0.2);
-      doc.line(dividerX, bottomTop - 4, dividerX, dividerBottom);
+      doc.line(divX, headerY - 4, divX, Math.min(divBottom, maxY));
       doc.setLineDashPattern([], 0);
 
-      doc.setFont('helvetica', 'normal');
+      // ── Footer ──
+      doc.setFont('helvetica','normal');
       doc.setFontSize(7);
-      doc.setTextColor(140, 140, 140);
-      doc.text('AD Setúbal — Documento gerado automaticamente', pageW / 2, pageH - marginOuter - 4, { align: 'center' });
+      doc.setTextColor(140,140,140);
+      doc.text('AD Set\u00fabal \u2014 Documento gerado automaticamente', pageW/2, pageH - mg - 4, { align:'center' });
 
-      var fname = 'programa-' + congLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + (dataVal || new Date().toISOString().slice(0, 10)) + '.pdf';
+      var fname = 'programa-' + congLabel.toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-' + (dataVal || new Date().toISOString().slice(0,10)) + '.pdf';
       doc.save(fname);
     }
   </script>
