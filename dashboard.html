@@ -672,18 +672,20 @@ function onEscLouReady() {
 function populateEscLou(cong, ds) {
   var cd = ESCALA_DATA[cong];
   if (!cd) return;
-  var avail = getAvail(ds, 'louvor');
+  var avail = getAvail(ds, 'louvor'); // only members who marked presence
 
   function pop(map, bucket) {
     Object.keys(map).forEach(function(selId) {
       var key = map[selId];
       var sel = document.getElementById(selId);
-      var members = (cd[bucket]&&cd[bucket][key]) || [];
+      // Only keep members who are present for this date
+      var members = ((cd[bucket]&&cd[bucket][key]) || []).filter(function(n) {
+        return avail.includes(n);
+      });
       sel.innerHTML = '<option value="">— Ninguém —</option>';
       members.forEach(function(n) {
         var opt = document.createElement('option');
         opt.value = n; opt.textContent = n;
-        if (avail.length && !avail.includes(n)) opt.style.color = 'rgba(255,255,255,0.28)';
         sel.appendChild(opt);
       });
       sel.disabled = !members.length;
@@ -743,16 +745,18 @@ function onEscSomReady() {
 
 function populateEscSom(cong, ds) {
   var cd=ESCALA_DATA[cong]; if(!cd) return;
-  var avail=getAvail(ds,'somimagem');
+  var avail=getAvail(ds,'somimagem'); // only members who marked presence
   var keys=['som','online','multimedia'];
   ESC_SOM_IDS.forEach(function(selId,i){
     var sel=document.getElementById(selId);
-    var members=(cd.tecnica&&cd.tecnica[keys[i]])||[];
+    // Only keep members who are present for this date
+    var members=((cd.tecnica&&cd.tecnica[keys[i]])||[]).filter(function(n){
+      return avail.includes(n);
+    });
     sel.innerHTML='<option value="">— Ninguém —</option>';
     members.forEach(function(n){
       var opt=document.createElement('option');
       opt.value=n;opt.textContent=n;
-      if(avail.length&&!avail.includes(n)) opt.style.color='rgba(255,255,255,0.28)';
       sel.appendChild(opt);
     });
     sel.disabled=!members.length;
