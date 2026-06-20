@@ -833,11 +833,15 @@
           back3:     ['Ana Maria', 'Macarena Caville', 'David Lucero', 'Marta Lucero', 'Raquel Sousa'],
           back4:     ['Ana Maria', 'Macarena Caville', 'David Lucero', 'Marta Lucero', 'Raquel Sousa']
         },
-        // Pool partilhado por Som, Online e Multimédia — exclusivo desta congregação.
-        tecnica: ['Tito Lucero', 'Paulo Sacramento', 'Enzo Trega', 'Edmanuel', 'Samuel de Andrade']
+        // Som, Online e Multimédia têm cada um o seu próprio pool de pessoas.
+        tecnica: {
+          som:        ['Tito Lucero', 'Paulo Sacramento', 'Enzo Trega', 'Edmanuel', 'Samuel de Andrade'],
+          online:     ['Tito Lucero', 'Paulo Sacramento', 'Enzo Trega', 'Edmanuel', 'Samuel de Andrade'],
+          multimedia: ['Tito Lucero', 'Paulo Sacramento', 'Enzo Trega', 'Edmanuel', 'Samuel de Andrade']
+        }
       }
       // Adiciona aqui outras congregações com o mesmo formato quando necessário:
-      // barreiro: { instrumentos: { ... }, vozes: { ... }, tecnica: [ ... ] }
+      // barreiro: { instrumentos: { ... }, vozes: { ... }, tecnica: { som: [...], online: [...], multimedia: [...] } }
     };
 
     // Mapeamento select id -> chave nos dados
@@ -1167,6 +1171,11 @@
       'prod-back3':     'back3',
       'prod-back4':     'back4'
     };
+    var PROD_TECNICA_KEY = {
+      'prod-som':         'som',
+      'prod-online':      'online',
+      'prod-multimédia':  'multimedia'
+    };
 
     function onProdCongregacaoChange() {
       var cong = document.getElementById('prod-congregacao').value;
@@ -1202,17 +1211,7 @@
 
       populate(PROD_INSTR_KEY, 'instrumentos');
       populate(PROD_VOZ_KEY, 'vozes');
-
-      PROD_TECNICA_IDS.forEach(function(selId) {
-        var sel = document.getElementById(selId);
-        var members = data.tecnica || [];
-        members.forEach(function(name) {
-          var opt = document.createElement('option');
-          opt.value = name; opt.textContent = name;
-          sel.appendChild(opt);
-        });
-        if (members.length === 0) sel.disabled = true;
-      });
+      populate(PROD_TECNICA_KEY, 'tecnica');
 
       onProdChange();
     }
