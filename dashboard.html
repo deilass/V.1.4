@@ -323,6 +323,12 @@
           <form id="content-form" action="https://formspree.io/f/mzdqnrzk" method="POST" onsubmit="handleSubmit(event)">
             <input type="hidden" name="_subject" value="Pedido de Conteúdo — AD Setúbal" />
 
+            <!-- 0. NOME -->
+            <div class="f-group">
+              <label class="f-label" for="nome-pedido">O teu nome *</label>
+              <input class="f-input" type="text" name="nome" id="nome-pedido" placeholder="Ex.: João Silva" required />
+            </div>
+
             <!-- 1. FINALIDADE -->
             <p class="f-section">1 — Finalidade do Evento</p>
             <div class="f-group">
@@ -782,8 +788,8 @@
     }
 
     // ── ENVIO DO FORMULÁRIO → DISCORD WEBHOOK ─────────────────────
-    // Cola aqui o teu Webhook URL do Discord
-    var DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1517840979913211914/zsHqZ4RRavxsEZLQNRYduJCr9Mh9OpqQvXXK3YwjSLe_RSeGu77vPtZ6meOXy1iOYdTh';
+    var DISCORD_WEBHOOK_GERAL   = 'https://discord.com/api/webhooks/1517840979913211914/zsHqZ4RRavxsEZLQNRYduJCr9Mh9OpqQvXXK3YwjSLe_RSeGu77vPtZ6meOXy1iOYdTh';
+    var DISCORD_WEBHOOK_CONNECT = 'https://discord.com/api/webhooks/1517842583861334137/m25oclR8_5I7rLU0G9igKe4BkF19eoxKiL-x1Nfqe-3CWYgxUYzocEhGgWkW6lMo2izR';
 
     async function handleSubmit(e) {
       e.preventDefault();
@@ -800,7 +806,8 @@
       // Recolher os dados do formulário
       var fd = new FormData(form);
 
-      var finalidade  = fd.get('finalidade')        || '—';
+      var nome        = fd.get('nome')               || '—';
+      var finalidade  = fd.get('finalidade')         || '—';
       var ambito      = fd.get('ambito')             || '—';
       var congregacao = fd.get('congregacao')        || '—';
       var tema        = fd.get('tema')               || '—';
@@ -809,6 +816,9 @@
       var local       = fd.get('local')              || '—';
       var dataDivulg  = fd.get('data_divulgacao')    || '—';
       var infoAdic    = fd.get('info_adicional')     || '';
+
+      // Escolher webhook consoante a finalidade
+      var webhookURL = (finalidade === 'Connect') ? DISCORD_WEBHOOK_CONNECT : DISCORD_WEBHOOK_GERAL;
 
       // Checkboxes de conteúdo (podem ser múltiplos)
       var conteudos = fd.getAll('conteudo');
@@ -822,17 +832,18 @@
       }
 
       var embed = {
-        title: '\uD83C\uDFA8 Novo Pedido de Conteúdo',
-        color: 0x29A8AB, // teal da AD Setúbal
+        title: '\uD83C\uDFA8 Novo Pedido de Conteúdo' + (finalidade === 'Connect' ? ' — Connect' : ' — AD Setúbal'),
+        color: finalidade === 'Connect' ? 0xF97316 : 0x29A8AB,
         fields: [
-          { name: '\uD83C\uDFDB\uFE0F Congregação', value: congregacao, inline: true },
-          { name: '\uD83C\uDFAF Finalidade',         value: finalidade,  inline: true },
-          { name: '\uD83C\uDF0D Âmbito',             value: ambito,      inline: true },
-          { name: '\uD83D\uDCCC Tipo de Conteúdo',   value: conteudoStr, inline: false },
-          { name: '\uD83D\uDCDD Tema / Título',       value: tema,        inline: false },
-          { name: '\uD83D\uDCC5 Data do Evento',      value: fmtDate(dataEvento) + ' às ' + horaEvento, inline: true },
-          { name: '\uD83D\uDCCD Local',               value: local,       inline: true },
-          { name: '\uD83D\uDCC6 Data de Divulgação',  value: fmtDate(dataDivulg), inline: true }
+          { name: '\uD83D\uDC64 Pedido por',          value: nome,        inline: true },
+          { name: '\uD83C\uDFAF Finalidade',           value: finalidade,  inline: true },
+          { name: '\uD83C\uDFDB\uFE0F Congregação',    value: congregacao, inline: true },
+          { name: '\uD83C\uDF0D Âmbito',               value: ambito,      inline: true },
+          { name: '\uD83D\uDCCC Tipo de Conteúdo',     value: conteudoStr, inline: false },
+          { name: '\uD83D\uDCDD Tema / Título',         value: tema,        inline: false },
+          { name: '\uD83D\uDCC5 Data do Evento',        value: fmtDate(dataEvento) + ' às ' + horaEvento, inline: true },
+          { name: '\uD83D\uDCCD Local',                 value: local,       inline: true },
+          { name: '\uD83D\uDCC6 Data de Divulgação',    value: fmtDate(dataDivulg), inline: true }
         ],
         timestamp: new Date().toISOString(),
         footer: { text: 'AD Setúbal — Dashboard' }
@@ -843,10 +854,7 @@
       }
 
       try {
-        if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL === 'COLE_AQUI_O_WEBHOOK_URL') {
-          throw new Error('Webhook URL não configurado.');
-        }
-        var res = await fetch(DISCORD_WEBHOOK_URL, {
+        var res = await fetch(webhookURL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ embeds: [embed] })
