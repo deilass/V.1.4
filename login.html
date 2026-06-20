@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrar | AD Setúbal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --dark:  #111111;
+      --dark2: #181818;
+      --teal:  #29A8AB;
+      --orange:#F5821F;
+    }
+    body {
+      background: var(--dark);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Barlow', sans-serif;
+      padding: 2rem;
+    }
+
+    .login-wrap {
+      width: 100%; max-width: 420px;
+    }
+
+    .login-brand {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .login-brand-line {
+      width: 2px; height: 40px;
+      background: var(--teal);
+      margin: 0 auto 1.2rem;
+    }
+    .login-brand-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1rem; font-weight: 800;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+    }
+    .login-brand-sub {
+      font-size: 0.75rem; color: rgba(255,255,255,0.25);
+      letter-spacing: 0.1em; margin-top: 0.2rem;
+    }
+
+    .login-card {
+      background: var(--dark2);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 2.5rem;
+    }
+    .login-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 2rem; font-weight: 900;
+      color: #fff; text-transform: uppercase;
+      line-height: 1; margin-bottom: 0.4rem;
+    }
+    .login-sub {
+      font-size: 0.84rem; color: rgba(255,255,255,0.3);
+      margin-bottom: 2rem; line-height: 1.6;
+    }
+
+    .f-group { margin-bottom: 1.2rem; }
+    .f-label {
+      display: block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); margin-bottom: 0.6rem;
+    }
+    .f-input {
+      width: 100%; padding: 0.85rem 1rem;
+      border: 1.5px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem; color: #fff;
+      outline: none; transition: border-color 0.2s;
+    }
+    .f-input::placeholder { color: rgba(255,255,255,0.15); }
+    .f-input:focus { border-color: var(--teal); }
+
+    .login-btn {
+      width: 100%; padding: 1rem;
+      background: var(--teal); color: #fff; border: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s;
+      margin-top: 0.5rem;
+    }
+    .login-btn:hover { background: var(--orange); }
+    .login-btn:disabled { background: rgba(255,255,255,0.08); cursor: not-allowed; }
+
+    .login-error {
+      display: none;
+      padding: 0.85rem 1rem;
+      border-left: 3px solid #dc2626;
+      background: rgba(220,38,38,0.08);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.08em; color: #f87171;
+      margin-top: 1rem; text-transform: uppercase;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.72rem; color: rgba(255,255,255,0.15);
+      letter-spacing: 0.06em;
+    }
+
+    /* loading spinner */
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle; margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="login-brand-line"></div>
+      <div class="login-brand-name">AD Setúbal</div>
+      <div class="login-brand-sub">Assembleia de Deus de Setúbal</div>
+    </div>
+
+    <div class="login-card">
+      <h1 class="login-title">Entrar</h1>
+      <p class="login-sub">Acesso reservado à equipa interna.</p>
+
+      <div class="f-group">
+        <label class="f-label" for="username">Utilizador</label>
+        <input class="f-input" type="text" id="username" placeholder="utilizador" autocomplete="username" />
+      </div>
+      <div class="f-group">
+        <label class="f-label" for="password">Palavra-passe</label>
+        <input class="f-input" type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      <button class="login-btn" id="login-btn" onclick="doLogin()">Entrar</button>
+      <div class="login-error" id="login-error">✕ Utilizador ou palavra-passe incorretos.</div>
+    </div>
+
+    <div class="login-footer">AD Setúbal &mdash; Área Restrita &mdash; 2025</div>
+  </div>
+
+  <script>
+    // Allow Enter key to submit
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doLogin();
+    });
+
+    async function doLogin() {
+      var username = document.getElementById('username').value.trim();
+      var password = document.getElementById('password').value;
+      var btn      = document.getElementById('login-btn');
+      var errEl    = document.getElementById('login-error');
+
+      errEl.style.display = 'none';
+
+      if (!username || !password) {
+        errEl.textContent = '✕ Preenche todos os campos.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.innerHTML = '<span class="spinner"></span>A verificar…';
+      btn.disabled  = true;
+
+      try {
+        // Fetch user database
+        var res  = await fetch('login.json');
+        var db   = await res.json();
+        var user = db.users.find(function(u) {
+          return u.username === username && u.password === password;
+        });
+
+        if (!user) {
+          errEl.textContent    = '✕ Utilizador ou palavra-passe incorretos.';
+          errEl.style.display  = 'block';
+          btn.innerHTML        = 'Entrar';
+          btn.disabled         = false;
+          return;
+        }
+
+        // Store session in sessionStorage
+        sessionStorage.setItem('ads_user', JSON.stringify({
+          id:     user.id,
+          nome:   user.nome,
+          role:   user.role,
+          equipa: user.equipa
+        }));
+
+        // Redirect to dashboard
+        window.location.href = 'dashboard.html';
+
+      } catch (err) {
+        errEl.textContent   = '✕ Erro ao carregar dados. Tenta novamente.';
+        errEl.style.display = 'block';
+        btn.innerHTML       = 'Entrar';
+        btn.disabled        = false;
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+{
+  "users": [
+    {
+      "id": "u1",
+      "username": "gestor.louvor",
+      "password": "louvor2025",
+      "nome": "João Amaral",
+      "role": "g-louvor",
+      "equipa": "louvor"
+    },
+    {
+      "id": "u2",
+      "username": "gestor.som",
+      "password": "som2025",
+      "nome": "Tito Lucero",
+      "role": "g-somimagem",
+      "equipa": "somimagem"
+    },
+    {
+      "id": "u3",
+      "username": "producao",
+      "password": "prod2025",
+      "nome": "Admin Produção",
+      "role": "producao",
+      "equipa": "producao"
+    },
+    {
+      "id": "u4",
+      "username": "marta.lucero",
+      "password": "marta123",
+      "nome": "Marta Lucero",
+      "role": "m-louvor",
+      "equipa": "louvor"
+    },
+    {
+      "id": "u5",
+      "username": "david.lucero",
+      "password": "david123",
+      "nome": "David Lucero",
+      "role": "m-louvor",
+      "equipa": "louvor"
+    },
+    {
+      "id": "u6",
+      "username": "ana.maria",
+      "password": "ana123",
+      "nome": "Ana Maria",
+      "role": "m-louvor",
+      "equipa": "louvor"
+    },
+    {
+      "id": "u7",
+      "username": "raquel.sousa",
+      "password": "raquel123",
+      "nome": "Raquel Sousa",
+      "role": "m-louvor",
+      "equipa": "louvor"
+    },
+    {
+      "id": "u8",
+      "username": "macarena.caville",
+      "password": "macarena123",
+      "nome": "Macarena Caville",
+      "role": "m-louvor",
+      "equipa": "louvor"
+    },
+    {
+      "id": "u9",
+      "username": "arao.caville",
+      "password": "arao123",
+      "nome": "Arão Caville",
+      "role": "m-louvor",
+      "equipa": "louvor"
+    },
+    {
+      "id": "u10",
+      "username": "maria.catarina",
+      "password": "catarina123",
+      "nome": "Maria Catarina",
+      "role": "m-louvor",
+      "equipa": "louvor"
+    },
+    {
+      "id": "u11",
+      "username": "paulo.sacramento",
+      "password": "paulo123",
+      "nome": "Paulo Sacramento",
+      "role": "m-somimagem",
+      "equipa": "somimagem"
+    },
+    {
+      "id": "u12",
+      "username": "enzo.trega",
+      "password": "enzo123",
+      "nome": "Enzo Trega",
+      "role": "m-somimagem",
+      "equipa": "somimagem"
+    },
+    {
+      "id": "u13",
+      "username": "edmanuel",
+      "password": "edmanuel123",
+      "nome": "Edmanuel",
+      "role": "m-somimagem",
+      "equipa": "somimagem"
+    },
+    {
+      "id": "u14",
+      "username": "samuel.andrade",
+      "password": "samuel123",
+      "nome": "Samuel de Andrade",
+      "role": "m-somimagem",
+      "equipa": "somimagem"
+    }
+  ]
+}
