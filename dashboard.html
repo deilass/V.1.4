@@ -20,6 +20,19 @@
     body { background: var(--dark); min-height: 100vh; font-family: 'Barlow', sans-serif; color: #fff; }
     #app { display: none; }
 
+    /* ── sync status pill ── */
+    #sync-status {
+      position: fixed; bottom: 1.2rem; right: 1.2rem; z-index: 999;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .65rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 2px;
+      pointer-events: none; opacity: 0; transition: opacity .3s;
+    }
+    #sync-status.visible { opacity: 1; }
+    #sync-status.syncing { background: rgba(245,130,31,.18); color: var(--orange); }
+    #sync-status.ok      { background: rgba(41,168,171,.18);  color: var(--teal);   }
+    #sync-status.err     { background: rgba(220,38,38,.18);   color: #f87171;       }
+
     .topbar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       height: 60px; background: var(--dark2);
@@ -137,6 +150,7 @@
     .cal-day.cal-past { opacity: .3 !important; pointer-events: none; }
     .cal-day.cal-today { border-color: rgba(255,255,255,.2); color: #fff; }
     .cal-day.cal-marked { background: rgba(41,168,171,.18); border-color: var(--teal); color: var(--teal); font-weight: 700; }
+    .cal-day.cal-toggling { opacity: .5; pointer-events: none; }
     .cal-dot { display: none; position: absolute; bottom: 3px; width: 4px; height: 4px; background: var(--teal); border-radius: 50%; }
     .cal-day.cal-marked .cal-dot { display: block; }
     .cal-legend { display: flex; gap: 1.2rem; margin-top: 1rem; font-size: .75rem; color: rgba(255,255,255,.3); }
@@ -197,6 +211,15 @@
     .pfc-remove { position: absolute; top: .6rem; right: .8rem; background: none; border: none; color: rgba(255,255,255,.2); font-size: .95rem; cursor: pointer; transition: color .2s; font-family: 'Barlow Condensed', sans-serif; }
     .pfc-remove:hover { color: #f87171; }
 
+    /* API config banner */
+    .api-config-banner {
+      background: rgba(245,130,31,.08); border: 1px solid rgba(245,130,31,.25);
+      padding: 1rem 1.4rem; margin-bottom: 1.5rem; max-width: 820px;
+    }
+    .api-config-banner p { font-size: .82rem; color: rgba(255,255,255,.5); line-height: 1.7; }
+    .api-config-banner strong { color: var(--orange); }
+    .api-config-banner code { background: rgba(255,255,255,.07); padding: 1px 6px; font-size: .78rem; color: #fff; }
+
     @media (max-width: 860px) {
       .dash-wrap { grid-template-columns: 1fr; }
       .dash-sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; padding: .5rem; border-right: none; border-bottom: 1px solid rgba(255,255,255,.06); }
@@ -211,6 +234,9 @@
   </style>
 </head>
 <body>
+
+<!-- Sync status pill -->
+<div id="sync-status"></div>
 
 <div id="app">
 
@@ -241,6 +267,9 @@
           <h1 class="panel-title">Marcar<br>Presença</h1>
           <p class="panel-desc">Marca os domingos em que estás disponível. Os gestores verão a tua disponibilidade ao criar as escalas.</p>
         </div>
+        <div id="cal-api-warn" class="api-config-banner" style="display:none;">
+          <p>⚠ <strong>API não configurada.</strong> As presenças estão a ser guardadas <strong>apenas neste dispositivo</strong> (localStorage). Para guardar na nuvem, configura o <code>SHEETS_API_URL</code> no início do script.</p>
+        </div>
         <div class="cal-wrap">
           <div class="cal-header">
             <button class="cal-nav-btn" onclick="calNav(-1)">&#8249;</button>
@@ -268,6 +297,7 @@
             <option value="louvor">Equipa de Louvor</option>
             <option value="somimagem">Equipa de Som/Imagem</option>
           </select>
+          <button class="f-submit" style="margin-top:0;font-size:.72rem;padding:.55rem 1.2rem;" onclick="reloadAll().then(renderDisponibilidade)">↺ Atualizar</button>
         </div>
         <div class="attendance-wrap" id="disp-list"></div>
       </div>
@@ -301,7 +331,6 @@
           </div>
 
           <div id="esc-lou-fields" style="display:none;">
-
             <p class="f-section">Direção Musical</p>
             <div class="f-row">
               <div class="f-group">
@@ -415,7 +444,7 @@
           <p class="panel-desc">Consulta as escalas de louvor e som/imagem guardadas pelos gestores. Usa para preencher a ficha de produção.</p>
         </div>
         <div class="flex-gap" style="margin-bottom:1.8rem;">
-          <button class="f-submit" style="margin-top:0;" onclick="renderReport()">↺ Atualizar</button>
+          <button class="f-submit" style="margin-top:0;" onclick="reloadAll().then(renderReport)">↺ Atualizar</button>
         </div>
         <div class="report-wrap" id="report-container">
           <div class="report-empty">Clica em "Atualizar" para carregar as escalas disponíveis.</div>
@@ -434,7 +463,6 @@
           <p class="form-card-title">Nova Ficha</p>
           <p class="form-card-sub">Seleciona a congregação e a data. Se existir escala guardada para esse dia, os campos são pré-preenchidos automaticamente.</p>
 
-          <!-- IDENTIFICAÇÃO -->
           <p class="f-section">Identificação</p>
           <div class="f-row">
             <div class="f-group">
@@ -469,13 +497,11 @@
             ⚠ Sem escala guardada para esta data. Preenche manualmente.
           </div>
 
-          <!-- PROGRAMA -->
           <p class="f-section">Programa</p>
           <p style="font-size:.82rem;color:rgba(255,255,255,.3);margin-bottom:.8rem;">Adiciona cada momento do culto pela ordem em que acontece.</p>
           <div id="fp-programa-list" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.8rem;"></div>
           <button class="f-submit secondary" style="margin-top:0;font-size:.72rem;padding:.6rem 1.2rem;" onclick="addFichaField('fp-programa-list')">+ Adicionar Momento</button>
 
-          <!-- EQUIPA DE LOUVOR -->
           <p class="f-section" style="margin-top:2rem;">Direção Musical</p>
           <div class="f-row">
             <div class="f-group"><label class="f-label">Diretor Musical</label><select class="f-select fp-prod-sel" id="fp-diretor" data-fpgroup="louvor" onchange="onFichaChange()"><option value="">— Ninguém —</option><option>João Amaral</option></select></div>
@@ -499,7 +525,6 @@
             <div class="f-group"><label class="f-label">Back 4</label><select class="f-select fp-prod-sel" id="fp-back4" data-fpgroup="louvor" onchange="onFichaChange()"><option value="">— Ninguém —</option></select></div>
           </div>
 
-          <!-- SOM / IMAGEM -->
           <p class="f-section">Som</p>
           <div class="f-row">
             <div class="f-group"><label class="f-label">Técnico de Som</label><select class="f-select fp-prod-sel" id="fp-som" data-fpgroup="tecnica" onchange="onFichaChange()"><option value="">— Ninguém —</option></select></div>
@@ -513,12 +538,10 @@
             <div class="f-group"><label class="f-label">Técnico Multimédia</label><select class="f-select fp-prod-sel" id="fp-multi" data-fpgroup="tecnica" onchange="onFichaChange()"><option value="">— Ninguém —</option></select></div>
           </div>
 
-          <!-- REHEARSAL TIMES -->
           <p class="f-section" style="margin-top:2rem;">Rehearsal Times</p>
           <div id="fp-rehearsal-list" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.8rem;"></div>
           <button class="f-submit secondary" style="margin-top:0;font-size:.72rem;padding:.6rem 1.2rem;" onclick="addFichaField('fp-rehearsal-list')">+ Adicionar Campo</button>
 
-          <!-- OTHER TIMES -->
           <p class="f-section" style="margin-top:2rem;">Other Times</p>
           <div id="fp-other-list" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.8rem;"></div>
           <button class="f-submit secondary" style="margin-top:0;font-size:.72rem;padding:.6rem 1.2rem;" onclick="addFichaField('fp-other-list')">+ Adicionar Campo</button>
@@ -530,7 +553,7 @@
         </div>
       </div>
 
-      <!-- ── GERIR ESCALAS (g-louvor / g-somimagem) ── -->
+      <!-- ── GERIR ESCALAS ── -->
       <div class="tab-panel" id="tab-gerir-escalas">
         <div class="panel-header">
           <span class="eyebrow">Gestão</span>
@@ -538,10 +561,9 @@
           <p class="panel-desc">Consulta, edita ou elimina as escalas que criaste.</p>
         </div>
         <div class="flex-gap" style="margin-bottom:1.8rem;">
-          <button class="f-submit" style="margin-top:0;" onclick="renderGerirEscalas()">↺ Atualizar</button>
+          <button class="f-submit" style="margin-top:0;" onclick="reloadAll().then(renderGerirEscalas)">↺ Atualizar</button>
         </div>
         <div id="gerir-escalas-container" style="max-width:860px;"></div>
-        <!-- Edit form inline (hidden by default) -->
         <div id="gerir-edit-wrap" style="display:none;max-width:860px;margin-top:2rem;">
           <div class="form-card">
             <div class="flex-gap" style="margin-bottom:1.2rem;justify-content:space-between;">
@@ -564,6 +586,22 @@
 </div><!-- #app -->
 
 <script>
+// ═══════════════════════════════════════════════════════════════════
+// ▼▼▼  CONFIGURAÇÃO — cola aqui o URL do teu Apps Script  ▼▼▼
+// ═══════════════════════════════════════════════════════════════════
+var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbzsKBtYzPXoTcg5f6KjO1ewtEbmTNjA2s8PfQjdG8J6LG-wZs1hmpGc-iHVrjuGLEWWwQ/exec';
+// Exemplo:
+// var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfy.../exec';
+// ═══════════════════════════════════════════════════════════════════
+
+var API_OK = !!SHEETS_API_URL;
+
+// ── Cache em memória (substitui localStorage como fonte primária) ──
+var _cache = {
+  presencas: {},   // { userId: { dateStr: true } }
+  escalas:   {}    // { dateStr: { tipo: obj } }
+};
+
 // ═══════════════════════════════════════════════════════════════════
 // DADOS
 // ═══════════════════════════════════════════════════════════════════
@@ -591,11 +629,10 @@ var ESCALA_DATA = {
   }
 };
 
-// Espelho dos utilizadores (actualizar se login.json mudar)
 var USERS = [
   {id:'u1',  nome:'João Amaral',       role:'g-louvor',    equipa:'louvor'},
-  {id:'u2',  nome:'Tito Lucero',      role:'g-somimagem', equipa:'somimagem'},
-  {id:'u3',  nome:'Dara Amaral',    role:'producao',    equipa:'producao'},
+  {id:'u2',  nome:'Tito Lucero',       role:'g-somimagem', equipa:'somimagem'},
+  {id:'u3',  nome:'Dara Amaral',       role:'producao',    equipa:'producao'},
   {id:'u4',  nome:'Marta Lucero',      role:'g-louvor',    equipa:'louvor'},
   {id:'u5',  nome:'David Lucero',      role:'m-louvor',    equipa:'louvor'},
   {id:'u6',  nome:'Ana Maria',         role:'m-louvor',    equipa:'louvor'},
@@ -610,18 +647,81 @@ var USERS = [
 ];
 
 var ESC_LOU_INSTR = {
-  'esc-lou-piano':   'piano',
-  'esc-lou-gt-ac':   'guitarra_acustica',
-  'esc-lou-gt-el':   'guitarra_eletrica',
-  'esc-lou-baixo':   'baixo',
-  'esc-lou-bateria': 'bateria'
+  'esc-lou-piano':'piano','esc-lou-gt-ac':'guitarra_acustica',
+  'esc-lou-gt-el':'guitarra_eletrica','esc-lou-baixo':'baixo','esc-lou-bateria':'bateria'
 };
 var ESC_LOU_VOZ = {
-  'esc-lou-dirigente':'dirigente',
-  'esc-lou-back1':'back1','esc-lou-back2':'back2',
+  'esc-lou-dirigente':'dirigente','esc-lou-back1':'back1','esc-lou-back2':'back2',
   'esc-lou-back3':'back3','esc-lou-back4':'back4'
 };
 var ESC_SOM_IDS = ['esc-som-som','esc-som-online','esc-som-multi'];
+
+// ═══════════════════════════════════════════════════════════════════
+// SYNC STATUS PILL
+// ═══════════════════════════════════════════════════════════════════
+var _syncTimer = null;
+function syncPill(state, msg) {
+  var el = document.getElementById('sync-status');
+  el.textContent = msg;
+  el.className = 'visible ' + state;
+  clearTimeout(_syncTimer);
+  if (state !== 'syncing') {
+    _syncTimer = setTimeout(function() { el.className = ''; }, 3500);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// API HELPERS
+// ═══════════════════════════════════════════════════════════════════
+function apiGet(params) {
+  if (!API_OK) return Promise.resolve(null);
+  var qs = Object.keys(params).map(function(k){ return k+'='+encodeURIComponent(params[k]); }).join('&');
+  return fetch(SHEETS_API_URL + '?' + qs)
+    .then(function(r){ return r.json(); })
+    .catch(function(){ return null; });
+}
+
+function apiPost(body) {
+  if (!API_OK) return Promise.resolve(null);
+  return fetch(SHEETS_API_URL, {
+    method: 'POST',
+    body: JSON.stringify(body)
+  })
+    .then(function(r){ return r.json(); })
+    .catch(function(){ return null; });
+}
+
+// ── localStorage fallback ──────────────────────────────────────────
+function lsGet(k)   { try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;} }
+function lsSet(k,v) { try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+
+// ═══════════════════════════════════════════════════════════════════
+// LOAD ALL DATA FROM SHEETS (or fall back to localStorage)
+// ═══════════════════════════════════════════════════════════════════
+function reloadAll() {
+  if (!API_OK) {
+    // Fallback: reconstruct _cache from localStorage
+    _cache.escalas = lsGet('ads_escalas') || {};
+    _cache.presencas = {};
+    USERS.forEach(function(u) {
+      var p = lsGet('ads_p_' + u.id);
+      if (p) _cache.presencas[u.id] = p;
+    });
+    return Promise.resolve();
+  }
+
+  syncPill('syncing', '↺ A sincronizar…');
+  return Promise.all([
+    apiGet({ action: 'getPresencas' }),
+    apiGet({ action: 'getEscalas'   })
+  ]).then(function(results) {
+    if (results[0]) _cache.presencas = results[0];
+    if (results[1]) _cache.escalas   = results[1];
+    syncPill('ok', '✓ Sincronizado');
+  }).catch(function() {
+    syncPill('err', '✕ Erro de ligação');
+  });
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // AUTH
@@ -639,10 +739,20 @@ var SESSION = null;
   b.textContent = labels[SESSION.role] || SESSION.role;
   b.className = 'topbar-role-badge role-badge-' + SESSION.role;
 
+  // Show API config warning on calendar if not configured
+  if (!API_OK) {
+    var warn = document.getElementById('cal-api-warn');
+    if (warn) warn.style.display = 'block';
+  }
+
   buildSidebar();
   document.getElementById('app').style.display = 'block';
-  var first = document.querySelector('#sidebar .sidebar-nav li a');
-  if (first) first.click();
+
+  // Load data then open first tab
+  reloadAll().then(function() {
+    var first = document.querySelector('#sidebar .sidebar-nav li a');
+    if (first) first.click();
+  });
 })();
 
 function doLogout() {
@@ -654,9 +764,7 @@ function doLogout() {
 // SIDEBAR
 // ═══════════════════════════════════════════════════════════════════
 function buildSidebar() {
-  var r = SESSION.role;
-  var html = '';
-
+  var r = SESSION.role, html = '';
   if (r === 'm-louvor' || r === 'm-somimagem') {
     html += '<p class="sidebar-section-label">A Minha Área</p><ul class="sidebar-nav">';
     html += navItem('presenca', icoCalendar(), 'Marcar Presença');
@@ -702,26 +810,98 @@ function switchTab(id, el) {
   if (p) p.classList.add('active');
   if (el) el.classList.add('active');
   if (id === 'presenca')        initCalendar();
-  if (id === 'disponibilidade') renderDisponibilidade();
-  if (id === 'producao')        renderReport();
+  if (id === 'disponibilidade') reloadAll().then(renderDisponibilidade);
+  if (id === 'producao')        reloadAll().then(renderReport);
   if (id === 'ficha-producao')  initFichaProducao();
-  if (id === 'gerir-escalas')   renderGerirEscalas();
+  if (id === 'gerir-escalas')   reloadAll().then(renderGerirEscalas);
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// STORAGE
+// PRESENÇA — helpers (opera sobre _cache + Sheets/localStorage)
 // ═══════════════════════════════════════════════════════════════════
-function sg(k)    { try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;} }
-function ss(k,v)  { localStorage.setItem(k,JSON.stringify(v)); }
+function getPresenca(uid) {
+  return _cache.presencas[uid] || {};
+}
 
-function getPresenca(uid) { return sg('ads_p_'+uid) || {}; }
-function setPresenca(uid,obj) { ss('ads_p_'+uid,obj); }
-function getEscalas()     { return sg('ads_escalas') || {}; }
-function saveEscala(date,tipo,obj) {
-  var all = getEscalas();
-  if (!all[date]) all[date] = {};
-  all[date][tipo] = obj;
-  ss('ads_escalas', all);
+function togglePresencaRemote(uid, ds) {
+  // Optimistic update in cache
+  if (!_cache.presencas[uid]) _cache.presencas[uid] = {};
+  var wasOn = !!_cache.presencas[uid][ds];
+  if (wasOn) delete _cache.presencas[uid][ds];
+  else        _cache.presencas[uid][ds] = true;
+
+  if (!API_OK) {
+    // localStorage fallback
+    lsSet('ads_p_' + uid, _cache.presencas[uid]);
+    return Promise.resolve();
+  }
+
+  syncPill('syncing', '↺ A guardar…');
+  return apiPost({ action: 'togglePresenca', userId: uid, dateStr: ds })
+    .then(function(res) {
+      if (res && (res.status === 'added' || res.status === 'removed')) {
+        syncPill('ok', '✓ Guardado');
+      } else {
+        // Rollback on failure
+        if (wasOn) _cache.presencas[uid][ds] = true;
+        else delete _cache.presencas[uid][ds];
+        syncPill('err', '✕ Erro ao guardar');
+      }
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ESCALAS — helpers
+// ═══════════════════════════════════════════════════════════════════
+function getEscalas() { return _cache.escalas; }
+
+function saveEscala(date, tipo, obj) {
+  if (!_cache.escalas[date]) _cache.escalas[date] = {};
+  _cache.escalas[date][tipo] = obj;
+
+  if (!API_OK) {
+    lsSet('ads_escalas', _cache.escalas);
+    return Promise.resolve();
+  }
+
+  syncPill('syncing', '↺ A guardar…');
+  return apiPost({ action: 'saveEscala', dateStr: date, tipo: tipo, dados: obj })
+    .then(function(res) {
+      if (res && (res.status === 'created' || res.status === 'updated')) {
+        syncPill('ok', '✓ Guardado na nuvem');
+      } else {
+        syncPill('err', '✕ Erro ao guardar');
+      }
+    });
+}
+
+function deleteEscalaRemote(ds, tipo) {
+  // Optimistic
+  if (_cache.escalas[ds]) {
+    delete _cache.escalas[ds][tipo];
+    if (!Object.keys(_cache.escalas[ds]).length) delete _cache.escalas[ds];
+  }
+
+  if (!API_OK) {
+    lsSet('ads_escalas', _cache.escalas);
+    return Promise.resolve();
+  }
+
+  syncPill('syncing', '↺ A eliminar…');
+  return apiPost({ action: 'deleteEscala', dateStr: ds, tipo: tipo })
+    .then(function(res) {
+      if (res && (res.status === 'deleted' || res.status === 'not_found')) {
+        syncPill('ok', '✓ Eliminado');
+      } else {
+        syncPill('err', '✕ Erro ao eliminar');
+      }
+    });
+}
+
+function getAvail(ds, equipa) {
+  return USERS
+    .filter(function(u){ return u.equipa===equipa && !!getPresenca(u.id)[ds]; })
+    .map(function(u){ return u.nome; });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -770,10 +950,17 @@ function renderCal() {
 }
 
 function toggleP(ds) {
-  var p = getPresenca(SESSION.id);
-  if (p[ds]) delete p[ds]; else p[ds] = true;
-  setPresenca(SESSION.id, p);
+  // Visual optimistic feedback imediato
+  var presenca = getPresenca(SESSION.id);
+  if (presenca[ds]) delete presenca[ds]; else presenca[ds] = true;
+  if (!_cache.presencas[SESSION.id]) _cache.presencas[SESSION.id] = {};
+  _cache.presencas[SESSION.id] = presenca;
   renderCal();
+
+  // Persist (reverts cache automatically if Sheets call fails)
+  togglePresencaRemote(SESSION.id, ds).then(function() {
+    renderCal(); // re-render with confirmed state
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -782,16 +969,10 @@ function toggleP(ds) {
 function renderDisponibilidade() {
   var r = SESSION.role;
   var filtroEl = document.getElementById('disp-filtro');
-  // Lock filter to own team for gestores
-  if (r === 'g-louvor') {
-    filtroEl.value = 'louvor';
-    filtroEl.disabled = true;
-  } else if (r === 'g-somimagem') {
-    filtroEl.value = 'somimagem';
-    filtroEl.disabled = true;
-  } else {
-    filtroEl.disabled = false;
-  }
+  if (r === 'g-louvor')    { filtroEl.value = 'louvor';    filtroEl.disabled = true; }
+  else if (r === 'g-somimagem') { filtroEl.value = 'somimagem'; filtroEl.disabled = true; }
+  else filtroEl.disabled = false;
+
   var filtro = filtroEl.value || 'louvor';
   var members = USERS.filter(function(u){ return u.equipa===filtro; });
   var sundays = nextSundays(3);
@@ -819,7 +1000,6 @@ function renderDisponibilidade() {
     }
     html += '</div></div>';
   });
-
   document.getElementById('disp-list').innerHTML = html || '<p class="att-empty">Sem domingos futuros.</p>';
 }
 
@@ -838,39 +1018,26 @@ function onEscLouReady() {
   var show = d && c;
   document.getElementById('esc-lou-fields').style.display = show ? 'block' : 'none';
   if (!show) return;
-
-  // Ceia: só 1º domingo do mês
   var dt = new Date(d+'T00:00:00');
   var isPrimeiro = dt.getDay()===0 && dt.getDate()<=7;
   document.getElementById('sl-ceia-wrap').style.display = isPrimeiro ? 'block' : 'none';
-
   populateEscLou(c, d);
 }
 
 function populateEscLou(cong, ds) {
-  var cd = ESCALA_DATA[cong];
-  if (!cd) return;
-  var avail = getAvail(ds, 'louvor'); // only members who marked presence
-
+  var cd = ESCALA_DATA[cong]; if (!cd) return;
+  var avail = getAvail(ds, 'louvor');
   function pop(map, bucket) {
     Object.keys(map).forEach(function(selId) {
       var key = map[selId];
       var sel = document.getElementById(selId);
-      // Only keep members who are present for this date
-      var members = ((cd[bucket]&&cd[bucket][key]) || []).filter(function(n) {
-        return avail.includes(n);
-      });
+      var members = ((cd[bucket]&&cd[bucket][key])||[]).filter(function(n){ return avail.includes(n); });
       sel.innerHTML = '<option value="">— Ninguém —</option>';
-      members.forEach(function(n) {
-        var opt = document.createElement('option');
-        opt.value = n; opt.textContent = n;
-        sel.appendChild(opt);
-      });
+      members.forEach(function(n){ var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o); });
       sel.disabled = !members.length;
     });
   }
-  pop(ESC_LOU_INSTR, 'instrumentos');
-  pop(ESC_LOU_VOZ,   'vozes');
+  pop(ESC_LOU_INSTR,'instrumentos'); pop(ESC_LOU_VOZ,'vozes');
   onEscLouChange();
 }
 
@@ -878,12 +1045,7 @@ function onEscLouChange() {
   var ui=new Set(), uv=new Set();
   Object.keys(ESC_LOU_INSTR).forEach(function(id){var v=document.getElementById(id).value;if(v)ui.add(v);});
   Object.keys(ESC_LOU_VOZ).forEach(function(id){var v=document.getElementById(id).value;if(v)uv.add(v);});
-  function ref(map,used){
-    Object.keys(map).forEach(function(id){
-      var sel=document.getElementById(id),cur=sel.value;
-      Array.from(sel.options).forEach(function(o){if(!o.value)return;o.disabled=used.has(o.value)&&o.value!==cur;});
-    });
-  }
+  function ref(map,used){Object.keys(map).forEach(function(id){var sel=document.getElementById(id),cur=sel.value;Array.from(sel.options).forEach(function(o){if(!o.value)return;o.disabled=used.has(o.value)&&o.value!==cur;});});}
   ref(ESC_LOU_INSTR,ui); ref(ESC_LOU_VOZ,uv);
 }
 
@@ -891,24 +1053,16 @@ function guardarEscalaLouvor() {
   var d=document.getElementById('esc-lou-data').value;
   var c=document.getElementById('esc-lou-cong').value;
   if(!d||!c){show('esc-lou-err');return;} hide('esc-lou-err');
-  var obj = {
+  var obj={
     data:d, congregacao:c,
-    diretor:   gv('esc-lou-diretor'),
-    piano:     gv('esc-lou-piano'),  gtAc: gv('esc-lou-gt-ac'),
-    gtEl:      gv('esc-lou-gt-el'),  baixo: gv('esc-lou-baixo'),
-    bateria:   gv('esc-lou-bateria'),
-    dirigente: gv('esc-lou-dirigente'),
-    back1:gv('esc-lou-back1'),back2:gv('esc-lou-back2'),
-    back3:gv('esc-lou-back3'),back4:gv('esc-lou-back4'),
-    setlist:{
-      primeiros: getSetlist('sl-primeiros'),
-      oferta:    getSetlist('sl-oferta'),
-      ceia:      getSetlist('sl-ceia')
-    },
-    savedAt: new Date().toISOString(), savedBy: SESSION.nome
+    diretor:gv('esc-lou-diretor'), piano:gv('esc-lou-piano'), gtAc:gv('esc-lou-gt-ac'),
+    gtEl:gv('esc-lou-gt-el'), baixo:gv('esc-lou-baixo'), bateria:gv('esc-lou-bateria'),
+    dirigente:gv('esc-lou-dirigente'), back1:gv('esc-lou-back1'), back2:gv('esc-lou-back2'),
+    back3:gv('esc-lou-back3'), back4:gv('esc-lou-back4'),
+    setlist:{primeiros:getSetlist('sl-primeiros'),oferta:getSetlist('sl-oferta'),ceia:getSetlist('sl-ceia')},
+    savedAt:new Date().toISOString(), savedBy:SESSION.nome
   };
-  saveEscala(d,'louvor',obj);
-  show('esc-lou-ok'); setTimeout(function(){hide('esc-lou-ok');},5000);
+  saveEscala(d,'louvor',obj).then(function(){ show('esc-lou-ok'); setTimeout(function(){hide('esc-lou-ok');},5000); });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -917,26 +1071,19 @@ function guardarEscalaLouvor() {
 function onEscSomReady() {
   var d=document.getElementById('esc-som-data').value;
   var c=document.getElementById('esc-som-cong').value;
-  document.getElementById('esc-som-fields').style.display = (d&&c)?'block':'none';
+  document.getElementById('esc-som-fields').style.display=(d&&c)?'block':'none';
   if(d&&c) populateEscSom(c,d);
 }
 
-function populateEscSom(cong, ds) {
+function populateEscSom(cong,ds) {
   var cd=ESCALA_DATA[cong]; if(!cd) return;
-  var avail=getAvail(ds,'somimagem'); // only members who marked presence
+  var avail=getAvail(ds,'somimagem');
   var keys=['som','online','multimedia'];
   ESC_SOM_IDS.forEach(function(selId,i){
     var sel=document.getElementById(selId);
-    // Only keep members who are present for this date
-    var members=((cd.tecnica&&cd.tecnica[keys[i]])||[]).filter(function(n){
-      return avail.includes(n);
-    });
+    var members=((cd.tecnica&&cd.tecnica[keys[i]])||[]).filter(function(n){ return avail.includes(n); });
     sel.innerHTML='<option value="">— Ninguém —</option>';
-    members.forEach(function(n){
-      var opt=document.createElement('option');
-      opt.value=n;opt.textContent=n;
-      sel.appendChild(opt);
-    });
+    members.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
     sel.disabled=!members.length;
   });
   onEscSomChange();
@@ -945,25 +1092,15 @@ function populateEscSom(cong, ds) {
 function onEscSomChange() {
   var used=new Set();
   ESC_SOM_IDS.forEach(function(id){var v=document.getElementById(id).value;if(v)used.add(v);});
-  ESC_SOM_IDS.forEach(function(id){
-    var sel=document.getElementById(id),cur=sel.value;
-    Array.from(sel.options).forEach(function(o){if(!o.value)return;o.disabled=used.has(o.value)&&o.value!==cur;});
-  });
+  ESC_SOM_IDS.forEach(function(id){var sel=document.getElementById(id),cur=sel.value;Array.from(sel.options).forEach(function(o){if(!o.value)return;o.disabled=used.has(o.value)&&o.value!==cur;});});
 }
 
 function guardarEscalaSom() {
   var d=document.getElementById('esc-som-data').value;
   var c=document.getElementById('esc-som-cong').value;
   if(!d||!c){show('esc-som-err');return;} hide('esc-som-err');
-  var obj={
-    data:d, congregacao:c,
-    tecsom:    gv('esc-som-som'),
-    online:    gv('esc-som-online'),
-    multimedia:gv('esc-som-multi'),
-    savedAt:new Date().toISOString(), savedBy:SESSION.nome
-  };
-  saveEscala(d,'som',obj);
-  show('esc-som-ok'); setTimeout(function(){hide('esc-som-ok');},5000);
+  var obj={data:d,congregacao:c,tecsom:gv('esc-som-som'),online:gv('esc-som-online'),multimedia:gv('esc-som-multi'),savedAt:new Date().toISOString(),savedBy:SESSION.nome};
+  saveEscala(d,'som',obj).then(function(){ show('esc-som-ok'); setTimeout(function(){hide('esc-som-ok');},5000); });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -982,13 +1119,12 @@ function addSong(containerId) {
 
 function removeSong(btn) {
   var row=btn.closest('.setlist-row'); var c=row.parentElement; row.remove();
-  var rows=c.querySelectorAll('.setlist-row');
-  rows.forEach(function(r,i){var n=r.querySelector('.setlist-num');if(n)n.textContent=i+1;});
+  c.querySelectorAll('.setlist-row').forEach(function(r,i){var n=r.querySelector('.setlist-num');if(n)n.textContent=i+1;});
 }
 
 function getSetlist(id) {
-  var rows=document.querySelectorAll('#'+id+' .setlist-row'),out=[];
-  rows.forEach(function(r){
+  var out=[];
+  document.querySelectorAll('#'+id+' .setlist-row').forEach(function(r){
     var t=(r.querySelector('.sl-t')||{}).value||'';
     var k=(r.querySelector('.sl-k')||{}).value||'';
     if(t.trim()) out.push({titulo:t.trim(),tom:k.trim()});
@@ -999,615 +1135,254 @@ function getSetlist(id) {
 // ═══════════════════════════════════════════════════════════════════
 // GERIR ESCALAS
 // ═══════════════════════════════════════════════════════════════════
-var _gerirEditDate = null;
-var _gerirEditTipo = null;
+var _gerirEditDate=null, _gerirEditTipo=null;
 
 function renderGerirEscalas() {
-  var r = SESSION.role;
-  var tipo = (r === 'g-somimagem') ? 'som' : 'louvor';
-  var escalas = getEscalas();
-  var dates = Object.keys(escalas).filter(function(ds) { return escalas[ds][tipo]; }).sort();
-  var el = document.getElementById('gerir-escalas-container');
-  fecharEditEscala();
-
-  if (!dates.length) {
-    el.innerHTML = '<div class="report-empty">Ainda não existem escalas guardadas.</div>';
-    return;
-  }
-
-  var html = '';
-  dates.forEach(function(ds) {
-    var esc = escalas[ds][tipo];
-    html += '<div class="report-card" style="margin-bottom:1rem;">';
-    html += '<div class="report-card-header" style="display:flex;align-items:center;justify-content:space-between;">';
-    html += '<div class="report-card-title">📅 ' + formatDatePT(ds) + '</div>';
-    html += '<div class="flex-gap" style="gap:.6rem;">';
-    html += '<button class="f-submit secondary" style="margin-top:0;font-size:.7rem;padding:.45rem 1rem;" onclick="abrirEditEscala(\'' + ds + '\',\'' + tipo + '\')">✎ Editar</button>';
-    html += '<button class="f-submit" style="margin-top:0;font-size:.7rem;padding:.45rem 1rem;background:var(--red);" onclick="eliminarEscala(\'' + ds + '\',\'' + tipo + '\')">✕ Eliminar</button>';
-    html += '</div></div>';
-
-    // Preview
-    html += '<div style="padding:1rem 1.4rem;display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;">';
-    if (tipo === 'louvor') {
-      var campos = [
-        ['Diretor', esc.diretor], ['Piano', esc.piano], ['Gt. Ac.', esc.gtAc],
-        ['Gt. El.', esc.gtEl], ['Baixo', esc.baixo], ['Bateria', esc.bateria],
-        ['Dirigente', esc.dirigente], ['Back 1', esc.back1], ['Back 2', esc.back2],
-        ['Back 3', esc.back3], ['Back 4', esc.back4]
-      ];
-      campos.forEach(function(c) {
-        if (!c[1]) return;
-        html += '<span style="font-size:.78rem;color:rgba(255,255,255,.45);">' + c[0] + ': <strong style="color:#fff;">' + c[1] + '</strong></span>';
-      });
-    } else {
-      [['Som', esc.tecsom], ['Online', esc.online], ['Multimédia', esc.multimedia]].forEach(function(c) {
-        if (!c[1]) return;
-        html += '<span style="font-size:.78rem;color:rgba(255,255,255,.45);">' + c[0] + ': <strong style="color:#fff;">' + c[1] + '</strong></span>';
-      });
-    }
-    if (esc.savedAt) {
-      var d = new Date(esc.savedAt);
-      html += '<span style="font-size:.7rem;color:rgba(255,255,255,.2);margin-left:auto;">Guardado ' + d.toLocaleDateString('pt-PT') + ' por ' + (esc.savedBy||'—') + '</span>';
-    }
-    html += '</div></div>';
-  });
-  el.innerHTML = html;
-}
-
-function eliminarEscala(ds, tipo) {
-  if (!confirm('Tens a certeza que queres eliminar a escala de ' + formatDatePT(ds) + '?')) return;
-  var all = getEscalas();
-  if (all[ds]) {
-    delete all[ds][tipo];
-    if (!Object.keys(all[ds]).length) delete all[ds];
-    ss('ads_escalas', all);
-  }
-  renderGerirEscalas();
-}
-
-function abrirEditEscala(ds, tipo) {
-  _gerirEditDate = ds;
-  _gerirEditTipo = tipo;
-  var esc = (getEscalas()[ds] || {})[tipo] || {};
-  var cong = esc.congregacao || 'setubal';
-
-  document.getElementById('gerir-edit-title').textContent = 'Editar Escala — ' + formatDatePT(ds);
-  document.getElementById('gerir-edit-sub').textContent = 'Congregação: ' + cong.charAt(0).toUpperCase() + cong.slice(1).replace('-',' ');
-
-  var fields = '';
-  if (tipo === 'louvor') {
-    var cd = (ESCALA_DATA[cong] || {});
-    var instrAll = cd.instrumentos || {};
-    var vozAll   = cd.vozes || {};
-
-    function sel(id, label, members, val) {
-      var opts = '<option value="">— Ninguém —</option>';
-      members.forEach(function(n) { opts += '<option value="'+n+'"'+(n===val?' selected':'')+'>'+n+'</option>'; });
-      return '<div class="f-group"><label class="f-label">'+label+'</label><select class="f-select" id="ge-'+id+'">'+opts+'</select></div>';
-    }
-
-    fields += '<p class="f-section">Direção Musical</p><div class="f-row">';
-    fields += '<div class="f-group"><label class="f-label">Diretor Musical</label><select class="f-select" id="ge-diretor"><option value="">— Ninguém —</option><option value="João Amaral"'+(esc.diretor==='João Amaral'?' selected':'')+'>João Amaral</option></select></div>';
-    fields += '</div>';
-    fields += '<p class="f-section">Instrumentos</p><div class="f-row">';
-    fields += sel('piano',   'Piano',            instrAll.piano||[],             esc.piano||'');
-    fields += sel('gt-ac',   'Guitarra Acústica', instrAll.guitarra_acustica||[], esc.gtAc||'');
-    fields += sel('gt-el',   'Guitarra Elétrica', instrAll.guitarra_eletrica||[], esc.gtEl||'');
-    fields += sel('baixo',   'Baixo',             instrAll.baixo||[],             esc.baixo||'');
-    fields += sel('bateria', 'Bateria',           instrAll.bateria||[],           esc.bateria||'');
-    fields += '</div>';
-    fields += '<p class="f-section">Vozes</p><div class="f-row">';
-    fields += sel('dirigente','Dirigente', vozAll.dirigente||[], esc.dirigente||'');
-    fields += sel('back1',   'Back 1',    vozAll.back1||[],     esc.back1||'');
-    fields += sel('back2',   'Back 2',    vozAll.back2||[],     esc.back2||'');
-    fields += sel('back3',   'Back 3',    vozAll.back3||[],     esc.back3||'');
-    fields += sel('back4',   'Back 4',    vozAll.back4||[],     esc.back4||'');
-    fields += '</div>';
-  } else {
-    var cd2 = (ESCALA_DATA[cong] || {});
-    var tec  = cd2.tecnica || {};
-
-    function selT(id, label, members, val) {
-      var opts = '<option value="">— Ninguém —</option>';
-      members.forEach(function(n) { opts += '<option value="'+n+'"'+(n===val?' selected':'')+'>'+n+'</option>'; });
-      return '<div class="f-group"><label class="f-label">'+label+'</label><select class="f-select" id="ge-'+id+'">'+opts+'</select></div>';
-    }
-    fields += '<p class="f-section">Som</p><div class="f-row">';
-    fields += selT('tecsom',    'Técnico de Som',  tec.som||[],        esc.tecsom||'');
-    fields += '</div><p class="f-section">Online</p><div class="f-row">';
-    fields += selT('online',    'Técnico Online',  tec.online||[],     esc.online||'');
-    fields += '</div><p class="f-section">Multimédia</p><div class="f-row">';
-    fields += selT('multimedia','Técnico Multimédia', tec.multimedia||[], esc.multimedia||'');
-    fields += '</div>';
-  }
-
-  document.getElementById('gerir-edit-fields').innerHTML = fields;
-  hide('gerir-edit-ok');
-  document.getElementById('gerir-edit-wrap').style.display = 'block';
-  document.getElementById('gerir-edit-wrap').scrollIntoView({behavior:'smooth'});
-}
-
-function fecharEditEscala() {
-  document.getElementById('gerir-edit-wrap').style.display = 'none';
-  _gerirEditDate = null;
-  _gerirEditTipo = null;
-}
-
-function guardarEdicaoEscala() {
-  if (!_gerirEditDate || !_gerirEditTipo) return;
-  var all = getEscalas();
-  var esc = (all[_gerirEditDate] || {})[_gerirEditTipo] || {};
-
-  function gev(id) { var el=document.getElementById('ge-'+id); return el?el.value:''; }
-
-  if (_gerirEditTipo === 'louvor') {
-    esc.diretor   = gev('diretor');
-    esc.piano     = gev('piano');
-    esc.gtAc      = gev('gt-ac');
-    esc.gtEl      = gev('gt-el');
-    esc.baixo     = gev('baixo');
-    esc.bateria   = gev('bateria');
-    esc.dirigente = gev('dirigente');
-    esc.back1     = gev('back1');
-    esc.back2     = gev('back2');
-    esc.back3     = gev('back3');
-    esc.back4     = gev('back4');
-  } else {
-    esc.tecsom    = gev('tecsom');
-    esc.online    = gev('online');
-    esc.multimedia= gev('multimedia');
-  }
-  esc.savedAt = new Date().toISOString();
-  esc.savedBy = SESSION.nome;
-
-  if (!all[_gerirEditDate]) all[_gerirEditDate] = {};
-  all[_gerirEditDate][_gerirEditTipo] = esc;
-  ss('ads_escalas', all);
-
-  show('gerir-edit-ok');
-  setTimeout(function() { hide('gerir-edit-ok'); }, 4000);
-  renderGerirEscalas();
-  fecharEditEscala();
-}
-
-
-function renderReport() {
+  var r=SESSION.role;
+  var tipo=(r==='g-somimagem')?'som':'louvor';
   var escalas=getEscalas();
-  var dates=Object.keys(escalas).sort();
-  var el=document.getElementById('report-container');
+  var dates=Object.keys(escalas).filter(function(ds){return escalas[ds][tipo];}).sort();
+  var el=document.getElementById('gerir-escalas-container');
+  fecharEditEscala();
   if(!dates.length){el.innerHTML='<div class="report-empty">Ainda não existem escalas guardadas.</div>';return;}
-
   var html='';
   dates.forEach(function(ds){
-    var e=escalas[ds], lou=e.louvor||null, som=e.som||null;
-    html+='<div class="report-card">';
-    html+='<div class="report-card-header"><div class="report-card-title">📅 '+formatDatePT(ds)+'</div></div>';
-    html+='<div class="report-cols">';
-
-    // Louvor
-    html+='<div class="report-col"><div class="report-col-title">🎵 Louvor</div>';
-    if(!lou){html+='<p class="no-escala">Escala não criada.</p>';}
-    else {
-      var rows=[
-        ['Diretor Musical',lou.diretor],['Piano',lou.piano],
-        ['Gt. Acústica',lou.gtAc],['Gt. Elétrica',lou.gtEl],
-        ['Baixo',lou.baixo],['Bateria',lou.bateria],
-        ['Dirigente',lou.dirigente],
-        ['Back 1',lou.back1],['Back 2',lou.back2],
-        ['Back 3',lou.back3],['Back 4',lou.back4]
-      ];
-      rows.forEach(function(r){
-        if(!r[1])return;
-        html+='<div class="report-row"><span class="report-row-label">'+r[0]+'</span><span class="report-row-val">'+r[1]+'</span></div>';
+    var esc=escalas[ds][tipo];
+    html+='<div class="report-card" style="margin-bottom:1rem;">';
+    html+='<div class="report-card-header" style="display:flex;align-items:center;justify-content:space-between;">';
+    html+='<div class="report-card-title">📅 '+formatDatePT(ds)+'</div>';
+    html+='<div class="flex-gap" style="gap:.6rem;">';
+    html+='<button class="f-submit secondary" style="margin-top:0;font-size:.7rem;padding:.45rem 1rem;" onclick="abrirEditEscala(\''+ds+'\',\''+tipo+'\')">✎ Editar</button>';
+    html+='<button class="f-submit" style="margin-top:0;font-size:.7rem;padding:.45rem 1rem;background:var(--red);" onclick="eliminarEscala(\''+ds+'\',\''+tipo+'\')">✕ Eliminar</button>';
+    html+='</div></div>';
+    html+='<div style="padding:1rem 1.4rem;display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;">';
+    if(tipo==='louvor'){
+      [['Diretor',esc.diretor],['Piano',esc.piano],['Gt. Ac.',esc.gtAc],['Gt. El.',esc.gtEl],['Baixo',esc.baixo],['Bateria',esc.bateria],['Dirigente',esc.dirigente],['Back 1',esc.back1],['Back 2',esc.back2],['Back 3',esc.back3],['Back 4',esc.back4]].forEach(function(c){
+        if(!c[1])return;
+        html+='<span style="font-size:.78rem;color:rgba(255,255,255,.45);">'+c[0]+': <strong style="color:#fff;">'+c[1]+'</strong></span>';
       });
-      if(lou.setlist){
-        html+=renderSetlistBlock('1º Tempo',lou.setlist.primeiros);
-        html+=renderSetlistBlock('Oferta',lou.setlist.oferta);
-        html+=renderSetlistBlock('Ceia',lou.setlist.ceia);
-      }
-    }
-    html+='</div>';
-
-    // Som
-    html+='<div class="report-col"><div class="report-col-title">🎧 Som & Imagem</div>';
-    if(!som){html+='<p class="no-escala">Escala não criada.</p>';}
-    else {
-      [['Técnico Som',som.tecsom],['Online',som.online],['Multimédia',som.multimedia]].forEach(function(r){
-        if(!r[1])return;
-        html+='<div class="report-row"><span class="report-row-label">'+r[0]+'</span><span class="report-row-val">'+r[1]+'</span></div>';
+    } else {
+      [['Som',esc.tecsom],['Online',esc.online],['Multimédia',esc.multimedia]].forEach(function(c){
+        if(!c[1])return;
+        html+='<span style="font-size:.78rem;color:rgba(255,255,255,.45);">'+c[0]+': <strong style="color:#fff;">'+c[1]+'</strong></span>';
       });
     }
-    html+='</div>';
-
+    if(esc.savedAt){var d=new Date(esc.savedAt);html+='<span style="font-size:.7rem;color:rgba(255,255,255,.2);margin-left:auto;">Guardado '+d.toLocaleDateString('pt-PT')+' por '+(esc.savedBy||'—')+'</span>';}
     html+='</div></div>';
   });
   el.innerHTML=html;
 }
 
-function renderSetlistBlock(title, songs) {
-  if(!songs||!songs.length) return '';
-  var h='<div class="report-setlist-block"><div class="report-setlist-title">'+title+'</div>';
-  songs.forEach(function(s,i){
-    h+='<div class="report-setlist-item">'+(i+1)+'. '+s.titulo+(s.tom?'<span class="tom">('+s.tom+')</span>':'')+' </div>';
+function eliminarEscala(ds,tipo) {
+  if(!confirm('Tens a certeza que queres eliminar a escala de '+formatDatePT(ds)+'?'))return;
+  deleteEscalaRemote(ds,tipo).then(renderGerirEscalas);
+}
+
+function abrirEditEscala(ds,tipo) {
+  _gerirEditDate=ds; _gerirEditTipo=tipo;
+  var esc=((getEscalas()[ds])||{})[tipo]||{};
+  var cong=esc.congregacao||'setubal';
+  document.getElementById('gerir-edit-title').textContent='Editar Escala — '+formatDatePT(ds);
+  document.getElementById('gerir-edit-sub').textContent='Congregação: '+cong.charAt(0).toUpperCase()+cong.slice(1).replace('-',' ');
+  var fields='';
+  if(tipo==='louvor'){
+    var cd=(ESCALA_DATA[cong]||{}),instrAll=cd.instrumentos||{},vozAll=cd.vozes||{};
+    function sel(id,label,members,val){var opts='<option value="">— Ninguém —</option>';members.forEach(function(n){opts+='<option value="'+n+'"'+(n===val?' selected':'')+'>'+n+'</option>';});return '<div class="f-group"><label class="f-label">'+label+'</label><select class="f-select" id="ge-'+id+'">'+opts+'</select></div>';}
+    fields+='<p class="f-section">Direção Musical</p><div class="f-row"><div class="f-group"><label class="f-label">Diretor Musical</label><select class="f-select" id="ge-diretor"><option value="">— Ninguém —</option><option value="João Amaral"'+(esc.diretor==='João Amaral'?' selected':'')+'>João Amaral</option></select></div></div>';
+    fields+='<p class="f-section">Instrumentos</p><div class="f-row">';
+    fields+=sel('piano','Piano',instrAll.piano||[],esc.piano||'');
+    fields+=sel('gt-ac','Guitarra Acústica',instrAll.guitarra_acustica||[],esc.gtAc||'');
+    fields+=sel('gt-el','Guitarra Elétrica',instrAll.guitarra_eletrica||[],esc.gtEl||'');
+    fields+=sel('baixo','Baixo',instrAll.baixo||[],esc.baixo||'');
+    fields+=sel('bateria','Bateria',instrAll.bateria||[],esc.bateria||'');
+    fields+='</div><p class="f-section">Vozes</p><div class="f-row">';
+    fields+=sel('dirigente','Dirigente',vozAll.dirigente||[],esc.dirigente||'');
+    fields+=sel('back1','Back 1',vozAll.back1||[],esc.back1||'');
+    fields+=sel('back2','Back 2',vozAll.back2||[],esc.back2||'');
+    fields+=sel('back3','Back 3',vozAll.back3||[],esc.back3||'');
+    fields+=sel('back4','Back 4',vozAll.back4||[],esc.back4||'');
+    fields+='</div>';
+  } else {
+    var cd2=(ESCALA_DATA[cong]||{}),tec=cd2.tecnica||{};
+    function selT(id,label,members,val){var opts='<option value="">— Ninguém —</option>';members.forEach(function(n){opts+='<option value="'+n+'"'+(n===val?' selected':'')+'>'+n+'</option>';});return '<div class="f-group"><label class="f-label">'+label+'</label><select class="f-select" id="ge-'+id+'">'+opts+'</select></div>';}
+    fields+='<p class="f-section">Som</p><div class="f-row">'+selT('tecsom','Técnico de Som',tec.som||[],esc.tecsom||'')+'</div>';
+    fields+='<p class="f-section">Online</p><div class="f-row">'+selT('online','Técnico Online',tec.online||[],esc.online||'')+'</div>';
+    fields+='<p class="f-section">Multimédia</p><div class="f-row">'+selT('multimedia','Técnico Multimédia',tec.multimedia||[],esc.multimedia||'')+'</div>';
+  }
+  document.getElementById('gerir-edit-fields').innerHTML=fields;
+  hide('gerir-edit-ok');
+  document.getElementById('gerir-edit-wrap').style.display='block';
+  document.getElementById('gerir-edit-wrap').scrollIntoView({behavior:'smooth'});
+}
+
+function fecharEditEscala() {
+  document.getElementById('gerir-edit-wrap').style.display='none';
+  _gerirEditDate=null; _gerirEditTipo=null;
+}
+
+function guardarEdicaoEscala() {
+  if(!_gerirEditDate||!_gerirEditTipo)return;
+  var all=getEscalas();
+  var esc=((all[_gerirEditDate])||{})[_gerirEditTipo]||{};
+  function gev(id){var el=document.getElementById('ge-'+id);return el?el.value:'';}
+  if(_gerirEditTipo==='louvor'){
+    esc.diretor=gev('diretor');esc.piano=gev('piano');esc.gtAc=gev('gt-ac');
+    esc.gtEl=gev('gt-el');esc.baixo=gev('baixo');esc.bateria=gev('bateria');
+    esc.dirigente=gev('dirigente');esc.back1=gev('back1');esc.back2=gev('back2');
+    esc.back3=gev('back3');esc.back4=gev('back4');
+  } else {
+    esc.tecsom=gev('tecsom');esc.online=gev('online');esc.multimedia=gev('multimedia');
+  }
+  esc.savedAt=new Date().toISOString();esc.savedBy=SESSION.nome;
+  saveEscala(_gerirEditDate,_gerirEditTipo,esc).then(function(){
+    show('gerir-edit-ok');
+    setTimeout(function(){hide('gerir-edit-ok');},4000);
+    renderGerirEscalas();
+    fecharEditEscala();
   });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RELATÓRIO
+// ═══════════════════════════════════════════════════════════════════
+function renderReport() {
+  var escalas=getEscalas();
+  var dates=Object.keys(escalas).sort();
+  var el=document.getElementById('report-container');
+  if(!dates.length){el.innerHTML='<div class="report-empty">Ainda não existem escalas guardadas.</div>';return;}
+  var html='';
+  dates.forEach(function(ds){
+    var e=escalas[ds],lou=e.louvor||null,som=e.som||null;
+    html+='<div class="report-card"><div class="report-card-header"><div class="report-card-title">📅 '+formatDatePT(ds)+'</div></div><div class="report-cols">';
+    html+='<div class="report-col"><div class="report-col-title">🎵 Louvor</div>';
+    if(!lou){html+='<p class="no-escala">Escala não criada.</p>';}
+    else{
+      [['Diretor Musical',lou.diretor],['Piano',lou.piano],['Gt. Acústica',lou.gtAc],['Gt. Elétrica',lou.gtEl],['Baixo',lou.baixo],['Bateria',lou.bateria],['Dirigente',lou.dirigente],['Back 1',lou.back1],['Back 2',lou.back2],['Back 3',lou.back3],['Back 4',lou.back4]].forEach(function(r){
+        if(!r[1])return;
+        html+='<div class="report-row"><span class="report-row-label">'+r[0]+'</span><span class="report-row-val">'+r[1]+'</span></div>';
+      });
+      if(lou.setlist){html+=renderSetlistBlock('1º Tempo',lou.setlist.primeiros);html+=renderSetlistBlock('Oferta',lou.setlist.oferta);html+=renderSetlistBlock('Ceia',lou.setlist.ceia);}
+    }
+    html+='</div><div class="report-col"><div class="report-col-title">🎧 Som & Imagem</div>';
+    if(!som){html+='<p class="no-escala">Escala não criada.</p>';}
+    else{[['Técnico Som',som.tecsom],['Online',som.online],['Multimédia',som.multimedia]].forEach(function(r){if(!r[1])return;html+='<div class="report-row"><span class="report-row-label">'+r[0]+'</span><span class="report-row-val">'+r[1]+'</span></div>';});}
+    html+='</div></div></div>';
+  });
+  el.innerHTML=html;
+}
+
+function renderSetlistBlock(title,songs){
+  if(!songs||!songs.length)return'';
+  var h='<div class="report-setlist-block"><div class="report-setlist-title">'+title+'</div>';
+  songs.forEach(function(s,i){h+='<div class="report-setlist-item">'+(i+1)+'. '+s.titulo+(s.tom?'<span class="tom">('+s.tom+')</span>':'')+' </div>';});
   return h+'</div>';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FICHA DE PRODUÇÃO
+// ═══════════════════════════════════════════════════════════════════
+var FP_INSTR_MAP={'fp-piano':'piano','fp-gt-ac':'guitarra_acustica','fp-gt-el':'guitarra_eletrica','fp-baixo':'baixo','fp-bateria':'bateria'};
+var FP_VOZ_MAP={'fp-dirigente':'dirigente','fp-back1':'back1','fp-back2':'back2','fp-back3':'back3','fp-back4':'back4'};
+var FP_TEC_IDS=['fp-som','fp-online','fp-multi'];
+var FP_INSTR_IDS=Object.keys(FP_INSTR_MAP);
+var FP_VOZ_IDS=Object.keys(FP_VOZ_MAP);
+var fpFieldCounter=0;
+
+function initFichaProducao(){}
+
+function onFichaReady(){
+  var ds=document.getElementById('fp-data').value;
+  var cong=document.getElementById('fp-cong').value;
+  if(!ds||!cong)return;
+  populateFichaSelects(cong);
+  var esc=getEscalas()[ds]||{};
+  var lou=esc.louvor||null,som=esc.som||null,hasEsc=!!(lou||som);
+  document.getElementById('fp-escala-notice').style.display=hasEsc?'block':'none';
+  document.getElementById('fp-no-escala-notice').style.display=hasEsc?'none':'block';
+  if(lou){setSelVal('fp-diretor',lou.diretor||'');setSelVal('fp-piano',lou.piano||'');setSelVal('fp-gt-ac',lou.gtAc||'');setSelVal('fp-gt-el',lou.gtEl||'');setSelVal('fp-baixo',lou.baixo||'');setSelVal('fp-bateria',lou.bateria||'');setSelVal('fp-dirigente',lou.dirigente||'');setSelVal('fp-back1',lou.back1||'');setSelVal('fp-back2',lou.back2||'');setSelVal('fp-back3',lou.back3||'');setSelVal('fp-back4',lou.back4||'');}
+  if(som){setSelVal('fp-som',som.tecsom||'');setSelVal('fp-online',som.online||'');setSelVal('fp-multi',som.multimedia||'');}
+  onFichaChange();
+}
+
+function populateFichaSelects(cong){
+  var cd=ESCALA_DATA[cong];if(!cd)return;
+  function pop(map,bucket){Object.keys(map).forEach(function(selId){var key=map[selId],sel=document.getElementById(selId),cur=sel.value,members=(cd[bucket]&&cd[bucket][key])||[];sel.innerHTML='<option value="">— Ninguém —</option>';members.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});sel.disabled=!members.length;if(cur)sel.value=cur;});}
+  var tecKeys=['som','online','multimedia'];
+  FP_TEC_IDS.forEach(function(selId,i){var sel=document.getElementById(selId),cur=sel.value,members=(cd.tecnica&&cd.tecnica[tecKeys[i]])||[];sel.innerHTML='<option value="">— Ninguém —</option>';members.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});sel.disabled=!members.length;if(cur)sel.value=cur;});
+  pop(FP_INSTR_MAP,'instrumentos');pop(FP_VOZ_MAP,'vozes');
+}
+
+function setSelVal(id,val){var sel=document.getElementById(id);if(!sel||!val)return;var exists=Array.from(sel.options).some(function(o){return o.value===val;});if(!exists){var o=document.createElement('option');o.value=val;o.textContent=val;sel.appendChild(o);}sel.value=val;}
+function onFichaChange(){function ref(ids){var used=new Set();ids.forEach(function(id){var v=gv(id);if(v)used.add(v);});ids.forEach(function(id){var sel=document.getElementById(id),cur=sel.value;Array.from(sel.options).forEach(function(o){if(!o.value)return;o.disabled=used.has(o.value)&&o.value!==cur;});});}ref(FP_INSTR_IDS);ref(FP_VOZ_IDS);ref(FP_TEC_IDS);}
+
+function addFichaField(containerId){
+  fpFieldCounter++;var id='fpc-'+fpFieldCounter;
+  var card=document.createElement('div');card.className='prod-field-card';card.id=id;card._fileDataUrl='';card._fileName='';
+  card.innerHTML='<button class="pfc-remove" onclick="removeFichaField(\''+id+'\')" title="Remover">✕</button><div class="pfc-grid"><div class="f-group pfc-full"><label class="f-label">Título</label><input class="f-input pf-titulo" type="text" placeholder="Ex.: Soundcheck Músicos"></div><div class="f-group pfc-full"><label class="f-label">Descrição</label><input class="f-input pf-desc" type="text" placeholder="Descrição opcional"></div><div class="f-group"><label class="f-label">Data</label><input class="f-input pf-data" type="date"></div><div class="f-group"><label class="f-label">Hora</label><input class="f-input pf-hora" type="time"></div><div class="f-group"><label class="f-label">Duração (min)</label><input class="f-input pf-duracao" type="number" min="0" placeholder="60"></div><div class="f-group"><label class="f-label">Link</label><input class="f-input pf-link" type="url" placeholder="https://…"></div><div class="f-group pfc-full"><label class="f-label">Ficheiro</label><input class="f-input pf-ficheiro" type="file" style="padding:.55rem 1rem;cursor:pointer;"><span class="pf-fname" style="display:none;font-size:.7rem;color:rgba(255,255,255,.35);margin-top:.2rem;display:block;"></span></div></div>';
+  document.getElementById(containerId).appendChild(card);
+  var fi=card.querySelector('.pf-ficheiro'),fn=card.querySelector('.pf-fname');
+  fi.addEventListener('change',function(){var f=fi.files[0];if(!f){card._fileDataUrl='';card._fileName='';fn.style.display='none';return;}card._fileName=f.name;fn.textContent='✓ '+f.name;fn.style.display='block';var r=new FileReader();r.onload=function(e){card._fileDataUrl=e.target.result;};r.readAsDataURL(f);});
+}
+
+function removeFichaField(id){var el=document.getElementById(id);if(el)el.remove();}
+
+function getFichaFieldItems(cid){var out=[];document.querySelectorAll('#'+cid+' .prod-field-card').forEach(function(c){out.push({titulo:(c.querySelector('.pf-titulo')||{}).value||'',desc:(c.querySelector('.pf-desc')||{}).value||'',data:(c.querySelector('.pf-data')||{}).value||'',hora:(c.querySelector('.pf-hora')||{}).value||'',duracao:(c.querySelector('.pf-duracao')||{}).value||'',link:(c.querySelector('.pf-link')||{}).value||'',fileDataUrl:c._fileDataUrl||'',fileName:c._fileName||''});});return out;}
+function fmtDDMM(ds){if(!ds)return'';var p=ds.split('-');return p.length===3?p[2]+'/'+p[1]:ds;}
+function fmtHourAMPM(ts){if(!ts)return'';var p=ts.split(':'),h=parseInt(p[0],10);if(isNaN(h))return'';var m=p[1]||'00',suf=h>=12?'P':'A',h12=h%12;if(!h12)h12=12;return h12+':'+m+suf;}
+
+function gerarFichaPDF(){
+  var congEl=document.getElementById('fp-cong');
+  var congLabel=congEl.options[congEl.selectedIndex]?congEl.options[congEl.selectedIndex].text:'';
+  var dataVal=document.getElementById('fp-data').value;
+  if(!congLabel){alert('Seleciona uma congregação primeiro.');return;}
+  var programa=getFichaFieldItems('fp-programa-list'),rehearsal=getFichaFieldItems('fp-rehearsal-list'),outros=getFichaFieldItems('fp-other-list');
+  var diretor=gv('fp-diretor');
+  var musicos=[{label:'a) Bateria',value:gv('fp-bateria')},{label:'b) Baixo',value:gv('fp-baixo')},{label:'c) Guitarra Elétrica',value:gv('fp-gt-el')},{label:'f) Piano',value:gv('fp-piano')},{label:'g) Guitarra Acústica',value:gv('fp-gt-ac')}];
+  var vozes=[{label:'Voz Suporte',value:gv('fp-back1')},{label:'Back 2',value:gv('fp-back2')},{label:'Back 3',value:gv('fp-back3')},{label:'Back 4',value:gv('fp-back4')}];
+  var lider=gv('fp-dirigente'),tecsom=gv('fp-som'),tecnol=gv('fp-online'),tecmul=gv('fp-multi');
+  var {jsPDF}=window.jspdf;
+  var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  var pageW=210,pageH=297,mg=10,cx=14,cR=196,cW=cR-cx,maxY=pageH-mg-14;
+  var colHEnd=cx+22,colDurX=colHEnd+2,colTitX=colDurX+16,titleMaxW=cR-colTitX-2;
+  function newPage(){doc.addPage();doc.setFillColor(255,255,255);doc.rect(mg,mg,pageW-mg*2,pageH-mg*2,'F');doc.setDrawColor(0,0,0);doc.setLineWidth(0.3);doc.rect(mg,mg,pageW-mg*2,pageH-mg*2,'S');return mg+10;}
+  doc.setFillColor(255,255,255);doc.rect(mg,mg,pageW-mg*2,pageH-mg*2,'F');doc.setDrawColor(0,0,0);doc.setLineWidth(0.3);doc.rect(mg,mg,pageW-mg*2,pageH-mg*2,'S');
+  doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(0,0,0);doc.text(congLabel.toUpperCase(),cx,mg+8);
+  if(dataVal){var dp=dataVal.split('-');var months2=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(80,80,80);doc.text(parseInt(dp[2])+' '+months2[parseInt(dp[1])-1]+' '+dp[0],cR,mg+8,{align:'right'});}
+  doc.setDrawColor(0,0,0);doc.setLineWidth(0.5);doc.line(cx,mg+10,cR,mg+10);
+  var y=mg+17;
+  doc.setFillColor(220,220,220);doc.rect(cx,y,cW,7,'F');doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.text('H',colHEnd-2,y+4.8,{align:'right'});doc.text('MIN',colDurX,y+4.8);doc.text('PROGRAMA',colTitX,y+4.8);y+=7.5;
+  programa.forEach(function(item,idx){doc.setFont('helvetica','bold');doc.setFontSize(8.5);var tLines=doc.splitTextToSize(item.titulo||' ',titleMaxW);doc.setFont('helvetica','normal');doc.setFontSize(7.3);var dLines=item.desc?doc.splitTextToSize(item.desc,titleMaxW):[];var lH=item.link?4.2:0,fH=(item.fileDataUrl&&item.fileName)?4.5:0;var rowH=Math.max(9,9+(tLines.length-1)*3.4+dLines.length*3.4+lH+fH);if(y+rowH>maxY){y=newPage();}var bg=idx%2===0?[243,243,243]:[255,255,255];doc.setFillColor(bg[0],bg[1],bg[2]);doc.rect(cx,y,cW,rowH,'F');var tY=y+5;doc.setFont('helvetica','normal');doc.setFontSize(7.8);doc.setTextColor(40,40,40);doc.text(fmtHourAMPM(item.hora),colHEnd,tY,{align:'right'});doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(0,0,0);doc.text(item.duracao?item.duracao+' min':'',colDurX,tY);tLines.forEach(function(l,i){doc.text(l,colTitX,tY+3.4*i);});doc.setFont('helvetica','normal');doc.setFontSize(7.3);doc.setTextColor(70,70,70);var aT=tY+3.4*tLines.length;dLines.forEach(function(l,i){doc.text(l,colTitX,aT+3.4*i);});var cur2=aT+3.4*dLines.length;if(item.link){doc.setFontSize(6.8);doc.setTextColor(0,80,180);var lt=item.link.length>48?item.link.slice(0,48)+'\u2026':item.link;doc.textWithLink(lt,colTitX,cur2,{url:item.link});doc.setTextColor(0,0,0);cur2+=4.2;}if(item.fileDataUrl&&item.fileName){doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(30,30,30);var fn2='\u2193 '+(item.fileName.length>42?item.fileName.slice(0,42)+'\u2026':item.fileName);doc.text(fn2,colTitX,cur2);doc.link(colTitX,cur2-3.5,titleMaxW,4,{url:item.fileDataUrl});}y+=rowH;});
+  if(y+14>maxY){y=newPage();}doc.setDrawColor(0,0,0);doc.setLineWidth(0.7);doc.line(cx,y,cR,y);y+=5;var totMin=programa.reduce(function(a,it){return a+(parseInt(it.duracao,10)||0);},0);var lastH2=programa.length?fmtHourAMPM(programa[programa.length-1].hora):'';doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(0,0,0);doc.text(lastH2,colHEnd,y,{align:'right'});doc.text(totMin+' min',colDurX,y);y+=12;
+  if(y+20>maxY){y=newPage();}var bottomY=y,divX=cx+cW*0.40,leftColX=cx,rightColX=divX+6,rightColW=cR-rightColX;var leftY=bottomY,rightY=bottomY;
+  function secHead2(x,yy,txt){doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(0,0,0);doc.text(txt,x,yy);return yy+5;}
+  function entry2(x,yy,bold,small,lnk,fdu,fn){doc.setFont('helvetica','bold');doc.setFontSize(8.2);doc.setTextColor(0,0,0);doc.text(bold,x,yy);yy+=3.8;if(small){doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(90,90,90);doc.text(small,x,yy);yy+=4.2;}else{yy+=1;}if(lnk){doc.setFontSize(7);doc.setTextColor(0,80,180);var lt2=lnk.length>32?lnk.slice(0,32)+'\u2026':lnk;doc.textWithLink(lt2,x,yy,{url:lnk});doc.setTextColor(0,0,0);yy+=4.5;}if(fdu&&fn){doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(30,30,30);var ft2='\u2193 '+(fn.length>28?fn.slice(0,28)+'\u2026':fn);doc.text(ft2,x,yy);doc.link(x,yy-3.5,divX-x-4,4.5,{url:fdu});yy+=5;}return yy+1.5;}
+  if(rehearsal.length){leftY=secHead2(leftColX,leftY,'Rehearsal Times');rehearsal.forEach(function(it){leftY=entry2(leftColX,leftY,it.titulo||'—',(fmtDDMM(it.data)+' '+fmtHourAMPM(it.hora)).trim(),it.link,it.fileDataUrl,it.fileName);});leftY+=2;}
+  if(outros.length){leftY=secHead2(leftColX,leftY,'Other Times');outros.forEach(function(it){leftY=entry2(leftColX,leftY,it.titulo||'—',(fmtDDMM(it.data)+' '+fmtHourAMPM(it.hora)).trim(),it.link,it.fileDataUrl,it.fileName);});}
+  rightY=secHead2(rightColX,rightY,'Audio');rightY=entry2(rightColX,rightY,'1. Técnico Principal',tecsom||'—');rightY=entry2(rightColX,rightY,'Online',tecnol||'—');rightY=entry2(rightColX,rightY,'Multimédia',tecmul||'—');rightY+=2;
+  rightY=secHead2(rightColX,rightY,'Líderes de Louvor');if(diretor)rightY=entry2(rightColX,rightY,'Dir. Musical',diretor);rightY=entry2(rightColX,rightY,'a) Líder Louvor',lider||'—');rightY+=2;
+  rightY=secHead2(rightColX,rightY,'Louvor (Vozes)');vozes.forEach(function(it){if(it.value)rightY=entry2(rightColX,rightY,it.label,it.value);});rightY+=2;
+  rightY=secHead2(rightColX,rightY,'Louvor (Músicos)');var subColW2=rightColW/3,sc1=rightColX,sc2=rightColX+subColW2,sc3=rightColX+subColW2*2;var mf=musicos.filter(function(m){return m.value;}),mY=rightY;for(var mi=0;mi<mf.length;mi+=3){var colXs=[sc1,sc2,sc3];for(var ci=0;ci<3&&(mi+ci)<mf.length;ci++){var m2=mf[mi+ci];doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.text(m2.label,colXs[ci],mY);doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(90,90,90);doc.text(m2.value,colXs[ci],mY+3.8);}mY+=9;}rightY=Math.max(rightY,mY)+2;
+  var divBot=Math.max(leftY,rightY)+4;doc.setLineDashPattern([0.6,0.8],0);doc.setDrawColor(150,150,150);doc.setLineWidth(0.2);doc.line(divX,bottomY-2,divX,Math.min(divBot,maxY));doc.setLineDashPattern([],0);
+  doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(140,140,140);doc.text('AD Setúbal — Documento gerado automaticamente',pageW/2,pageH-mg-4,{align:'center'});
+  var fname='ficha-'+(congLabel||'producao').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-'+(dataVal||new Date().toISOString().slice(0,10))+'.pdf';
+  doc.save(fname);
 }
 
 // ═══════════════════════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════════════════════
-function dateStr(d) {
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-}
-function formatDatePT(ds) {
-  var p=ds.split('-');
-  var months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  var dows=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  var d=new Date(ds+'T00:00:00');
-  return dows[d.getDay()]+' '+parseInt(p[2])+' '+months[parseInt(p[1])-1]+' '+p[0];
-}
-function nextSundays(months) {
-  var out=[],today=new Date();today.setHours(0,0,0,0);
-  var end=new Date(today);end.setMonth(end.getMonth()+months);
-  var d=new Date(today);
-  while(d<=end){if(d.getDay()===0)out.push(dateStr(d));d.setDate(d.getDate()+1);}
-  return out;
-}
-function getAvail(ds, equipa) {
-  return USERS.filter(function(u){return u.equipa===equipa&&!!getPresenca(u.id)[ds];}).map(function(u){return u.nome;});
-}
+function dateStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function formatDatePT(ds){var p=ds.split('-');var months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];var dows=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];var d=new Date(ds+'T00:00:00');return dows[d.getDay()]+' '+parseInt(p[2])+' '+months[parseInt(p[1])-1]+' '+p[0];}
+function nextSundays(months){var out=[],today=new Date();today.setHours(0,0,0,0);var end=new Date(today);end.setMonth(end.getMonth()+months);var d=new Date(today);while(d<=end){if(d.getDay()===0)out.push(dateStr(d));d.setDate(d.getDate()+1);}return out;}
 function gv(id){var el=document.getElementById(id);return el?el.value:'';}
 function show(id){var el=document.getElementById(id);if(el)el.style.display='block';}
 function hide(id){var el=document.getElementById(id);if(el)el.style.display='none';}
-
-// SVGs
 function icoCalendar(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>';}
 function icoUsers(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>';}
 function icoMusic(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';}
 function icoHeadphones(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>';}
 function icoList(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>';}
 function icoMonitor(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>';}
-// ═══════════════════════════════════════════════════════════════════
-// FICHA DE PRODUÇÃO
-// ═══════════════════════════════════════════════════════════════════
-var FP_INSTR_MAP = {
-  'fp-piano':'piano','fp-gt-ac':'guitarra_acustica','fp-gt-el':'guitarra_eletrica',
-  'fp-baixo':'baixo','fp-bateria':'bateria'
-};
-var FP_VOZ_MAP = {
-  'fp-dirigente':'dirigente','fp-back1':'back1','fp-back2':'back2','fp-back3':'back3','fp-back4':'back4'
-};
-var FP_TEC_IDS = ['fp-som','fp-online','fp-multi'];
-var FP_INSTR_IDS = Object.keys(FP_INSTR_MAP);
-var FP_VOZ_IDS = Object.keys(FP_VOZ_MAP);
-var fpFieldCounter = 0;
-
-function initFichaProducao() {
-  // nothing on first load, waits for user to pick date+cong
-}
-
-function onFichaReady() {
-  var ds   = document.getElementById('fp-data').value;
-  var cong = document.getElementById('fp-cong').value;
-  if (!ds || !cong) return;
-
-  // 1. Populate selects with all members from ESCALA_DATA
-  populateFichaSelects(cong);
-
-  // 2. Try to load saved escalas for this date
-  var escalas = getEscalas();
-  var esc = escalas[ds] || {};
-  var lou = esc.louvor || null;
-  var som = esc.som    || null;
-  var hasEsc = !!(lou || som);
-
-  document.getElementById('fp-escala-notice').style.display    = hasEsc ? 'block' : 'none';
-  document.getElementById('fp-no-escala-notice').style.display = hasEsc ? 'none'  : 'block';
-
-  if (lou) {
-    // Pre-fill louvor
-    setSelVal('fp-diretor',  lou.diretor  || '');
-    setSelVal('fp-piano',    lou.piano    || '');
-    setSelVal('fp-gt-ac',    lou.gtAc     || '');
-    setSelVal('fp-gt-el',    lou.gtEl     || '');
-    setSelVal('fp-baixo',    lou.baixo    || '');
-    setSelVal('fp-bateria',  lou.bateria  || '');
-    setSelVal('fp-dirigente',lou.dirigente|| '');
-    setSelVal('fp-back1',    lou.back1    || '');
-    setSelVal('fp-back2',    lou.back2    || '');
-    setSelVal('fp-back3',    lou.back3    || '');
-    setSelVal('fp-back4',    lou.back4    || '');
-  }
-  if (som) {
-    setSelVal('fp-som',    som.tecsom     || '');
-    setSelVal('fp-online', som.online     || '');
-    setSelVal('fp-multi',  som.multimedia || '');
-  }
-
-  onFichaChange();
-}
-
-function populateFichaSelects(cong) {
-  var cd = ESCALA_DATA[cong]; if (!cd) return;
-
-  function pop(map, bucket) {
-    Object.keys(map).forEach(function(selId) {
-      var key = map[selId];
-      var sel = document.getElementById(selId);
-      var cur = sel.value; // preserve current selection
-      var members = (cd[bucket]&&cd[bucket][key]) || [];
-      sel.innerHTML = '<option value="">— Ninguém —</option>';
-      members.forEach(function(n) {
-        var opt = document.createElement('option');
-        opt.value = n; opt.textContent = n;
-        sel.appendChild(opt);
-      });
-      sel.disabled = !members.length;
-      if (cur) sel.value = cur;
-    });
-  }
-
-  // Tecnica selects
-  var tecKeys = ['som','online','multimedia'];
-  FP_TEC_IDS.forEach(function(selId, i) {
-    var sel = document.getElementById(selId);
-    var cur = sel.value;
-    var members = (cd.tecnica && cd.tecnica[tecKeys[i]]) || [];
-    sel.innerHTML = '<option value="">— Ninguém —</option>';
-    members.forEach(function(n) {
-      var opt = document.createElement('option'); opt.value=n; opt.textContent=n;
-      sel.appendChild(opt);
-    });
-    sel.disabled = !members.length;
-    if (cur) sel.value = cur;
-  });
-
-  pop(FP_INSTR_MAP, 'instrumentos');
-  pop(FP_VOZ_MAP,   'vozes');
-}
-
-function setSelVal(id, val) {
-  var sel = document.getElementById(id); if (!sel || !val) return;
-  // Add option if not already present (in case member not in ESCALA_DATA)
-  var exists = Array.from(sel.options).some(function(o){ return o.value === val; });
-  if (!exists) {
-    var opt = document.createElement('option'); opt.value=val; opt.textContent=val;
-    sel.appendChild(opt);
-  }
-  sel.value = val;
-}
-
-function onFichaChange() {
-  function ref(ids) {
-    var used=new Set();
-    ids.forEach(function(id){var v=gv(id);if(v)used.add(v);});
-    ids.forEach(function(id){
-      var sel=document.getElementById(id),cur=sel.value;
-      Array.from(sel.options).forEach(function(o){if(!o.value)return;o.disabled=used.has(o.value)&&o.value!==cur;});
-    });
-  }
-  ref(FP_INSTR_IDS); ref(FP_VOZ_IDS); ref(FP_TEC_IDS);
-}
-
-// Dynamic field cards (Programa, Rehearsal, Other Times)
-function addFichaField(containerId) {
-  fpFieldCounter++;
-  var id = 'fpc-' + fpFieldCounter;
-  var card = document.createElement('div');
-  card.className = 'prod-field-card'; card.id = id;
-  card._fileDataUrl = ''; card._fileName = '';
-  card.innerHTML =
-    '<button class="pfc-remove" onclick="removeFichaField(\''+id+'\')" title="Remover">✕</button>' +
-    '<div class="pfc-grid">' +
-      '<div class="f-group pfc-full"><label class="f-label">Título</label><input class="f-input pf-titulo" type="text" placeholder="Ex.: Soundcheck Músicos"></div>' +
-      '<div class="f-group pfc-full"><label class="f-label">Descrição</label><input class="f-input pf-desc" type="text" placeholder="Descrição opcional"></div>' +
-      '<div class="f-group"><label class="f-label">Data</label><input class="f-input pf-data" type="date"></div>' +
-      '<div class="f-group"><label class="f-label">Hora</label><input class="f-input pf-hora" type="time"></div>' +
-      '<div class="f-group"><label class="f-label">Duração (min)</label><input class="f-input pf-duracao" type="number" min="0" placeholder="60"></div>' +
-      '<div class="f-group"><label class="f-label">Link</label><input class="f-input pf-link" type="url" placeholder="https://…"></div>' +
-      '<div class="f-group pfc-full"><label class="f-label">Ficheiro</label><input class="f-input pf-ficheiro" type="file" style="padding:.55rem 1rem;cursor:pointer;"><span class="pf-fname" style="display:none;font-size:.7rem;color:rgba(255,255,255,.35);margin-top:.2rem;display:block;"></span></div>' +
-    '</div>';
-  document.getElementById(containerId).appendChild(card);
-  var fi = card.querySelector('.pf-ficheiro');
-  var fn = card.querySelector('.pf-fname');
-  fi.addEventListener('change', function() {
-    var f = fi.files[0]; if(!f){card._fileDataUrl='';card._fileName='';fn.style.display='none';return;}
-    card._fileName=f.name; fn.textContent='✓ '+f.name; fn.style.display='block';
-    var r=new FileReader(); r.onload=function(e){card._fileDataUrl=e.target.result;}; r.readAsDataURL(f);
-  });
-}
-
-function removeFichaField(id) { var el=document.getElementById(id); if(el)el.remove(); }
-
-function getFichaFieldItems(cid) {
-  var cards=document.querySelectorAll('#'+cid+' .prod-field-card'), out=[];
-  cards.forEach(function(c){
-    out.push({
-      titulo: (c.querySelector('.pf-titulo')||{}).value||'',
-      desc:   (c.querySelector('.pf-desc')||{}).value||'',
-      data:   (c.querySelector('.pf-data')||{}).value||'',
-      hora:   (c.querySelector('.pf-hora')||{}).value||'',
-      duracao:(c.querySelector('.pf-duracao')||{}).value||'',
-      link:   (c.querySelector('.pf-link')||{}).value||'',
-      fileDataUrl: c._fileDataUrl||'', fileName: c._fileName||''
-    });
-  });
-  return out;
-}
-
-function fmtDDMM(ds) {
-  if (!ds) return '';
-  var p=ds.split('-'); return p.length===3?p[2]+'/'+p[1]:ds;
-}
-function fmtHourAMPM(ts) {
-  if (!ts) return '';
-  var p=ts.split(':'),h=parseInt(p[0],10); if(isNaN(h))return '';
-  var m=p[1]||'00',suf=h>=12?'P':'A',h12=h%12; if(!h12)h12=12;
-  return h12+':'+m+suf;
-}
-
-function gerarFichaPDF() {
-  var congEl = document.getElementById('fp-cong');
-  var congLabel = congEl.options[congEl.selectedIndex] ? congEl.options[congEl.selectedIndex].text : '';
-  var dataVal = document.getElementById('fp-data').value;
-  if (!congLabel) { alert('Seleciona uma congregação primeiro.'); return; }
-
-  var programa  = getFichaFieldItems('fp-programa-list');
-  var rehearsal = getFichaFieldItems('fp-rehearsal-list');
-  var outros    = getFichaFieldItems('fp-other-list');
-
-  var diretor = gv('fp-diretor');
-  var musicos = [
-    {label:'a) Bateria',           value:gv('fp-bateria')},
-    {label:'b) Baixo',             value:gv('fp-baixo')},
-    {label:'c) Guitarra Elétrica', value:gv('fp-gt-el')},
-    {label:'f) Piano',             value:gv('fp-piano')},
-    {label:'g) Guitarra Acústica', value:gv('fp-gt-ac')}
-  ];
-  var vozes = [
-    {label:'Voz Suporte', value:gv('fp-back1')},
-    {label:'Back 2',      value:gv('fp-back2')},
-    {label:'Back 3',      value:gv('fp-back3')},
-    {label:'Back 4',      value:gv('fp-back4')}
-  ];
-  var lider  = gv('fp-dirigente');
-  var tecsom = gv('fp-som');
-  var tecnol = gv('fp-online');
-  var tecmul = gv('fp-multi');
-
-  var {jsPDF} = window.jspdf;
-  var doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  var pageW=210,pageH=297,mg=10,cx=14,cR=196,cW=cR-cx,maxY=pageH-mg-14;
-  var colHEnd=cx+22,colDurX=colHEnd+2,colTitX=colDurX+16,titleMaxW=cR-colTitX-2;
-
-  function newPage() {
-    doc.addPage();
-    doc.setFillColor(255,255,255); doc.rect(mg,mg,pageW-mg*2,pageH-mg*2,'F');
-    doc.setDrawColor(0,0,0); doc.setLineWidth(0.3); doc.rect(mg,mg,pageW-mg*2,pageH-mg*2,'S');
-    return mg+10;
-  }
-
-  // ── PAGE 1 FRAME ──
-  doc.setFillColor(255,255,255); doc.rect(mg,mg,pageW-mg*2,pageH-mg*2,'F');
-  doc.setDrawColor(0,0,0); doc.setLineWidth(0.3); doc.rect(mg,mg,pageW-mg*2,pageH-mg*2,'S');
-
-  // Header
-  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(0,0,0);
-  doc.text(congLabel.toUpperCase(), cx, mg+8);
-  if (dataVal) {
-    var dp=dataVal.split('-');
-    var months2=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    var dlabel = parseInt(dp[2])+' '+months2[parseInt(dp[1])-1]+' '+dp[0];
-    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(80,80,80);
-    doc.text(dlabel, cR, mg+8, {align:'right'});
-  }
-  doc.setDrawColor(0,0,0); doc.setLineWidth(0.5);
-  doc.line(cx, mg+10, cR, mg+10);
-
-  var y = mg+17;
-
-  // Programme table header
-  doc.setFillColor(220,220,220); doc.rect(cx,y,cW,7,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(0,0,0);
-  doc.text('H', colHEnd-2, y+4.8, {align:'right'});
-  doc.text('MIN', colDurX, y+4.8);
-  doc.text('PROGRAMA', colTitX, y+4.8);
-  y += 7.5;
-
-  // Programme rows
-  programa.forEach(function(item,idx){
-    doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
-    var tLines = doc.splitTextToSize(item.titulo||' ', titleMaxW);
-    doc.setFont('helvetica','normal'); doc.setFontSize(7.3);
-    var dLines = item.desc ? doc.splitTextToSize(item.desc,titleMaxW) : [];
-    var lH=item.link?4.2:0, fH=(item.fileDataUrl&&item.fileName)?4.5:0;
-    var rowH=Math.max(9,9+(tLines.length-1)*3.4+dLines.length*3.4+lH+fH);
-    if(y+rowH>maxY){y=newPage();}
-    var bg=idx%2===0?[243,243,243]:[255,255,255];
-    doc.setFillColor(bg[0],bg[1],bg[2]); doc.rect(cx,y,cW,rowH,'F');
-    var tY=y+5;
-    doc.setFont('helvetica','normal');doc.setFontSize(7.8);doc.setTextColor(40,40,40);
-    doc.text(fmtHourAMPM(item.hora),colHEnd,tY,{align:'right'});
-    doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(0,0,0);
-    doc.text(item.duracao?item.duracao+' min':'',colDurX,tY);
-    tLines.forEach(function(l,i){doc.text(l,colTitX,tY+3.4*i);});
-    doc.setFont('helvetica','normal');doc.setFontSize(7.3);doc.setTextColor(70,70,70);
-    var aT=tY+3.4*tLines.length;
-    dLines.forEach(function(l,i){doc.text(l,colTitX,aT+3.4*i);});
-    var cur=aT+3.4*dLines.length;
-    if(item.link){doc.setFontSize(6.8);doc.setTextColor(0,80,180);var lt=item.link.length>48?item.link.slice(0,48)+'\u2026':item.link;doc.textWithLink(lt,colTitX,cur,{url:item.link});doc.setTextColor(0,0,0);cur+=4.2;}
-    if(item.fileDataUrl&&item.fileName){doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(30,30,30);var fn2='\u2193 '+(item.fileName.length>42?item.fileName.slice(0,42)+'\u2026':item.fileName);doc.text(fn2,colTitX,cur);doc.link(colTitX,cur-3.5,titleMaxW,4,{url:item.fileDataUrl});}
-    y+=rowH;
-  });
-
-  // Totals
-  if(y+14>maxY){y=newPage();}
-  doc.setDrawColor(0,0,0);doc.setLineWidth(0.7);doc.line(cx,y,cR,y);y+=5;
-  var totMin=programa.reduce(function(a,it){return a+(parseInt(it.duracao,10)||0);},0);
-  var lastH2=programa.length?fmtHourAMPM(programa[programa.length-1].hora):'';
-  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(0,0,0);
-  doc.text(lastH2,colHEnd,y,{align:'right'});doc.text(totMin+' min',colDurX,y);y+=12;
-
-  // Bottom two-column section
-  if(y+20>maxY){y=newPage();}
-  var bottomY=y,divX=cx+cW*0.40,leftColX=cx,rightColX=divX+6,rightColW=cR-rightColX;
-  var leftY=bottomY,rightY=bottomY;
-
-  function secHead2(x,yy,txt){doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(0,0,0);doc.text(txt,x,yy);return yy+5;}
-  function entry2(x,yy,bold,small,lnk,fdu,fn){
-    doc.setFont('helvetica','bold');doc.setFontSize(8.2);doc.setTextColor(0,0,0);doc.text(bold,x,yy);yy+=3.8;
-    if(small){doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(90,90,90);doc.text(small,x,yy);yy+=4.2;}else{yy+=1;}
-    if(lnk){doc.setFontSize(7);doc.setTextColor(0,80,180);var lt2=lnk.length>32?lnk.slice(0,32)+'\u2026':lnk;doc.textWithLink(lt2,x,yy,{url:lnk});doc.setTextColor(0,0,0);yy+=4.5;}
-    if(fdu&&fn){doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(30,30,30);var ft2='\u2193 '+(fn.length>28?fn.slice(0,28)+'\u2026':fn);doc.text(ft2,x,yy);doc.link(x,yy-3.5,divX-x-4,4.5,{url:fdu});yy+=5;}
-    return yy+1.5;
-  }
-
-  if(rehearsal.length){leftY=secHead2(leftColX,leftY,'Rehearsal Times');rehearsal.forEach(function(it){var tl=(fmtDDMM(it.data)+' '+fmtHourAMPM(it.hora)).trim();leftY=entry2(leftColX,leftY,it.titulo||'—',tl,it.link,it.fileDataUrl,it.fileName);});leftY+=2;}
-  if(outros.length){leftY=secHead2(leftColX,leftY,'Other Times');outros.forEach(function(it){var tl=(fmtDDMM(it.data)+' '+fmtHourAMPM(it.hora)).trim();leftY=entry2(leftColX,leftY,it.titulo||'—',tl,it.link,it.fileDataUrl,it.fileName);});}
-
-  rightY=secHead2(rightColX,rightY,'Audio');
-  rightY=entry2(rightColX,rightY,'1. Técnico Principal',tecsom||'—');
-  rightY=entry2(rightColX,rightY,'Online',tecnol||'—');
-  rightY=entry2(rightColX,rightY,'Multimédia',tecmul||'—');
-  rightY+=2;
-
-  rightY=secHead2(rightColX,rightY,'Líderes de Louvor');
-  if(diretor) rightY=entry2(rightColX,rightY,'Dir. Musical',diretor);
-  rightY=entry2(rightColX,rightY,'a) Líder Louvor',lider||'—');
-  rightY+=2;
-
-  rightY=secHead2(rightColX,rightY,'Louvor (Vozes)');
-  vozes.forEach(function(it){if(it.value)rightY=entry2(rightColX,rightY,it.label,it.value);});
-  rightY+=2;
-
-  rightY=secHead2(rightColX,rightY,'Louvor (Músicos)');
-  var subColW2=rightColW/3,sc1=rightColX,sc2=rightColX+subColW2,sc3=rightColX+subColW2*2;
-  var mf=musicos.filter(function(m){return m.value;});
-  var mY=rightY;
-  for(var mi=0;mi<mf.length;mi+=3){
-    var colXs=[sc1,sc2,sc3];
-    for(var ci=0;ci<3&&(mi+ci)<mf.length;ci++){
-      var m2=mf[mi+ci];
-      doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.text(m2.label,colXs[ci],mY);
-      doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(90,90,90);doc.text(m2.value,colXs[ci],mY+3.8);
-    }
-    mY+=9;
-  }
-  rightY=Math.max(rightY,mY)+2;
-
-  // Divider
-  var divBot=Math.max(leftY,rightY)+4;
-  doc.setLineDashPattern([0.6,0.8],0);doc.setDrawColor(150,150,150);doc.setLineWidth(0.2);
-  doc.line(divX,bottomY-2,divX,Math.min(divBot,maxY));doc.setLineDashPattern([],0);
-
-  // Footer
-  doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(140,140,140);
-  doc.text('AD Setúbal — Documento gerado automaticamente',pageW/2,pageH-mg-4,{align:'center'});
-
-  var fname='ficha-'+(congLabel||'producao').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-'+(dataVal||new Date().toISOString().slice(0,10))+'.pdf';
-  doc.save(fname);
-}
-
 function icoClipboard(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>';}
 </script>
 </body>
