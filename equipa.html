@@ -86,11 +86,9 @@
       font-size: 0.6rem; font-weight: 700;
       letter-spacing: 0.18em; text-transform: uppercase;
       padding: 0.28rem 0.75rem;
-      background: var(--teal); color: #fff;
     }
-    .team-card-role-badge.pastor { background: var(--teal); }
-    .team-card-role-badge.jovens { background: var(--orange); }
-    .team-card-role-badge.lideranca { background: var(--purple); }
+    .team-card-role-badge.pastor { background: var(--teal); color: #fff; }
+    .team-card-role-badge.jovens { background: var(--orange); color: #fff; }
 
     .team-card-body { padding: 1.8rem 2rem; }
     .team-card-cong {
@@ -157,6 +155,7 @@
     .modal-img-col img {
       width: 100%; height: 100%; object-fit: cover; display: block;
       filter: brightness(0.75);
+      position: absolute; inset: 0;
     }
     .modal-img-placeholder {
       width: 100%; height: 100%; min-height: 420px;
@@ -172,6 +171,7 @@
     .modal-img-overlay {
       position: absolute; inset: 0;
       background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);
+      pointer-events: none;
     }
     .modal-img-badge {
       position: absolute; top: 1.2rem; left: 1.2rem;
@@ -179,10 +179,9 @@
       font-size: 0.6rem; font-weight: 700;
       letter-spacing: 0.18em; text-transform: uppercase;
       padding: 0.3rem 0.8rem;
-      background: var(--teal); color: #fff;
     }
-    .modal-img-badge.jovens { background: var(--orange); }
-    .modal-img-badge.lideranca { background: var(--purple); }
+    .modal-img-badge.pastor { background: var(--teal); color: #fff; }
+    .modal-img-badge.jovens { background: var(--orange); color: #fff; }
     .modal-img-cong {
       position: absolute; bottom: 1.4rem; left: 1.4rem;
       font-family: 'Barlow Condensed', sans-serif;
@@ -274,18 +273,16 @@
     <div class="page-header-content fade-in">
       <span class="eyebrow">As Pessoas por Trás da Igreja</span>
       <h1>A Nossa Equipa</h1>
-      <p>Pastores, líderes de jovens e responsáveis de congregação — pessoas ao serviço da comunidade.</p>
+      <p>Pastores e líderes de jovens ao serviço das congregações do Distrito de Setúbal e da Área de Missão de Beja.</p>
     </div>
   </div>
 
   <div class="dark-section">
 
-    <!-- FILTER -->
     <div class="filter-bar">
       <button class="filter-btn active" onclick="filterTeam('all',this)">Todos</button>
       <button class="filter-btn" onclick="filterTeam('pastor',this)">Pastores</button>
       <button class="filter-btn" onclick="filterTeam('jovens',this)">Líderes de Jovens</button>
-      <button class="filter-btn" onclick="filterTeam('lideranca',this)">Liderança Local</button>
     </div>
 
     <div class="team-no-results" id="team-no-results">
@@ -296,30 +293,30 @@
     <p class="section-label" data-section="geral">Liderança Geral</p>
     <div class="team-grid" data-section="geral">
 
-      <div class="team-card fade-in" data-role="pastor" data-id="0" onclick="openModal(0)">
+      <div class="team-card fade-in" data-role="pastor" data-id="antonio" onclick="openModal('antonio')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>PM</span></div>
+          <div class="team-card-img-placeholder"><span>AP</span></div>
           <span class="team-card-role-badge pastor">Pastor</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong">AD Setúbal — Geral</p>
-          <h3 class="team-card-name">Pastor Manuel</h3>
+          <h3 class="team-card-name">Antônio Portugal</h3>
           <p class="team-card-role">Pastor Presidente</p>
-          <p class="team-card-bio-preview">Lidera a Assembleia de Deus de Setúbal com dedicação à Palavra e à missão em todo o Distrito.</p>
+          <p class="team-card-bio-preview">Lidera a Assembleia de Deus de Setúbal com dedicação à Palavra e à missão em todo o Distrito e Área de Missão de Beja.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
 
-      <div class="team-card fade-in" data-role="jovens" data-id="1" onclick="openModal(1)">
+      <div class="team-card fade-in" data-role="jovens" data-id="arao-macarena" onclick="openModal('arao-macarena')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>CG</span></div>
+          <div class="team-card-img-placeholder"><span>AM</span></div>
           <span class="team-card-role-badge jovens">Jovens</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong jovens">Connect — Liderança Geral</p>
-          <h3 class="team-card-name">Connect Team</h3>
-          <p class="team-card-role">Liderança Geral do Ministério de Jovens</p>
-          <p class="team-card-bio-preview">Equipa responsável pelo Connect a nível transversal, articulando os grupos de jovens de todas as congregações.</p>
+          <h3 class="team-card-name">Arão e Macarena Caville</h3>
+          <p class="team-card-role">Líderes Gerais do Connect</p>
+          <p class="team-card-bio-preview">Responsáveis pelo ministério de jovens Connect a nível transversal, articulando os grupos de jovens de todas as congregações.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
@@ -330,30 +327,30 @@
     <p class="section-label" data-section="setubal">Setúbal — Sede</p>
     <div class="team-grid" data-section="setubal">
 
-      <div class="team-card fade-in" data-role="pastor" data-id="2" onclick="openModal(2)">
+      <div class="team-card fade-in" data-role="pastor" data-id="antonio" onclick="openModal('antonio')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>PS</span></div>
+          <div class="team-card-img-placeholder"><span>AP</span></div>
           <span class="team-card-role-badge pastor">Pastor</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong">Setúbal — Sede</p>
-          <h3 class="team-card-name">Pastor Setúbal</h3>
+          <h3 class="team-card-name">Antônio Portugal</h3>
           <p class="team-card-role">Pastor da Congregação</p>
-          <p class="team-card-bio-preview">Responsável pela congregação sede, com foco no ensino bíblico e no crescimento da comunidade local.</p>
+          <p class="team-card-bio-preview">Lidera a congregação sede de Setúbal e a AD Setúbal no seu todo, com foco no ensino bíblico e na missão regional.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
 
-      <div class="team-card fade-in" data-role="jovens" data-id="3" onclick="openModal(3)">
+      <div class="team-card fade-in" data-role="jovens" data-id="arao-macarena" onclick="openModal('arao-macarena')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>JS</span></div>
+          <div class="team-card-img-placeholder"><span>AM</span></div>
           <span class="team-card-role-badge jovens">Jovens</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong jovens">Connect — Setúbal</p>
-          <h3 class="team-card-name">Líder Jovens STB</h3>
-          <p class="team-card-role">Líder do Connect Setúbal</p>
-          <p class="team-card-bio-preview">Dinamiza o grupo de jovens da sede, com encontros regulares de louvor, Palavra e comunhão.</p>
+          <h3 class="team-card-name">Arão e Macarena Caville</h3>
+          <p class="team-card-role">Líderes do Connect Setúbal</p>
+          <p class="team-card-bio-preview">Dinamizam o grupo de jovens da sede de Setúbal com encontros regulares de louvor, Palavra e comunhão.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
@@ -364,30 +361,30 @@
     <p class="section-label" data-section="barreiro">Barreiro</p>
     <div class="team-grid" data-section="barreiro">
 
-      <div class="team-card fade-in" data-role="pastor" data-id="4" onclick="openModal(4)">
+      <div class="team-card fade-in" data-role="pastor" data-id="ruan" onclick="openModal('ruan')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>PB</span></div>
+          <div class="team-card-img-placeholder"><span>RM</span></div>
           <span class="team-card-role-badge pastor">Pastor</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong">Barreiro</p>
-          <h3 class="team-card-name">Pastor Barreiro</h3>
+          <h3 class="team-card-name">Ruan Mendes</h3>
           <p class="team-card-role">Pastor da Congregação</p>
-          <p class="team-card-bio-preview">Serve a congregação do Barreiro com compromisso pastoral e atenção às necessidades da comunidade local.</p>
+          <p class="team-card-bio-preview">Serve a congregação do Barreiro com compromisso pastoral e atenção às necessidades espirituais da comunidade local.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
 
-      <div class="team-card fade-in" data-role="jovens" data-id="5" onclick="openModal(5)">
+      <div class="team-card fade-in" data-role="jovens" data-id="catarina" onclick="openModal('catarina')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>JB</span></div>
+          <div class="team-card-img-placeholder"><span>CS</span></div>
           <span class="team-card-role-badge jovens">Jovens</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong jovens">Connect — Barreiro</p>
-          <h3 class="team-card-name">Líder Jovens BR</h3>
+          <h3 class="team-card-name">Catarina Silva</h3>
           <p class="team-card-role">Líder do Connect Barreiro</p>
-          <p class="team-card-bio-preview">Lidera o grupo de jovens do Barreiro, criando espaço para fé e amizade entre a nova geração.</p>
+          <p class="team-card-bio-preview">Lidera o grupo de jovens do Barreiro, criando espaço para fé e amizade entre a nova geração da congregação.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
@@ -398,28 +395,28 @@
     <p class="section-label" data-section="pinhalnovo">Pinhal Novo</p>
     <div class="team-grid" data-section="pinhalnovo">
 
-      <div class="team-card fade-in" data-role="pastor" data-id="6" onclick="openModal(6)">
+      <div class="team-card fade-in" data-role="pastor" data-id="rafael" onclick="openModal('rafael')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>PP</span></div>
+          <div class="team-card-img-placeholder"><span>RL</span></div>
           <span class="team-card-role-badge pastor">Pastor</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong">Pinhal Novo</p>
-          <h3 class="team-card-name">Pastor Pinhal Novo</h3>
+          <h3 class="team-card-name">Rafael Luz</h3>
           <p class="team-card-role">Pastor da Congregação</p>
-          <p class="team-card-bio-preview">Aposta no discipulado e no ensino sólido da Bíblia para edificar a congregação de Pinhal Novo.</p>
+          <p class="team-card-bio-preview">Aposta no discipulado e no ensino bíblico sólido para edificar a congregação de Pinhal Novo.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
 
-      <div class="team-card fade-in" data-role="jovens" data-id="7" onclick="openModal(7)">
+      <div class="team-card fade-in" data-role="jovens" data-id="luiza" onclick="openModal('luiza')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>JP</span></div>
+          <div class="team-card-img-placeholder"><span>LL</span></div>
           <span class="team-card-role-badge jovens">Jovens</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong jovens">Connect — Pinhal Novo</p>
-          <h3 class="team-card-name">Líder Jovens PN</h3>
+          <h3 class="team-card-name">Luiza Luz</h3>
           <p class="team-card-role">Líder do Connect Pinhal Novo</p>
           <p class="team-card-bio-preview">Conduz os jovens de Pinhal Novo num ambiente de fé prática e pertença comunitária.</p>
           <span class="team-card-cta">Ver perfil →</span>
@@ -432,30 +429,30 @@
     <p class="section-label" data-section="moita">Moita</p>
     <div class="team-grid" data-section="moita">
 
-      <div class="team-card fade-in" data-role="pastor" data-id="8" onclick="openModal(8)">
+      <div class="team-card fade-in" data-role="pastor" data-id="claudionor" onclick="openModal('claudionor')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>PM</span></div>
+          <div class="team-card-img-placeholder"><span>CO</span></div>
           <span class="team-card-role-badge pastor">Pastor</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong">Moita</p>
-          <h3 class="team-card-name">Pastor Moita</h3>
+          <h3 class="team-card-name">Claudionor Oliveira</h3>
           <p class="team-card-role">Pastor da Congregação</p>
-          <p class="team-card-bio-preview">Pastoral centrada na oração e na vida comunitária da congregação da Moita.</p>
+          <p class="team-card-bio-preview">Pastoral centrada na oração e na vida comunitária da congregação da Moita, onde também serve a congregação do Montijo.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
 
-      <div class="team-card fade-in" data-role="jovens" data-id="9" onclick="openModal(9)">
+      <div class="team-card fade-in" data-role="jovens" data-id="jorge-rita" onclick="openModal('jorge-rita')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>JM</span></div>
+          <div class="team-card-img-placeholder"><span>JR</span></div>
           <span class="team-card-role-badge jovens">Jovens</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong jovens">Connect — Moita</p>
-          <h3 class="team-card-name">Líder Jovens MT</h3>
-          <p class="team-card-role">Líder do Connect Moita</p>
-          <p class="team-card-bio-preview">Acompanha os jovens da Moita com proximidade, incentivando o crescimento espiritual e relacional.</p>
+          <h3 class="team-card-name">Jorge e Rita de Sá</h3>
+          <p class="team-card-role">Líderes do Connect Moita</p>
+          <p class="team-card-bio-preview">Acompanham os jovens da Moita com proximidade, incentivando o crescimento espiritual e relacional.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
@@ -466,56 +463,50 @@
     <p class="section-label" data-section="montijo">Montijo</p>
     <div class="team-grid" data-section="montijo">
 
-      <div class="team-card fade-in" data-role="pastor" data-id="10" onclick="openModal(10)">
+      <div class="team-card fade-in" data-role="pastor" data-id="claudionor" onclick="openModal('claudionor')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>PM</span></div>
+          <div class="team-card-img-placeholder"><span>CO</span></div>
           <span class="team-card-role-badge pastor">Pastor</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong">Montijo</p>
-          <h3 class="team-card-name">Pastor Montijo</h3>
+          <h3 class="team-card-name">Claudionor Oliveira</h3>
           <p class="team-card-role">Pastor da Congregação</p>
-          <p class="team-card-bio-preview">Serve a congregação do Montijo com dedicação ao evangelismo local e ao crescimento em fé.</p>
+          <p class="team-card-bio-preview">Serve a congregação do Montijo com dedicação ao evangelismo local, acumulando também o pastoreio da Moita.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
 
     </div>
 
-    <!-- ALCOCHETE -->
-    <p class="section-label" data-section="alcochete">Alcochete</p>
-    <div class="team-grid" data-section="alcochete">
-
-      <div class="team-card fade-in" data-role="lideranca" data-id="11" onclick="openModal(11)">
-        <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>LA</span></div>
-          <span class="team-card-role-badge lideranca">Liderança</span>
-        </div>
-        <div class="team-card-body">
-          <p class="team-card-cong">Alcochete</p>
-          <h3 class="team-card-name">Líder Alcochete</h3>
-          <p class="team-card-role">Responsável da Congregação</p>
-          <p class="team-card-bio-preview">Responsável pela congregação de Alcochete, com presença ativa no acompanhamento da comunidade local.</p>
-          <span class="team-card-cta">Ver perfil →</span>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- AIRES -->
-    <p class="section-label" data-section="aires">Aires</p>
+    <!-- AIRES E PALMELA -->
+    <p class="section-label" data-section="aires">Aires e Palmela</p>
     <div class="team-grid" data-section="aires">
 
-      <div class="team-card fade-in" data-role="lideranca" data-id="12" onclick="openModal(12)">
+      <div class="team-card fade-in" data-role="pastor" data-id="dionildo" onclick="openModal('dionildo')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>LAi</span></div>
-          <span class="team-card-role-badge lideranca">Liderança</span>
+          <div class="team-card-img-placeholder"><span>DV</span></div>
+          <span class="team-card-role-badge pastor">Pastor</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong">Aires</p>
-          <h3 class="team-card-name">Líder Aires</h3>
-          <p class="team-card-role">Responsável da Congregação</p>
-          <p class="team-card-bio-preview">Cuida da congregação de Aires com fidelidade e serviço à comunidade de Palmela.</p>
+          <h3 class="team-card-name">Dionildo Vidal</h3>
+          <p class="team-card-role">Pastor da Congregação</p>
+          <p class="team-card-bio-preview">Cuida das congregações de Aires e Palmela com fidelidade ao Evangelho e serviço à comunidade local.</p>
+          <span class="team-card-cta">Ver perfil →</span>
+        </div>
+      </div>
+
+      <div class="team-card fade-in" data-role="pastor" data-id="dionildo" onclick="openModal('dionildo')">
+        <div class="team-card-img">
+          <div class="team-card-img-placeholder"><span>DV</span></div>
+          <span class="team-card-role-badge pastor">Pastor</span>
+        </div>
+        <div class="team-card-body">
+          <p class="team-card-cong">Palmela</p>
+          <h3 class="team-card-name">Dionildo Vidal</h3>
+          <p class="team-card-role">Pastor da Congregação</p>
+          <p class="team-card-bio-preview">Serve Palmela com o mesmo compromisso pastoral de Aires, presente em ambas as comunidades.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
@@ -526,85 +517,85 @@
     <p class="section-label" data-section="beja">Área de Missão — Beja</p>
     <div class="team-grid" data-section="beja">
 
-      <div class="team-card fade-in" data-role="pastor" data-id="13" onclick="openModal(13)">
+      <div class="team-card fade-in" data-role="pastor" data-id="pastor-beja" onclick="openModal('pastor-beja')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>PBJ</span></div>
+          <div class="team-card-img-placeholder"><span>PB</span></div>
           <span class="team-card-role-badge pastor">Pastor</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong">Beja</p>
-          <h3 class="team-card-name">Pastor Beja</h3>
-          <p class="team-card-role">Pastor — Área de Missão Beja</p>
-          <p class="team-card-bio-preview">Lidera o trabalho missionário na cidade de Beja, ancorando a missão no Alentejo.</p>
+          <h3 class="team-card-name">Pastor — Beja</h3>
+          <p class="team-card-role">Pastor da Congregação</p>
+          <p class="team-card-bio-preview">Ancora o trabalho missionário na cidade de Beja, ponto central da Área de Missão no Alentejo.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
 
-      <div class="team-card fade-in" data-role="lideranca" data-id="14" onclick="openModal(14)">
+      <div class="team-card fade-in" data-role="pastor" data-id="pastor-vidigueira" onclick="openModal('pastor-vidigueira')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>LV</span></div>
-          <span class="team-card-role-badge lideranca">Liderança</span>
+          <div class="team-card-img-placeholder"><span>PV</span></div>
+          <span class="team-card-role-badge pastor">Pastor</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong">Vidigueira</p>
-          <h3 class="team-card-name">Líder Vidigueira</h3>
-          <p class="team-card-role">Responsável da Congregação</p>
+          <h3 class="team-card-name">Pastor — Vidigueira</h3>
+          <p class="team-card-role">Pastor da Congregação</p>
           <p class="team-card-bio-preview">Serve a congregação de Vidigueira com persistência e compromisso com a missão no Alentejo.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
 
-      <div class="team-card fade-in" data-role="lideranca" data-id="15" onclick="openModal(15)">
+      <div class="team-card fade-in" data-role="pastor" data-id="pastor-ermidas" onclick="openModal('pastor-ermidas')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>LE</span></div>
-          <span class="team-card-role-badge lideranca">Liderança</span>
+          <div class="team-card-img-placeholder"><span>PE</span></div>
+          <span class="team-card-role-badge pastor">Pastor</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong">Ermidas</p>
-          <h3 class="team-card-name">Líder Ermidas</h3>
-          <p class="team-card-role">Responsável da Congregação</p>
-          <p class="team-card-bio-preview">Responsável pela congregação de Ermidas, com raízes profundas na comunidade local do Alentejo.</p>
+          <h3 class="team-card-name">Pastor — Ermidas</h3>
+          <p class="team-card-role">Pastor da Congregação</p>
+          <p class="team-card-bio-preview">Responsável pela congregação de Ermidas, com raízes na comunidade local do Alentejo.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
 
-      <div class="team-card fade-in" data-role="lideranca" data-id="16" onclick="openModal(16)">
+      <div class="team-card fade-in" data-role="pastor" data-id="pastor-ferreira" onclick="openModal('pastor-ferreira')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>LF</span></div>
-          <span class="team-card-role-badge lideranca">Liderança</span>
+          <div class="team-card-img-placeholder"><span>PF</span></div>
+          <span class="team-card-role-badge pastor">Pastor</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong">Ferreira do Alentejo</p>
-          <h3 class="team-card-name">Líder Ferreira</h3>
-          <p class="team-card-role">Responsável da Congregação</p>
+          <h3 class="team-card-name">Pastor — Ferreira</h3>
+          <p class="team-card-role">Pastor da Congregação</p>
           <p class="team-card-bio-preview">Cuida da congregação de Ferreira do Alentejo com fé e constância na obra missionária.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
 
-      <div class="team-card fade-in" data-role="lideranca" data-id="17" onclick="openModal(17)">
+      <div class="team-card fade-in" data-role="pastor" data-id="pastor-ervidel" onclick="openModal('pastor-ervidel')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>LEr</span></div>
-          <span class="team-card-role-badge lideranca">Liderança</span>
+          <div class="team-card-img-placeholder"><span>PEr</span></div>
+          <span class="team-card-role-badge pastor">Pastor</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong">Ervidel</p>
-          <h3 class="team-card-name">Líder Ervidel</h3>
-          <p class="team-card-role">Responsável da Congregação</p>
+          <h3 class="team-card-name">Pastor — Ervidel</h3>
+          <p class="team-card-role">Pastor da Congregação</p>
           <p class="team-card-bio-preview">Serve a congregação de Ervidel como ponto de referência da missão no interior alentejano.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
       </div>
 
-      <div class="team-card fade-in" data-role="lideranca" data-id="18" onclick="openModal(18)">
+      <div class="team-card fade-in" data-role="pastor" data-id="pastor-alvalade" onclick="openModal('pastor-alvalade')">
         <div class="team-card-img">
-          <div class="team-card-img-placeholder"><span>LA</span></div>
-          <span class="team-card-role-badge lideranca">Liderança</span>
+          <div class="team-card-img-placeholder"><span>PA</span></div>
+          <span class="team-card-role-badge pastor">Pastor</span>
         </div>
         <div class="team-card-body">
           <p class="team-card-cong">Alvalade do Sado</p>
-          <h3 class="team-card-name">Líder Alvalade</h3>
-          <p class="team-card-role">Responsável da Congregação</p>
+          <h3 class="team-card-name">Pastor — Alvalade</h3>
+          <p class="team-card-role">Pastor da Congregação</p>
           <p class="team-card-bio-preview">Responsável pela congregação de Alvalade do Sado, um ponto de missão na margem do Sado.</p>
           <span class="team-card-cta">Ver perfil →</span>
         </div>
@@ -612,7 +603,7 @@
 
     </div>
 
-  </div><!-- /.dark-section -->
+  </div>
 
   <!-- CTA -->
   <div class="teal-section section-pad" style="text-align:center;">
@@ -628,8 +619,8 @@
       <button class="modal-close" onclick="closeModal()" aria-label="Fechar">✕</button>
       <div class="modal-img-col" id="modal-img-col">
         <div class="modal-img-placeholder" id="modal-img-placeholder"><span id="modal-initials"></span></div>
-        <img id="modal-img" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
-        <div class="modal-img-overlay" id="modal-img-overlay-div"></div>
+        <img id="modal-img" src="" alt="" style="display:none;" />
+        <div class="modal-img-overlay"></div>
         <span class="modal-img-badge" id="modal-img-badge"></span>
         <span class="modal-img-cong" id="modal-img-cong"></span>
       </div>
@@ -647,297 +638,222 @@
 
   <script src="shared.js"></script>
   <script>
-    // ── DATA ──────────────────────────────────────────────────────────
-    var TEAM = [
-      {
-        id: 0,
-        nome: 'Pastor Manuel',
-        role: 'Pastor Presidente',
+    var TEAM = {
+      'antonio': {
+        nome: 'Antônio Portugal',
+        role: 'Pastor Presidente e Pastor de Setúbal',
         tipo: 'pastor',
-        cong: 'AD Setúbal — Geral',
+        cong: 'AD Setúbal — Sede e Geral',
         badgeLabel: 'Pastor',
         badgeClass: 'pastor',
-        initials: 'PM',
+        initials: 'AP',
         foto: '',
-        bio: 'O Pastor Manuel lidera a Assembleia de Deus de Setúbal com um ministério dedicado à Palavra, à oração e à missão. Com décadas de serviço à frente da igreja, tem sido instrumento de crescimento espiritual em todo o Distrito de Setúbal e na Área de Missão de Beja. A sua visão pastoral une as congregações numa só família, comprometida com o Evangelho.',
+        bio: 'O Pastor Antônio Portugal lidera a Assembleia de Deus de Setúbal como Pastor Presidente, acumulando o pastoreio da congregação sede de Setúbal. O seu ministério é marcado pelo compromisso com a Palavra, a oração e a missão em todo o Distrito de Setúbal e na Área de Missão de Beja. Com visão pastoral integradora, une as congregações numa só família centrada no Evangelho.',
         meta: [
           { icon: 'map', text: 'Setúbal, Portugal' },
-          { icon: 'church', text: 'Liderança de toda a estrutura AD Setúbal' }
+          { icon: 'church', text: 'Pastor Presidente — AD Setúbal' }
         ]
       },
-      {
-        id: 1,
-        nome: 'Connect — Equipa Geral',
-        role: 'Liderança Geral do Ministério de Jovens',
+      'arao-macarena': {
+        nome: 'Arão e Macarena Caville',
+        role: 'Líderes Gerais do Connect',
         tipo: 'jovens',
-        cong: 'Connect — Liderança Geral',
+        cong: 'Connect — Liderança Geral e Setúbal',
         badgeLabel: 'Jovens',
         badgeClass: 'jovens',
-        initials: 'CG',
+        initials: 'AM',
         foto: '',
-        bio: 'A equipa de liderança geral do Connect é responsável por articular o ministério de jovens de todas as congregações. Trabalha para criar uma cultura de pertença, crescimento e serviço entre os jovens da AD Setúbal, através de encontros gerais, formação de líderes locais e iniciativas transversais à rede de congregações.',
+        bio: 'Arão e Macarena Caville lideram o ministério de jovens Connect a nível geral e na congregação de Setúbal. Trabalham para criar uma cultura de pertença, crescimento espiritual e serviço entre os jovens da AD Setúbal, através de encontros regulares, formação e iniciativas que unem a rede de congregações.',
         meta: [
-          { icon: 'users', text: 'Presente em múltiplas congregações' },
+          { icon: 'users', text: 'Liderança Geral do Connect' },
+          { icon: 'map', text: 'Setúbal — Sede' },
           { icon: 'instagram', text: '@connect_adstb' }
         ]
       },
-      {
-        id: 2,
-        nome: 'Pastor Setúbal',
-        role: 'Pastor da Congregação',
-        tipo: 'pastor',
-        cong: 'Setúbal — Sede',
-        badgeLabel: 'Pastor',
-        badgeClass: 'pastor',
-        initials: 'PS',
-        foto: '',
-        bio: 'Responsável pela congregação sede de Setúbal, aposta no ensino bíblico sólido e no acompanhamento próximo de cada família. O seu ministério local é marcado pela abertura a novos visitantes e pelo compromisso com o discipulado.',
-        meta: [
-          { icon: 'map', text: 'Rua Almeida Garrett, 47-49, Setúbal' }
-        ]
-      },
-      {
-        id: 3,
-        nome: 'Líder Connect Setúbal',
-        role: 'Líder do Connect Setúbal',
-        tipo: 'jovens',
-        cong: 'Connect — Setúbal',
-        badgeLabel: 'Jovens',
-        badgeClass: 'jovens',
-        initials: 'JS',
-        foto: '',
-        bio: 'Dinamiza o grupo de jovens da sede de Setúbal com encontros regulares que combinam louvor, estudo bíblico e momentos de comunhão. Acredita que a nova geração tem um papel central na missão da igreja.',
-        meta: [
-          { icon: 'map', text: 'Setúbal — Sede' }
-        ]
-      },
-      {
-        id: 4,
-        nome: 'Pastor Barreiro',
-        role: 'Pastor da Congregação',
+      'ruan': {
+        nome: 'Ruan Mendes',
+        role: 'Pastor da Congregação do Barreiro',
         tipo: 'pastor',
         cong: 'Barreiro',
         badgeLabel: 'Pastor',
         badgeClass: 'pastor',
-        initials: 'PB',
+        initials: 'RM',
         foto: '',
-        bio: 'Com um ministério pastoral centrado no serviço e na comunhão, lidera a congregação do Barreiro com atenção às necessidades espirituais e práticas da comunidade. Investe no ensino bíblico e no crescimento dos membros em fé.',
+        bio: 'O Pastor Ruan Mendes serve a congregação do Barreiro com compromisso pastoral e atenção às necessidades espirituais da comunidade local. O seu ministério aposta no crescimento dos membros em fé, no ensino bíblico e no acolhimento de novos visitantes.',
         meta: [
           { icon: 'map', text: 'Rua Dom Manuel de Melo, 2, Barreiro' }
         ]
       },
-      {
-        id: 5,
-        nome: 'Líder Connect Barreiro',
+      'catarina': {
+        nome: 'Catarina Silva',
         role: 'Líder do Connect Barreiro',
         tipo: 'jovens',
         cong: 'Connect — Barreiro',
         badgeLabel: 'Jovens',
         badgeClass: 'jovens',
-        initials: 'JB',
+        initials: 'CS',
         foto: '',
-        bio: 'Lidera o grupo de jovens do Barreiro criando um espaço de fé, amizade e crescimento para a nova geração. O seu trabalho une os jovens da congregação num ambiente de autenticidade e compromisso espiritual.',
+        bio: 'Catarina Silva lidera o grupo de jovens do Barreiro, criando um espaço de fé, amizade e crescimento espiritual para a nova geração. O seu trabalho une os jovens da congregação num ambiente de autenticidade e compromisso com o Evangelho.',
         meta: [
           { icon: 'map', text: 'Barreiro' }
         ]
       },
-      {
-        id: 6,
-        nome: 'Pastor Pinhal Novo',
-        role: 'Pastor da Congregação',
+      'rafael': {
+        nome: 'Rafael Luz',
+        role: 'Pastor da Congregação de Pinhal Novo',
         tipo: 'pastor',
         cong: 'Pinhal Novo',
         badgeLabel: 'Pastor',
         badgeClass: 'pastor',
-        initials: 'PP',
+        initials: 'RL',
         foto: '',
-        bio: 'Aposta no discipulado e no ensino sólido da Bíblia como base do crescimento da congregação de Pinhal Novo. O seu ministério integra a formação espiritual com o serviço prático à comunidade.',
+        bio: 'O Pastor Rafael Luz aposta no discipulado e no ensino bíblico sólido como base do crescimento da congregação de Pinhal Novo. O seu ministério integra a formação espiritual com o serviço prático à comunidade local.',
         meta: [
           { icon: 'map', text: 'Rua Jorge de Sena, 7, Pinhal Novo' }
         ]
       },
-      {
-        id: 7,
-        nome: 'Líder Connect Pinhal Novo',
+      'luiza': {
+        nome: 'Luiza Luz',
         role: 'Líder do Connect Pinhal Novo',
         tipo: 'jovens',
         cong: 'Connect — Pinhal Novo',
         badgeLabel: 'Jovens',
         badgeClass: 'jovens',
-        initials: 'JP',
+        initials: 'LL',
         foto: '',
-        bio: 'Conduz os jovens de Pinhal Novo em encontros de fé prática e pertença comunitária. A liderança local do Connect em Pinhal Novo é marcada pela proximidade e pelo acompanhamento de cada jovem.',
+        bio: 'Luiza Luz conduz os jovens de Pinhal Novo num ambiente de fé prática e pertença comunitária. A liderança do Connect em Pinhal Novo é marcada pela proximidade e pelo acompanhamento próximo de cada jovem.',
         meta: [
           { icon: 'map', text: 'Pinhal Novo' }
         ]
       },
-      {
-        id: 8,
-        nome: 'Pastor Moita',
-        role: 'Pastor da Congregação',
+      'claudionor': {
+        nome: 'Claudionor Oliveira',
+        role: 'Pastor da Moita e do Montijo',
         tipo: 'pastor',
-        cong: 'Moita',
+        cong: 'Moita e Montijo',
         badgeLabel: 'Pastor',
         badgeClass: 'pastor',
-        initials: 'PMo',
+        initials: 'CO',
         foto: '',
-        bio: 'O ministério na Moita tem sido de oração e construção de comunidade. O pastor local investe na vida espiritual das famílias e no acompanhamento pastoral próximo de cada membro da congregação.',
+        bio: 'O Pastor Claudionor Oliveira serve as congregações da Moita e do Montijo com dedicação e entrega. Um ministério pastoral centrado na oração, no acompanhamento das famílias e no crescimento espiritual das duas comunidades que pastoreia.',
         meta: [
-          { icon: 'map', text: 'Rua de São Sebastião, 35, Moita' }
+          { icon: 'map', text: 'Rua de São Sebastião, 35, Moita' },
+          { icon: 'map', text: 'Rua Bulhão Pato, 76, Montijo' }
         ]
       },
-      {
-        id: 9,
-        nome: 'Líder Connect Moita',
-        role: 'Líder do Connect Moita',
+      'jorge-rita': {
+        nome: 'Jorge e Rita de Sá',
+        role: 'Líderes do Connect Moita',
         tipo: 'jovens',
         cong: 'Connect — Moita',
         badgeLabel: 'Jovens',
         badgeClass: 'jovens',
-        initials: 'JMo',
+        initials: 'JR',
         foto: '',
-        bio: 'Acompanha os jovens da Moita com proximidade, incentivando o crescimento espiritual e relacional. Acredita que cada jovem tem um propósito a descobrir dentro da comunidade de fé.',
+        bio: 'Jorge e Rita de Sá acompanham os jovens da Moita com proximidade, incentivando o crescimento espiritual e relacional. Acreditam que cada jovem tem um propósito a descobrir dentro da comunidade de fé e trabalham para criar um ambiente de autenticidade e pertença.',
         meta: [
           { icon: 'map', text: 'Moita' }
         ]
       },
-      {
-        id: 10,
-        nome: 'Pastor Montijo',
-        role: 'Pastor da Congregação',
+      'dionildo': {
+        nome: 'Dionildo Vidal',
+        role: 'Pastor de Aires e Palmela',
         tipo: 'pastor',
-        cong: 'Montijo',
+        cong: 'Aires e Palmela',
         badgeLabel: 'Pastor',
         badgeClass: 'pastor',
-        initials: 'PMj',
+        initials: 'DV',
         foto: '',
-        bio: 'Serve a congregação do Montijo com dedicação ao evangelismo local e ao crescimento da fé entre os membros. O seu ministério é marcado pela abertura à comunidade e pelo compromisso com a missão.',
-        meta: [
-          { icon: 'map', text: 'Rua Bulhão Pato, 76, Montijo' }
-        ]
-      },
-      {
-        id: 11,
-        nome: 'Responsável Alcochete',
-        role: 'Responsável da Congregação',
-        tipo: 'lideranca',
-        cong: 'Alcochete',
-        badgeLabel: 'Liderança',
-        badgeClass: 'lideranca',
-        initials: 'LA',
-        foto: '',
-        bio: 'Responsável pela congregação de Alcochete, presente no acompanhamento da comunidade local com regularidade e entrega. A congregação cresce através do serviço constante e do testemunho de cada membro.',
-        meta: [
-          { icon: 'map', text: 'Largo Coronel Ramos da Costa, 50, Alcochete' }
-        ]
-      },
-      {
-        id: 12,
-        nome: 'Responsável Aires',
-        role: 'Responsável da Congregação',
-        tipo: 'lideranca',
-        cong: 'Aires',
-        badgeLabel: 'Liderança',
-        badgeClass: 'lideranca',
-        initials: 'LAi',
-        foto: '',
-        bio: 'Cuida da congregação de Aires com fidelidade e serviço à comunidade de Palmela. Um ministério de proximidade, onde cada pessoa é acompanhada com atenção pastoral.',
+        bio: 'O Pastor Dionildo Vidal cuida das congregações de Aires e Palmela com fidelidade ao Evangelho e serviço à comunidade. O seu ministério abrange as duas congregações com igual entrega, crescendo através do testemunho e da presença pastoral constante.',
         meta: [
           { icon: 'map', text: 'Rua Heróis do Ultramar, Aires, Palmela' }
         ]
       },
-      {
-        id: 13,
-        nome: 'Pastor Beja',
-        role: 'Pastor — Área de Missão Beja',
+      'pastor-beja': {
+        nome: 'Pastor — Beja',
+        role: 'Pastor da Congregação de Beja',
         tipo: 'pastor',
         cong: 'Beja',
         badgeLabel: 'Pastor',
         badgeClass: 'pastor',
-        initials: 'PBj',
+        initials: 'PB',
         foto: '',
-        bio: 'Lidera o trabalho missionário na cidade de Beja, ancorando toda a presença da AD Setúbal no Alentejo. O seu ministério estende-se à coordenação da Área de Missão Beja, que inclui seis localidades alentejanas.',
+        bio: 'Ancora o trabalho missionário na cidade de Beja, ponto central da Área de Missão de Beja. O seu ministério é fruto do compromisso da AD Setúbal com a missão no Alentejo.',
         meta: [
-          { icon: 'map', text: 'Rua Camilo Castelo Branco, 11, Beja' },
-          { icon: 'church', text: 'Coordena a Área de Missão Beja' }
+          { icon: 'map', text: 'Rua Camilo Castelo Branco, 11, Beja' }
         ]
       },
-      {
-        id: 14,
-        nome: 'Responsável Vidigueira',
-        role: 'Responsável da Congregação',
-        tipo: 'lideranca',
+      'pastor-vidigueira': {
+        nome: 'Pastor — Vidigueira',
+        role: 'Pastor da Congregação de Vidigueira',
+        tipo: 'pastor',
         cong: 'Vidigueira',
-        badgeLabel: 'Liderança',
-        badgeClass: 'lideranca',
-        initials: 'LV',
+        badgeLabel: 'Pastor',
+        badgeClass: 'pastor',
+        initials: 'PV',
         foto: '',
-        bio: 'Serve a congregação de Vidigueira com persistência e compromisso com a missão no Alentejo. Um trabalho que cresce pela fidelidade ao Evangelho e ao acompanhamento da comunidade local.',
+        bio: 'Serve a congregação de Vidigueira com persistência e compromisso com a missão no Alentejo. Um trabalho que cresce pela fidelidade ao Evangelho e ao acompanhamento da comunidade.',
         meta: [
           { icon: 'map', text: 'R. da Boavista 20, Vidigueira' }
         ]
       },
-      {
-        id: 15,
-        nome: 'Responsável Ermidas',
-        role: 'Responsável da Congregação',
-        tipo: 'lideranca',
+      'pastor-ermidas': {
+        nome: 'Pastor — Ermidas',
+        role: 'Pastor da Congregação de Ermidas',
+        tipo: 'pastor',
         cong: 'Ermidas',
-        badgeLabel: 'Liderança',
-        badgeClass: 'lideranca',
-        initials: 'LE',
+        badgeLabel: 'Pastor',
+        badgeClass: 'pastor',
+        initials: 'PE',
         foto: '',
-        bio: 'Responsável pela congregação de Ermidas, com raízes profundas na comunidade local do Alentejo. O serviço em Ermidas é um testemunho de fidelidade e amor ao próximo ao longo dos anos.',
+        bio: 'Responsável pela congregação de Ermidas, com raízes profundas na comunidade local do Alentejo. O serviço em Ermidas é um testemunho de fidelidade e amor ao próximo.',
         meta: [
           { icon: 'map', text: 'Av. Manuel Joaquim Pereira, 70, Ermidas' }
         ]
       },
-      {
-        id: 16,
-        nome: 'Responsável Ferreira do Alentejo',
-        role: 'Responsável da Congregação',
-        tipo: 'lideranca',
+      'pastor-ferreira': {
+        nome: 'Pastor — Ferreira do Alentejo',
+        role: 'Pastor da Congregação de Ferreira do Alentejo',
+        tipo: 'pastor',
         cong: 'Ferreira do Alentejo',
-        badgeLabel: 'Liderança',
-        badgeClass: 'lideranca',
-        initials: 'LF',
+        badgeLabel: 'Pastor',
+        badgeClass: 'pastor',
+        initials: 'PF',
         foto: '',
         bio: 'Cuida da congregação de Ferreira do Alentejo com fé e constância na obra missionária. A presença da AD Setúbal em Ferreira é fruto de um trabalho continuado de evangelismo e pastoral local.',
         meta: [
           { icon: 'map', text: 'Rua Mestre de Aviz, 41, Ferreira do Alentejo' }
         ]
       },
-      {
-        id: 17,
-        nome: 'Responsável Ervidel',
-        role: 'Responsável da Congregação',
-        tipo: 'lideranca',
+      'pastor-ervidel': {
+        nome: 'Pastor — Ervidel',
+        role: 'Pastor da Congregação de Ervidel',
+        tipo: 'pastor',
         cong: 'Ervidel',
-        badgeLabel: 'Liderança',
-        badgeClass: 'lideranca',
-        initials: 'LEr',
+        badgeLabel: 'Pastor',
+        badgeClass: 'pastor',
+        initials: 'PEr',
         foto: '',
         bio: 'Serve a congregação de Ervidel como ponto de referência da missão no interior alentejano. O trabalho em Ervidel é marcado pela proximidade com a comunidade e pelo serviço constante.',
         meta: [
           { icon: 'map', text: 'R. 5 de Outubro, 8, Ervidel' }
         ]
       },
-      {
-        id: 18,
-        nome: 'Responsável Alvalade do Sado',
-        role: 'Responsável da Congregação',
-        tipo: 'lideranca',
+      'pastor-alvalade': {
+        nome: 'Pastor — Alvalade do Sado',
+        role: 'Pastor da Congregação de Alvalade do Sado',
+        tipo: 'pastor',
         cong: 'Alvalade do Sado',
-        badgeLabel: 'Liderança',
-        badgeClass: 'lideranca',
-        initials: 'LAl',
+        badgeLabel: 'Pastor',
+        badgeClass: 'pastor',
+        initials: 'PA',
         foto: '',
         bio: 'Responsável pela congregação de Alvalade do Sado, um ponto de missão junto à margem do Sado. A congregação reúne a comunidade local num ambiente de fé e acolhimento.',
         meta: [
           { icon: 'map', text: 'Rua 31 de Maio, 18, Alvalade do Sado' }
         ]
       }
-    ];
+    };
 
     // ── FILTER ──────────────────────────────────────────────────────
     var currentFilter = 'all';
@@ -952,13 +868,11 @@
     function applyTeamFilter() {
       var totalVisible = 0;
       document.querySelectorAll('.team-card').forEach(function(card) {
-        var role = card.dataset.role;
-        var show = currentFilter === 'all' || role === currentFilter;
+        var show = currentFilter === 'all' || card.dataset.role === currentFilter;
         card.style.display = show ? '' : 'none';
         if (show) totalVisible++;
       });
 
-      // Show/hide section labels and grids
       document.querySelectorAll('[data-section]').forEach(function(el) {
         if (el.classList.contains('team-card')) return;
         var section = el.dataset.section;
@@ -977,41 +891,32 @@
       var p = TEAM[id];
       if (!p) return;
 
-      // Badge
       var badge = document.getElementById('modal-img-badge');
       badge.textContent = p.badgeLabel;
       badge.className = 'modal-img-badge ' + p.badgeClass;
 
-      // Congregation label colour
       var cong = document.getElementById('modal-img-cong');
       cong.textContent = p.cong;
       cong.className = 'modal-img-cong' + (p.tipo === 'jovens' ? ' jovens' : '');
 
-      // Photo or placeholder
+      document.getElementById('modal-initials').textContent = p.initials;
       var img = document.getElementById('modal-img');
       var ph = document.getElementById('modal-img-placeholder');
-      document.getElementById('modal-initials').textContent = p.initials;
       if (p.foto) {
-        img.src = p.foto;
-        img.alt = p.nome;
-        img.style.display = 'block';
-        ph.style.display = 'none';
+        img.src = p.foto; img.alt = p.nome;
+        img.style.display = 'block'; ph.style.display = 'none';
       } else {
-        img.style.display = 'none';
-        ph.style.display = 'flex';
+        img.style.display = 'none'; ph.style.display = 'flex';
       }
 
-      // Text
       document.getElementById('modal-eyebrow').textContent = p.cong;
       document.getElementById('modal-name').textContent = p.nome;
       document.getElementById('modal-role').textContent = p.role;
       document.getElementById('modal-bio').textContent = p.bio;
 
-      // Meta
       var metaEl = document.getElementById('modal-meta');
       metaEl.innerHTML = p.meta.map(function(m){
-        var ico = getMetaIcon(m.icon, p.tipo);
-        return '<div class="modal-meta-row' + (p.tipo==='jovens'?' jovens-color':'') + '">' + ico + '<span>' + m.text + '</span></div>';
+        return '<div class="modal-meta-row' + (p.tipo==='jovens'?' jovens-color':'') + '">' + getMetaIcon(m.icon, p.tipo) + '<span>' + m.text + '</span></div>';
       }).join('');
 
       document.getElementById('modal-overlay').classList.add('open');
@@ -1030,11 +935,11 @@
     document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
 
     function getMetaIcon(type, tipo) {
-      var color = tipo === 'jovens' ? 'var(--orange)' : 'var(--teal)';
-      if (type === 'map') return '<svg viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="1.8"><path d="M12 21s7-7.4 7-12a7 7 0 10-14 0c0 4.6 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>';
-      if (type === 'church') return '<svg viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="1.8"><path d="M3 21h18M3 10l9-7 9 7"/><path d="M9 21V12h6v9"/><path d="M12 3v4M10 5h4"/></svg>';
-      if (type === 'users') return '<svg viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>';
-      if (type === 'instagram') return '<svg viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="'+color+'" stroke="none"/></svg>';
+      var c = tipo === 'jovens' ? 'var(--orange)' : 'var(--teal)';
+      if (type === 'map') return '<svg viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="1.8"><path d="M12 21s7-7.4 7-12a7 7 0 10-14 0c0 4.6 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>';
+      if (type === 'church') return '<svg viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="1.8"><path d="M3 21h18M3 10l9-7 9 7"/><path d="M9 21V12h6v9"/><path d="M12 3v4M10 5h4"/></svg>';
+      if (type === 'users') return '<svg viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>';
+      if (type === 'instagram') return '<svg viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="'+c+'" stroke="none"/></svg>';
       return '';
     }
   </script>
