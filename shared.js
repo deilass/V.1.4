@@ -4,7 +4,12 @@ const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
 const pages = [
   { href: 'index.html', label: 'Início' },
-  { href: 'quem-somos.html', label: 'Quem Somos' },
+  { 
+    href: 'quem-somos.html', label: 'Quem Somos',
+    children:[
+      { href: 'equipa.html', label: 'A nossa Equipa', sub: 'Conhece a nossa equipa'}
+    ]
+  },
   {
     href: 'participa.html', label: 'Participa',
     children: [
