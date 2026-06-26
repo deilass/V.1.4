@@ -127,7 +127,6 @@
       background: var(--dark);
       padding: 5rem 3rem 3rem;
     }
-    /* Carousel wrapper */
     .locations-carousel-wrap {
       background: var(--dark);
       position: relative;
@@ -187,7 +186,6 @@
       transition: color 0.2s;
     }
     .loc-card:hover .loc-card-link { color: var(--teal); }
-    /* Carousel arrow buttons */
     .carousel-btn {
       position: absolute; top: 50%; transform: translateY(-50%);
       width: 48px; height: 48px;
@@ -318,7 +316,6 @@
       .participa-card { padding: 2.2rem 1.5rem; }
       .galeria-strip { grid-template-columns: repeat(3,1fr); }
       .galeria-header { padding: 3.5rem 1.5rem 2rem; }
-    }
       .hero { min-height: 100svh; }
       .hero-content { padding: 0 1.5rem 3rem; }
       .hero-bottom { grid-template-columns: 1fr; padding: 0 1.5rem 2.5rem; gap: 1.5rem; }
@@ -334,6 +331,7 @@
       .online-img img, .about-img img { position: relative; }
       .online-text, .about-text { padding: 4rem 1.5rem; }
       .mission-band { grid-template-columns: 1fr; padding: 4rem 1.5rem; }
+    }
     @media (max-width: 500px) {
       .schedule-strip { grid-template-columns: 1fr; }
     }
@@ -362,13 +360,13 @@
   <div class="ticker">
     <div class="ticker-inner">
       <span class="ticker-item"><span class="ticker-dot"></span>Dom 16h00 — Culto de Celebração</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>13 Localidades</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>14 Localidades</span>
       <span class="ticker-item"><span class="ticker-dot"></span>Distrito de Setúbal</span>
       <span class="ticker-item"><span class="ticker-dot"></span>Área de Missão Beja</span>
       <span class="ticker-item"><span class="ticker-dot"></span>Culto Online — YouTube</span>
       <span class="ticker-item"><span class="ticker-dot"></span>6.ª Feira 20h00 — Estudo Bíblico</span>
       <span class="ticker-item"><span class="ticker-dot"></span>Dom 16h00 — Culto de Celebração</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>13 Localidades</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>14 Localidades</span>
       <span class="ticker-item"><span class="ticker-dot"></span>Distrito de Setúbal</span>
       <span class="ticker-item"><span class="ticker-dot"></span>Área de Missão Beja</span>
       <span class="ticker-item"><span class="ticker-dot"></span>Culto Online — YouTube</span>
@@ -382,7 +380,7 @@
       <h2 class="statement-title">Uma Igreja,<br><span>Muitas</span><br>Famílias</h2>
     </div>
     <div class="statement-right fade-in">
-      <p class="statement-text">A AD Setúbal é uma comunidade cristã evangélica pentecostal com presença em 13 localidades entre o Distrito de Setúbal e o Alentejo.</p>
+      <p class="statement-text">A AD Setúbal é uma comunidade cristã evangélica pentecostal com presença em 14 localidades entre o Distrito de Setúbal e o Alentejo.</p>
       <p class="statement-text">Fundados no Evangelho, vivemos em comunidade, adoramos juntos e crescemos na fé — abertos a todos, independentemente de quem és ou de onde vens.</p>
       <div><a href="quem-somos.html" class="btn btn-outline-teal">Quem Somos</a></div>
     </div>
@@ -493,6 +491,15 @@
         <div class="loc-card-body">
           <p class="loc-card-tag">Congregação</p>
           <h3 class="loc-card-name">Aires</h3>
+          <p class="loc-card-time">Sáb 16h00 Culto</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80" alt="Palmela" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag">Congregação</p>
+          <h3 class="loc-card-name">Palmela</h3>
           <p class="loc-card-time">Dom 10h00 Culto</p>
           <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
         </div>
@@ -511,16 +518,7 @@
         <div class="loc-card-body">
           <p class="loc-card-tag">Congregação</p>
           <h3 class="loc-card-name">Alcochete</h3>
-          <p class="loc-card-time">Dom 10h00 Culto</p>
-          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
-        </div>
-      </div>
-      <div class="loc-card fade-in">
-        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80" alt="Palmela" />
-        <div class="loc-card-body">
-          <p class="loc-card-tag">Congregação</p>
-          <h3 class="loc-card-name">Palmela</h3>
-          <p class="loc-card-time">Dom 10h00 Culto</p>
+          <p class="loc-card-time">Dom 16h00 Culto</p>
           <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
         </div>
       </div>
@@ -569,6 +567,15 @@
           <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
         </div>
       </div>
+      <div class="loc-card fade-in">
+        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80" alt="Aljustrel" style="filter:brightness(0.45) sepia(0.3);" />
+        <div class="loc-card-body">
+          <p class="loc-card-tag" style="color:var(--orange);">Missão Beja</p>
+          <h3 class="loc-card-name">Aljustrel</h3>
+          <p class="loc-card-time">Área de Missão<br>Ver horários</p>
+          <a href="congregacoes.html" class="loc-card-link">Saber mais →</a>
+        </div>
+      </div>
     </div>
     <button class="carousel-btn next" onclick="scrollCarousel(1)" aria-label="Próximo">&#8594;</button>
   </div>
@@ -580,12 +587,7 @@
   <div class="online-split">
     <div class="online-img" id="online-media">
       <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=900&q=80" alt="Culto Online" />
-      <iframe
-        id="yt-embed"
-        src=""
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-      ></iframe>
+      <iframe id="yt-embed" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       <div class="online-img-overlay">
         <button class="play-btn" id="online-play-trigger" onclick="launchEmbed()" aria-label="Assistir ao vivo">
           <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -610,7 +612,7 @@
       <span class="eyebrow">Quem Somos</span>
       <div class="teal-bar"></div>
       <h2 class="display-md">Décadas<br>de Fé e<br>Serviço</h2>
-      <p class="body-text">A Assembleia de Deus de Setúbal tem uma longa história de fé e serviço na região. Servimos congregações em Setúbal, Barreiro, Pinhal Novo, Moita, Aires, Montijo, Alcochete e em diversas localidades do Alentejo.</p>
+      <p class="body-text">A Assembleia de Deus de Setúbal tem uma longa história de fé e serviço na região. Servimos congregações em Setúbal, Barreiro, Pinhal Novo, Moita, Aires, Palmela, Montijo, Alcochete e em diversas localidades do Alentejo.</p>
       <a href="quem-somos.html" class="btn btn-dark">Saber Mais</a>
     </div>
   </div>
@@ -619,7 +621,7 @@
   <div class="mission-band fade-in">
     <div>
       <h2>Área de Missão Beja</h2>
-      <p>O nosso compromisso missionário leva-nos ao Alentejo, com presença em Beja, Vidigueira, Ermidas, Alvalade do Sado, Ferreira do Alentejo e Ervidel.</p>
+      <p>O nosso compromisso missionário leva-nos ao Alentejo, com presença em Beja, Vidigueira, Ermidas, Alvalade do Sado, Ferreira do Alentejo, Ervidel e Aljustrel.</p>
     </div>
     <a href="congregacoes.html" class="btn btn-white">Ver Missão Beja</a>
   </div>
@@ -643,15 +645,12 @@
 
   <script src="shared.js"></script>
   <script>
-    // YouTube live embed
     function launchEmbed() {
       var wrap = document.getElementById('online-media');
       var iframe = document.getElementById('yt-embed');
       iframe.src = 'https://www.youtube.com/embed/live_stream?channel=UCpDnP2y6vgTOnPcyh7wHmNw&autoplay=1&rel=0';
       wrap.classList.add('playing');
     }
- 
-    // Carousel arrows
     function scrollCarousel(dir) {
       var c = document.getElementById('loc-carousel');
       c.scrollBy({ left: dir * 300, behavior: 'smooth' });
