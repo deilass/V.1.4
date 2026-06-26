@@ -21,7 +21,6 @@ const pages = [
   },
   { href: 'congregacoes.html', label: 'Congregações' },
   { href: 'culto-online.html', label: 'Online' },
-  { href: 'galeria.html', label: 'Galeria' },
   { href: 'contacto.html', label: 'Contacto' },
   { href: 'oferta.html', label: 'Oferta', cta: true },
 ];
