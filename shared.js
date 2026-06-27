@@ -101,7 +101,6 @@ function buildFooter() {
         <p class="footer-heading">A Igreja</p>
         <ul class="footer-links">
           <li><a href="culto-online.html">Culto Online</a></li>
-          <li><a href="galeria.html">Galeria</a></li>
           <li><a href="oferta.html">Oferta</a></li>
           <li><a href="contacto.html">Contacto</a></li>
         </ul>
