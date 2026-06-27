@@ -79,9 +79,12 @@ nav.light-nav .nav-links a { color: var(--dark); }
 }
 .nav-cta:hover { background: var(--orange) !important; color: #fff !important; }
 
-/* ---- Dropdown "Participa" ---- */
+/* ---- Dropdown "Participa" — desktop only ---- */
 .has-dropdown { position: relative; }
-.has-dropdown > a::after { content: '▾'; margin-left: 0.4em; font-size: 0.7em; opacity: 0.65; display: inline-block; }
+/* Arrow only on desktop */
+@media (min-width: 901px) {
+  .has-dropdown > a::after { content: '▾'; margin-left: 0.4em; font-size: 0.7em; opacity: 0.65; display: inline-block; }
+}
 .dropdown-menu {
   position: absolute; top: 100%; left: 50%;
   transform: translateX(-50%) translateY(8px);
@@ -116,22 +119,6 @@ nav.light-nav .dropdown-menu { background: #fff; border-color: var(--border-ligh
 nav.light-nav .dropdown-menu a { color: rgba(0,0,0,0.62); }
 nav.light-nav .dropdown-menu a:hover { background: var(--light); color: var(--dark); }
 nav.light-nav .dropdown-menu .sub-label { color: rgba(0,0,0,0.32); }
-
-@media (max-width: 900px) {
-.has-dropdown > a::after { display: none; }
-.has-dropdown { overflow: hidden; }
-.has-dropdown.is-open { overflow: visible; }
-.dropdown-menu {
-  position: static; opacity: 1; pointer-events: auto; transform: none;
-  background: transparent; border: none; box-shadow: none;
-  padding: 0 0 0.3rem 1rem; margin-top: 0.2rem;
-  max-height: 0; overflow: hidden;
-  transition: max-height 0.25s ease;
-}
-.has-dropdown.is-open .dropdown-menu { max-height: 400px; }
-  .dropdown-menu a { color: rgba(255,255,255,0.55); padding: 0.55rem 0.5rem; font-size: 0.88rem; }
-  .dropdown-menu .sub-label { color: rgba(255,255,255,0.3); }
-}
 
 .hamburger {
   display: none; flex-direction: column; gap: 5px;
@@ -360,17 +347,17 @@ footer { background: var(--dark); color: var(--white); }
   }
   .nav-links.open { display: flex; }
 
-  /* links normais */
+  /* links normais — sempre brancos no menu mobile */
   .nav-links > li > a {
     display: block;
     padding: 1rem 1.8rem;
     font-size: 1.1rem; font-weight: 700;
-    color: rgba(255,255,255,0.78);
+    color: rgba(255,255,255,0.78) !important;
     border-bottom: 1px solid rgba(255,255,255,0.06);
     text-align: left;
   }
-  .nav-links > li > a:hover { color: var(--teal); background: rgba(255,255,255,0.03); }
-  .nav-links > li.active > a { color: var(--teal); }
+  .nav-links > li > a:hover,
+  .nav-links > li > a.active { color: var(--teal) !important; background: rgba(255,255,255,0.03); }
 
   /* botão OFERTA — alinhado à esquerda, largura automática */
   .nav-links > li > a.nav-cta {
@@ -383,35 +370,18 @@ footer { background: var(--dark); color: var(--white); }
     font-size: 0.85rem;
   }
 
-  /* dropdown do Participa */
-  .has-dropdown > a::after { display: none; }
+  /* Remover completamente seta e comportamento dropdown em mobile */
+  .has-dropdown > a::before { display: none !important; }
+  .has-dropdown > a::after  { display: none !important; }
   .has-dropdown > a {
-    display: flex; justify-content: space-between; align-items: center;
+    display: block !important;
+    justify-content: unset !important;
   }
-  .has-dropdown > a::before {
-    content: '›';
-    font-size: 1.3rem; font-weight: 300; color: rgba(255,255,255,0.35);
-    transition: transform 0.2s;
-  }
-  .has-dropdown.is-open > a::before { transform: rotate(90deg); color: var(--teal); }
 
-  .dropdown-menu {
-    position: static; opacity: 1; pointer-events: auto; transform: none;
-    background: rgba(0,0,0,0.25);
-    border: none; box-shadow: none;
-    padding: 0.3rem 0 0.6rem 0;
-    max-height: 0; overflow: hidden;
-    transition: max-height 0.28s ease;
+  /* Esconder completamente o dropdown em mobile */
+  .has-dropdown .dropdown-menu {
+    display: none !important;
   }
-  .has-dropdown.is-open .dropdown-menu { max-height: 400px; }
-
-  .dropdown-menu li a {
-    display: block; padding: 0.7rem 1.8rem 0.7rem 3rem;
-    color: rgba(255,255,255,0.5); font-size: 0.88rem; font-weight: 500;
-    border-bottom: none; text-transform: none; letter-spacing: 0.01em;
-  }
-  .dropdown-menu li a:hover { color: var(--teal); }
-  .dropdown-menu .sub-label { display: none; } /* esconde legenda em mobile, poupa espaço */
 
   .hamburger { display: flex; }
   .section-pad { padding: 4rem 1.5rem; }
