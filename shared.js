@@ -159,12 +159,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const navLinks = document.getElementById('nav-links');
   ham.addEventListener('click', () => navLinks.classList.toggle('open'));
 
-  // Em mobile, tocar no link "Participa" abre/fecha o submenu em vez de navegar
+  // Em mobile, os links com dropdown navegam diretamente (sem abrir submenu)
+  // Em desktop, mantém o comportamento de dropdown ao hover
   document.querySelectorAll('.has-dropdown > a').forEach(link => {
     link.addEventListener('click', (e) => {
       if (window.innerWidth <= 900) {
-        e.preventDefault();
-        link.parentElement.classList.toggle('is-open');
+        // Navegar diretamente para a página — sem dropdown em mobile
+        // Não prevenir o comportamento padrão, deixar o href funcionar
+        navLinks.classList.remove('open');
       }
     });
   });

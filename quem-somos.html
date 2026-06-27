@@ -27,6 +27,32 @@
       border-left: 2px solid rgba(255,255,255,0.1);
     }
 
+    /* MOBILE-ONLY EQUIPA BUTTON */
+    .equipa-mobile-btn {
+      display: none;
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: var(--dark2);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .equipa-mobile-btn a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--teal);
+    }
+    .equipa-mobile-btn a svg {
+      width: 16px; height: 16px; stroke: var(--teal);
+    }
+    @media (max-width: 900px) {
+      .equipa-mobile-btn { display: block; }
+    }
+
     /* VALUES */
     .values-grid { display: grid; grid-template-columns: repeat(2,1fr); }
     .value-block {
@@ -166,6 +192,14 @@
       <h1>Quem Somos</h1>
       <p>Uma comunidade cristã evangélica pentecostal com décadas de história ao serviço do Distrito de Setúbal e da Área de Missão de Beja.</p>
     </div>
+  </div>
+
+  <!-- BOTÃO EQUIPA — EXCLUSIVO MOBILE -->
+  <div class="equipa-mobile-btn">
+    <a href="equipa.html">
+      Conhece a Nossa Equipa
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
   </div>
 
   <!-- MISSION -->
