@@ -326,6 +326,18 @@
     var DISCORD_WEBHOOK_GERAL   = 'https://discord.com/api/webhooks/1517840979913211914/zsHqZ4RRavxsEZLQNRYduJCr9Mh9OpqQvXXK3YwjSLe_RSeGu77vPtZ6meOXy1iOYdTh';
     var DISCORD_WEBHOOK_CONNECT = 'https://discord.com/api/webhooks/1517842583861334137/m25oclR8_5I7rLU0G9igKe4BkF19eoxKiL-x1Nfqe-3CWYgxUYzocEhGgWkW6lMo2izR';
 
+    // ▼▼▼ Cola aqui o URL do Apps Script (.../exec) depois de implementares a Sheet de tracking ▼▼▼
+    var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbwQvpg88oAXWP3UEbrQNpRKzyQVeqcqrhR2IKI31zW7xRNfcLkwA0rHs3lkjLaasXEqcw/exec';
+    // Exemplo: 'https://script.google.com/macros/s/AKfy.../exec'
+
+    function logToSheet(payload) {
+      if (!SHEETS_API_URL) return Promise.resolve(null);
+      return fetch(SHEETS_API_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      }).then(function(r){ return r.json(); }).catch(function(){ return null; });
+    }
+
     async function handleSubmit(e) {
       e.preventDefault();
       var form      = e.target;
@@ -384,13 +396,34 @@
         embed.fields.push({ name: '\u2139\uFE0F Informação Adicional', value: infoAdic, inline: false });
       }
 
+      var sheetPayload = {
+        action: 'novoPedido',
+        nome: nome,
+        finalidade: finalidade,
+        ambito: ambito,
+        congregacao: congregacao,
+        conteudo: conteudoStr,
+        tema: tema,
+        dataEvento: dataEvento,
+        horaEvento: horaEvento,
+        local: local,
+        dataDivulgacao: dataDivulg,
+        infoAdicional: infoAdic
+      };
+
       try {
-        var res = await fetch(webhookURL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ embeds: [embed] })
-        });
-        if (res.ok || res.status === 204) {
+        var results = await Promise.all([
+          fetch(webhookURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ embeds: [embed] })
+          }),
+          logToSheet(sheetPayload)
+        ]);
+
+        var discordRes = results[0];
+
+        if (discordRes.ok || discordRes.status === 204) {
           successEl.style.display = 'block';
           form.reset();
           document.getElementById('extra-info-wrap').style.display = 'none';
@@ -399,7 +432,7 @@
           errorEl.style.display = 'block';
         }
       } catch (err) {
-        console.error('Discord Webhook error:', err);
+        console.error('Erro ao enviar pedido:', err);
         errorEl.style.display = 'block';
       }
 
