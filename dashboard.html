@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | AD Setúbal</title>
-  <link rel="icon" type="image/x-icon" href="logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
@@ -677,7 +676,7 @@ function syncPill(state, msg) {
 function apiGet(params) {
   if (!API_OK) return Promise.resolve(null);
   var qs = Object.keys(params).map(function(k){ return k+'='+encodeURIComponent(params[k]); }).join('&');
-  return fetch(SHEETS_API_URL + '?' + qs)
+  return fetch(SHEETS_API_URL + '?' + qs, { redirect: 'follow' })
     .then(function(r){ return r.json(); })
     .catch(function(){ return null; });
 }
@@ -686,6 +685,7 @@ function apiPost(body) {
   if (!API_OK) return Promise.resolve(null);
   return fetch(SHEETS_API_URL, {
     method: 'POST',
+    redirect: 'follow',
     body: JSON.stringify(body)
   })
     .then(function(r){ return r.json(); })
@@ -810,8 +810,10 @@ function switchTab(id, el) {
   var p = document.getElementById('tab-'+id);
   if (p) p.classList.add('active');
   if (el) el.classList.add('active');
-  if (id === 'presenca')        initCalendar();
+  if (id === 'presenca')        reloadAll().then(function() { calY = null; initCalendar(); });
   if (id === 'disponibilidade') reloadAll().then(renderDisponibilidade);
+  if (id === 'escala-louvor')   reloadAll().then(function() { onEscLouReady(); });
+  if (id === 'escala-som')      reloadAll().then(function() { onEscSomReady(); });
   if (id === 'producao')        reloadAll().then(renderReport);
   if (id === 'ficha-producao')  initFichaProducao();
   if (id === 'gerir-escalas')   reloadAll().then(renderGerirEscalas);
@@ -911,8 +913,7 @@ function getAvail(ds, equipa) {
 var calY, calM;
 
 function initCalendar() {
-  if (calY) { renderCal(); return; }
-  var n = new Date(); calY = n.getFullYear(); calM = n.getMonth();
+  if (!calY) { var n = new Date(); calY = n.getFullYear(); calM = n.getMonth(); }
   renderCal();
 }
 
