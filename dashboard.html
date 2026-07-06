@@ -626,7 +626,8 @@ var CONGREGACOES = {
   'barreiro':     'Barreiro',
   'pinhal-novo':  'Pinhal Novo',
   'moita':        'Moita',
-  'aires':        'Aires (Palmela)',
+  'aires':        'Aires',
+  'palmela':      'Palmela',
   'montijo':      'Montijo',
   'alcochete':    'Alcochete',
   'beja':         'Beja',
@@ -634,7 +635,8 @@ var CONGREGACOES = {
   'ermidas':      'Ermidas',
   'alvalade':     'Alvalade do Sado',
   'ferreira':     'Ferreira do Alentejo',
-  'ervidel':      'Ervidel'
+  'ervidel':      'Ervidel',
+  'aljustrel':    'Aljustrel'
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1273,7 +1275,10 @@ function populateEscLou(cong, ds) {
     Object.keys(map).forEach(function(selId) {
       var key = map[selId];
       var sel = document.getElementById(selId);
-      var members = ((cd[bucket]&&cd[bucket][key])||[]).filter(function(n){ return avail.includes(n); });
+      var roster = cd[bucket] && cd[bucket][key];
+      var members = roster
+        ? roster.filter(function(n){ return avail.includes(n); })
+        : avail.slice();
       sel.innerHTML = '<option value="">— Ninguém —</option>';
       members.forEach(function(n){ var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o); });
       sel.disabled = !members.length;
@@ -1323,7 +1328,10 @@ function populateEscSom(cong,ds) {
   var keys=['som','online','multimedia'];
   ESC_SOM_IDS.forEach(function(selId,i){
     var sel=document.getElementById(selId);
-    var members=((cd.tecnica&&cd.tecnica[keys[i]])||[]).filter(function(n){ return avail.includes(n); });
+    var roster = cd.tecnica && cd.tecnica[keys[i]];
+    var members = roster
+      ? roster.filter(function(n){ return avail.includes(n); })
+      : avail.slice();
     sel.innerHTML='<option value="">— Ninguém —</option>';
     members.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
     sel.disabled=!members.length;
@@ -1552,9 +1560,11 @@ function onFichaReady(){
 
 function populateFichaSelects(cong){
   var cd=ESCALA_DATA[cong];if(!cd)cd={};
-  function pop(map,bucket){Object.keys(map).forEach(function(selId){var key=map[selId],sel=document.getElementById(selId),cur=sel.value,members=(cd[bucket]&&cd[bucket][key])||[];sel.innerHTML='<option value="">— Ninguém —</option>';members.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});sel.disabled=!members.length;if(cur)sel.value=cur;});}
+  var todosLouvor=USERS.filter(function(u){return u.congregacao===cong&&u.equipa==='louvor';}).map(function(u){return u.nome;});
+  var todosSom=USERS.filter(function(u){return u.congregacao===cong&&u.equipa==='somimagem';}).map(function(u){return u.nome;});
+  function pop(map,bucket){Object.keys(map).forEach(function(selId){var key=map[selId],sel=document.getElementById(selId),cur=sel.value,roster=cd[bucket]&&cd[bucket][key],members=roster||todosLouvor;sel.innerHTML='<option value="">— Ninguém —</option>';members.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});sel.disabled=!members.length;if(cur)sel.value=cur;});}
   var tecKeys=['som','online','multimedia'];
-  FP_TEC_IDS.forEach(function(selId,i){var sel=document.getElementById(selId),cur=sel.value,members=(cd.tecnica&&cd.tecnica[tecKeys[i]])||[];sel.innerHTML='<option value="">— Ninguém —</option>';members.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});sel.disabled=!members.length;if(cur)sel.value=cur;});
+  FP_TEC_IDS.forEach(function(selId,i){var sel=document.getElementById(selId),cur=sel.value,roster=cd.tecnica&&cd.tecnica[tecKeys[i]],members=roster||todosSom;sel.innerHTML='<option value="">— Ninguém —</option>';members.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});sel.disabled=!members.length;if(cur)sel.value=cur;});
   pop(FP_INSTR_MAP,'instrumentos');pop(FP_VOZ_MAP,'vozes');
 }
 
