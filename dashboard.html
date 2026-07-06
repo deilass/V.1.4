@@ -145,8 +145,8 @@
     .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
     .cal-dow { font-family: 'Barlow Condensed', sans-serif; font-size: .58rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.22); text-align: center; padding: 4px 0 8px; }
     .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: .82rem; font-weight: 500; color: rgba(255,255,255,.2); border: 1.5px solid transparent; cursor: default; transition: all .15s; border-radius: 2px; position: relative; }
-    .cal-day.cal-sunday { color: rgba(255,255,255,.65); font-weight: 600; cursor: pointer; }
-    .cal-day.cal-sunday:hover { border-color: rgba(41,168,171,.4); background: rgba(41,168,171,.06); color: #fff; }
+    .cal-day.cal-clickable { color: rgba(255,255,255,.65); font-weight: 600; cursor: pointer; }
+    .cal-day.cal-clickable:hover { border-color: rgba(41,168,171,.4); background: rgba(41,168,171,.06); color: #fff; }
     .cal-day.cal-past { opacity: .3 !important; pointer-events: none; }
     .cal-day.cal-today { border-color: rgba(255,255,255,.2); color: #fff; }
     .cal-day.cal-marked { background: rgba(41,168,171,.18); border-color: var(--teal); color: var(--teal); font-weight: 700; }
@@ -265,7 +265,7 @@
         <div class="panel-header">
           <span class="eyebrow">A minha área</span>
           <h1 class="panel-title">Marcar<br>Presença</h1>
-          <p class="panel-desc">Marca os domingos em que estás disponível. Os gestores verão a tua disponibilidade ao criar as escalas.</p>
+          <p class="panel-desc">Marca a tua disponibilidade nos dias abertos pelo gestor. Só podes marcar presença em dias já abertos.</p>
         </div>
         <div id="cal-api-warn" class="api-config-banner" style="display:none;">
           <p>⚠ <strong>API não configurada.</strong> As presenças estão a ser guardadas <strong>apenas neste dispositivo</strong> (localStorage). Para guardar na nuvem, configura o <code>SHEETS_API_URL</code> no início do script.</p>
@@ -278,11 +278,11 @@
           </div>
           <div class="cal-grid" id="cal-grid"></div>
           <div class="cal-legend">
-            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--teal)"></div>Disponível</div>
-            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(255,255,255,.25)"></div>Domingo</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--teal)"></div>Presença marcada</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(255,255,255,.25)"></div>Fechado</div>
           </div>
         </div>
-        <p style="font-size:.76rem;color:rgba(255,255,255,.2);margin-top:.8rem;">Clica num domingo para marcar/desmarcar a tua disponibilidade.</p>
+        <p style="font-size:.76rem;color:rgba(255,255,255,.2);margin-top:.8rem;">Clica num dia aberto para marcar/desmarcar a tua presença.</p>
       </div>
 
       <!-- ── DISPONIBILIDADE (gestores) ── -->
@@ -300,6 +300,28 @@
           <button class="f-submit" style="margin-top:0;font-size:.72rem;padding:.55rem 1.2rem;" onclick="reloadAll().then(renderDisponibilidade)">↺ Atualizar</button>
         </div>
         <div class="attendance-wrap" id="disp-list"></div>
+      </div>
+
+      <!-- ── DIAS DE CULTO (gestores) ── -->
+      <div class="tab-panel" id="tab-dias-abertos">
+        <div class="panel-header">
+          <span class="eyebrow">Gestão</span>
+          <h1 class="panel-title">Dias de<br>Culto</h1>
+          <p class="panel-desc">Abre os dias em que os membros podem marcar presença. Só dias abertos ficam disponíveis para a equipa.</p>
+        </div>
+        <div class="cal-wrap">
+          <div class="cal-header">
+            <button class="cal-nav-btn" onclick="calGNav(-1)">&#8249;</button>
+            <div class="cal-month-label" id="calg-month-label"></div>
+            <button class="cal-nav-btn" onclick="calGNav(1)">&#8250;</button>
+          </div>
+          <div class="cal-grid" id="calg-grid"></div>
+          <div class="cal-legend">
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--teal)"></div>Aberto</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(255,255,255,.25)"></div>Fechado</div>
+          </div>
+        </div>
+        <p style="font-size:.76rem;color:rgba(255,255,255,.2);margin-top:.8rem;">Clica num dia para abrir/fechar a marcação de presença.</p>
       </div>
 
       <!-- ── ESCALA LOUVOR (g-louvor) ── -->
@@ -589,7 +611,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ▼▼▼  CONFIGURAÇÃO — cola aqui o URL do teu Apps Script  ▼▼▼
 // ═══════════════════════════════════════════════════════════════════
-var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbzdbLGKHPOEoVslgQ2PtEkXEjguDltcUEwNHAgb6xGr8TzM_p3885LgobEIfldp2q8r/exec';
+var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbxcqjGXVVspKsc-_gBdnBLb8jcDt266F-tsvNN73a7EF1jaSbxEnLffYOpbNU2R41kF/exec';
 // Exemplo:
 // var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfy.../exec';
 // ═══════════════════════════════════════════════════════════════════
@@ -598,8 +620,9 @@ var API_OK = !!SHEETS_API_URL;
 
 // ── Cache em memória (substitui localStorage como fonte primária) ──
 var _cache = {
-  presencas: {},   // { userId: { dateStr: true } }
-  escalas:   {}    // { dateStr: { tipo: obj } }
+  presencas:   {},   // { userId: { dateStr: true } }
+  escalas:     {},   // { dateStr: { tipo: obj } }
+  diasAbertos: {}    // { dateStr: true }
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -676,7 +699,7 @@ function syncPill(state, msg) {
 function apiGet(params) {
   if (!API_OK) return Promise.resolve(null);
   var qs = Object.keys(params).map(function(k){ return k+'='+encodeURIComponent(params[k]); }).join('&');
-  return fetch(SHEETS_API_URL + '?' + qs, { redirect: 'follow' })
+  return fetch(SHEETS_API_URL + '?' + qs)
     .then(function(r){ return r.json(); })
     .catch(function(){ return null; });
 }
@@ -685,7 +708,6 @@ function apiPost(body) {
   if (!API_OK) return Promise.resolve(null);
   return fetch(SHEETS_API_URL, {
     method: 'POST',
-    redirect: 'follow',
     body: JSON.stringify(body)
   })
     .then(function(r){ return r.json(); })
@@ -703,6 +725,7 @@ function reloadAll() {
   if (!API_OK) {
     // Fallback: reconstruct _cache from localStorage
     _cache.escalas = lsGet('ads_escalas') || {};
+    _cache.diasAbertos = lsGet('ads_dias_abertos') || {};
     _cache.presencas = {};
     USERS.forEach(function(u) {
       var p = lsGet('ads_p_' + u.id);
@@ -714,10 +737,12 @@ function reloadAll() {
   syncPill('syncing', '↺ A sincronizar…');
   return Promise.all([
     apiGet({ action: 'getPresencas' }),
-    apiGet({ action: 'getEscalas'   })
+    apiGet({ action: 'getEscalas'   }),
+    apiGet({ action: 'getDiasAbertos' })
   ]).then(function(results) {
-    if (results[0]) _cache.presencas = results[0];
-    if (results[1]) _cache.escalas   = results[1];
+    if (results[0]) _cache.presencas   = results[0];
+    if (results[1]) _cache.escalas     = results[1];
+    if (results[2]) _cache.diasAbertos = results[2];
     syncPill('ok', '✓ Sincronizado');
   }).catch(function() {
     syncPill('err', '✕ Erro de ligação');
@@ -777,6 +802,9 @@ function buildSidebar() {
     html += '</ul>';
     html += '<p class="sidebar-section-label">Gestão</p><ul class="sidebar-nav">';
     html += navItem('disponibilidade', icoUsers(), 'Disponibilidade');
+    if (r === 'g-louvor' || r === 'g-somimagem') {
+      html += navItem('dias-abertos', icoCalendar(), 'Dias de Culto');
+    }
     html += '</ul>';
   }
   if (r === 'g-louvor') {
@@ -810,10 +838,9 @@ function switchTab(id, el) {
   var p = document.getElementById('tab-'+id);
   if (p) p.classList.add('active');
   if (el) el.classList.add('active');
-  if (id === 'presenca')        reloadAll().then(function() { calY = null; initCalendar(); });
+  if (id === 'presenca')        initCalendar();
   if (id === 'disponibilidade') reloadAll().then(renderDisponibilidade);
-  if (id === 'escala-louvor')   reloadAll().then(function() { onEscLouReady(); });
-  if (id === 'escala-som')      reloadAll().then(function() { onEscSomReady(); });
+  if (id === 'dias-abertos')    reloadAll().then(initCalGestor);
   if (id === 'producao')        reloadAll().then(renderReport);
   if (id === 'ficha-producao')  initFichaProducao();
   if (id === 'gerir-escalas')   reloadAll().then(renderGerirEscalas);
@@ -848,6 +875,36 @@ function togglePresencaRemote(uid, ds) {
         // Rollback on failure
         if (wasOn) _cache.presencas[uid][ds] = true;
         else delete _cache.presencas[uid][ds];
+        syncPill('err', '✕ Erro ao guardar');
+      }
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DIAS ABERTOS — helpers
+// ═══════════════════════════════════════════════════════════════════
+function getDiasAbertos() {
+  return _cache.diasAbertos || {};
+}
+
+function toggleAbertoRemote(ds) {
+  var wasOpen = !!_cache.diasAbertos[ds];
+  if (wasOpen) delete _cache.diasAbertos[ds];
+  else _cache.diasAbertos[ds] = true;
+
+  if (!API_OK) {
+    lsSet('ads_dias_abertos', _cache.diasAbertos);
+    return Promise.resolve();
+  }
+
+  syncPill('syncing', '↺ A guardar…');
+  return apiPost({ action: 'toggleDiaAberto', dateStr: ds })
+    .then(function(res) {
+      if (res && (res.status === 'added' || res.status === 'removed')) {
+        syncPill('ok', '✓ Guardado');
+      } else {
+        if (wasOpen) _cache.diasAbertos[ds] = true;
+        else delete _cache.diasAbertos[ds];
         syncPill('err', '✕ Erro ao guardar');
       }
     });
@@ -911,9 +968,11 @@ function getAvail(ds, equipa) {
 // CALENDAR
 // ═══════════════════════════════════════════════════════════════════
 var calY, calM;
+var calGY, calGM;
 
 function initCalendar() {
-  if (!calY) { var n = new Date(); calY = n.getFullYear(); calM = n.getMonth(); }
+  if (calY) { renderCal(); return; }
+  var n = new Date(); calY = n.getFullYear(); calM = n.getMonth();
   renderCal();
 }
 
@@ -928,6 +987,7 @@ function renderCal() {
   var mNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   document.getElementById('cal-month-label').textContent = mNames[calM] + ' ' + calY;
   var presenca = getPresenca(SESSION.id);
+  var abertos = getDiasAbertos();
   var today = new Date(); today.setHours(0,0,0,0);
   var firstDow = new Date(calY, calM, 1).getDay();
   var days = new Date(calY, calM+1, 0).getDate();
@@ -937,15 +997,15 @@ function renderCal() {
   for (var d=1;d<=days;d++) {
     var dt = new Date(calY,calM,d); dt.setHours(0,0,0,0);
     var ds = dateStr(dt);
-    var isSun = dt.getDay()===0;
+    var isAberto = !!abertos[ds];
     var isPast = dt < today;
     var isMarked = !!presenca[ds];
     var cls = 'cal-day';
-    if (isSun) cls += ' cal-sunday';
+    if (isAberto && !isPast) cls += ' cal-clickable';
     if (isPast) cls += ' cal-past';
     if (dt.getTime()===today.getTime()) cls += ' cal-today';
     if (isMarked) cls += ' cal-marked';
-    var click = isSun && !isPast ? ' onclick="toggleP(\''+ds+'\')"' : '';
+    var click = isAberto && !isPast ? ' onclick="toggleP(\''+ds+'\')"' : '';
     html += '<div class="'+cls+'"'+click+'>'+d+'<span class="cal-dot"></span></div>';
   }
   document.getElementById('cal-grid').innerHTML = html;
@@ -965,6 +1025,56 @@ function toggleP(ds) {
   });
 }
 
+function initCalGestor() {
+  if (calGY) { renderCalGestor(); return; }
+  var n = new Date(); calGY = n.getFullYear(); calGM = n.getMonth();
+  renderCalGestor();
+}
+
+function calGNav(d) {
+  calGM += d;
+  if (calGM < 0)  { calGM = 11; calGY--; }
+  if (calGM > 11) { calGM = 0;  calGY++; }
+  renderCalGestor();
+}
+
+function renderCalGestor() {
+  var mNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('calg-month-label').textContent = mNames[calGM] + ' ' + calGY;
+  var abertos = getDiasAbertos();
+  var today = new Date(); today.setHours(0,0,0,0);
+  var firstDow = new Date(calGY, calGM, 1).getDay();
+  var days = new Date(calGY, calGM+1, 0).getDate();
+  var html = '';
+  ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(function(d){ html+='<div class="cal-dow">'+d+'</div>'; });
+  for (var i=0;i<firstDow;i++) html+='<div class="cal-day"></div>';
+  for (var d=1;d<=days;d++) {
+    var dt = new Date(calGY,calGM,d); dt.setHours(0,0,0,0);
+    var ds = dateStr(dt);
+    var isPast = dt < today;
+    var isAberto = !!abertos[ds];
+    var cls = 'cal-day';
+    if (!isPast) cls += ' cal-clickable';
+    if (isPast) cls += ' cal-past';
+    if (dt.getTime()===today.getTime()) cls += ' cal-today';
+    if (isAberto) cls += ' cal-marked';
+    var click = !isPast ? ' onclick="toggleAberto(\''+ds+'\')"' : '';
+    html += '<div class="'+cls+'"'+click+'>'+d+'<span class="cal-dot"></span></div>';
+  }
+  document.getElementById('calg-grid').innerHTML = html;
+}
+
+function toggleAberto(ds) {
+  var abertos = getDiasAbertos();
+  if (abertos[ds]) delete abertos[ds]; else abertos[ds] = true;
+  _cache.diasAbertos = abertos;
+  renderCalGestor();
+
+  toggleAbertoRemote(ds).then(function() {
+    renderCalGestor();
+  });
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // DISPONIBILIDADE
 // ═══════════════════════════════════════════════════════════════════
@@ -977,7 +1087,11 @@ function renderDisponibilidade() {
 
   var filtro = filtroEl.value || 'louvor';
   var members = USERS.filter(function(u){ return u.equipa===filtro; });
-  var sundays = nextSundays(3);
+  var today = new Date(); today.setHours(0,0,0,0);
+  var sundays = Object.keys(getDiasAbertos()).filter(function(ds){
+    var dt = new Date(ds+'T00:00:00'); dt.setHours(0,0,0,0);
+    return dt >= today;
+  }).sort();
   var escalas = getEscalas();
   var html = '';
 
