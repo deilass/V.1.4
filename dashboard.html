@@ -56,11 +56,12 @@
       letter-spacing: 0.14em; text-transform: uppercase;
       padding: 2px 8px; border-radius: 2px;
     }
-    .role-badge-producao    { background: rgba(245,130,31,0.18);  color: var(--orange); }
-    .role-badge-g-louvor    { background: rgba(41,168,171,0.18);  color: var(--teal); }
-    .role-badge-g-somimagem { background: rgba(124,92,191,0.18);  color: var(--purple); }
-    .role-badge-m-louvor    { background: rgba(41,168,171,0.09);  color: rgba(41,168,171,0.75); }
-    .role-badge-m-somimagem { background: rgba(124,92,191,0.09);  color: rgba(124,92,191,0.75); }
+    /* Badges genéricos por prefixo de role (gestor/membro × louvor/somimagem) — independentes da congregação */
+    .role-badge-producao { background: rgba(245,130,31,0.18);  color: var(--orange); }
+    .role-badge-gl       { background: rgba(41,168,171,0.18);  color: var(--teal); }
+    .role-badge-gs       { background: rgba(124,92,191,0.18);  color: var(--purple); }
+    .role-badge-ml       { background: rgba(41,168,171,0.09);  color: rgba(41,168,171,0.75); }
+    .role-badge-ms       { background: rgba(124,92,191,0.09);  color: rgba(124,92,191,0.75); }
     .logout-btn {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 0.7rem; font-weight: 700;
@@ -127,6 +128,7 @@
     .f-input:focus, .f-select:focus, .f-textarea:focus { border-color: var(--teal); }
     .f-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2329A8AB' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; cursor: pointer; }
     .f-select option { background: var(--dark2); color: #fff; }
+    .f-select:disabled { opacity: .55; cursor: not-allowed; }
     .f-textarea { resize: vertical; min-height: 90px; }
     .f-submit { padding: .85rem 1.8rem; background: var(--teal); color: #fff; border: none; font-family: 'Barlow Condensed', sans-serif; font-size: .78rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; transition: background .2s; margin-top: 1.2rem; }
     .f-submit:hover { background: var(--orange); }
@@ -145,8 +147,8 @@
     .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
     .cal-dow { font-family: 'Barlow Condensed', sans-serif; font-size: .58rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.22); text-align: center; padding: 4px 0 8px; }
     .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: .82rem; font-weight: 500; color: rgba(255,255,255,.2); border: 1.5px solid transparent; cursor: default; transition: all .15s; border-radius: 2px; position: relative; }
-    .cal-day.cal-clickable { color: rgba(255,255,255,.65); font-weight: 600; cursor: pointer; }
-    .cal-day.cal-clickable:hover { border-color: rgba(41,168,171,.4); background: rgba(41,168,171,.06); color: #fff; }
+    .cal-day.cal-sunday { color: rgba(255,255,255,.65); font-weight: 600; cursor: pointer; }
+    .cal-day.cal-sunday:hover { border-color: rgba(41,168,171,.4); background: rgba(41,168,171,.06); color: #fff; }
     .cal-day.cal-past { opacity: .3 !important; pointer-events: none; }
     .cal-day.cal-today { border-color: rgba(255,255,255,.2); color: #fff; }
     .cal-day.cal-marked { background: rgba(41,168,171,.18); border-color: var(--teal); color: var(--teal); font-weight: 700; }
@@ -187,6 +189,7 @@
     .report-card { background: var(--dark2); border: 1px solid rgba(255,255,255,.07); margin-bottom: 1.2rem; overflow: hidden; }
     .report-card-header { background: rgba(41,168,171,.06); border-bottom: 1px solid rgba(255,255,255,.07); padding: .9rem 1.4rem; display: flex; align-items: center; justify-content: space-between; }
     .report-card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 800; text-transform: uppercase; color: #fff; letter-spacing: .1em; }
+    .report-card-cong { font-family: 'Barlow Condensed', sans-serif; font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--teal); }
     .report-cols { display: grid; grid-template-columns: 1fr 1fr; }
     .report-col { padding: 1.2rem 1.4rem; }
     .report-col + .report-col { border-left: 1px solid rgba(255,255,255,.06); }
@@ -219,6 +222,7 @@
     .api-config-banner p { font-size: .82rem; color: rgba(255,255,255,.5); line-height: 1.7; }
     .api-config-banner strong { color: var(--orange); }
     .api-config-banner code { background: rgba(255,255,255,.07); padding: 1px 6px; font-size: .78rem; color: #fff; }
+    .locked-note { font-size: .74rem; color: rgba(255,255,255,.25); margin-top: .4rem; }
 
     @media (max-width: 860px) {
       .dash-wrap { grid-template-columns: 1fr; }
@@ -265,7 +269,7 @@
         <div class="panel-header">
           <span class="eyebrow">A minha área</span>
           <h1 class="panel-title">Marcar<br>Presença</h1>
-          <p class="panel-desc">Marca a tua disponibilidade nos dias abertos pelo gestor. Só podes marcar presença em dias já abertos.</p>
+          <p class="panel-desc">Marca os domingos em que estás disponível. Os gestores da tua congregação verão a tua disponibilidade ao criar as escalas.</p>
         </div>
         <div id="cal-api-warn" class="api-config-banner" style="display:none;">
           <p>⚠ <strong>API não configurada.</strong> As presenças estão a ser guardadas <strong>apenas neste dispositivo</strong> (localStorage). Para guardar na nuvem, configura o <code>SHEETS_API_URL</code> no início do script.</p>
@@ -278,11 +282,11 @@
           </div>
           <div class="cal-grid" id="cal-grid"></div>
           <div class="cal-legend">
-            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--teal)"></div>Presença marcada</div>
-            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(255,255,255,.25)"></div>Fechado</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--teal)"></div>Disponível</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(255,255,255,.25)"></div>Domingo</div>
           </div>
         </div>
-        <p style="font-size:.76rem;color:rgba(255,255,255,.2);margin-top:.8rem;">Clica num dia aberto para marcar/desmarcar a tua presença.</p>
+        <p style="font-size:.76rem;color:rgba(255,255,255,.2);margin-top:.8rem;">Clica num domingo para marcar/desmarcar a tua disponibilidade.</p>
       </div>
 
       <!-- ── DISPONIBILIDADE (gestores) ── -->
@@ -290,9 +294,12 @@
         <div class="panel-header">
           <span class="eyebrow">Gestão</span>
           <h1 class="panel-title">Disponibilidade<br>da Equipa</h1>
-          <p class="panel-desc">Membros que marcaram presença para cada domingo. Usa para criar as escalas.</p>
+          <p class="panel-desc">Membros que marcaram presença para cada domingo, na tua congregação. Usa para criar as escalas.</p>
         </div>
         <div class="flex-gap" style="margin-bottom:1.5rem;">
+          <select class="f-select" id="disp-cong-filtro" onchange="renderDisponibilidade()" style="width:220px;">
+            <option value="">Todas as Congregações</option>
+          </select>
           <select class="f-select" id="disp-filtro" onchange="renderDisponibilidade()" style="width:220px;">
             <option value="louvor">Equipa de Louvor</option>
             <option value="somimagem">Equipa de Som/Imagem</option>
@@ -302,38 +309,16 @@
         <div class="attendance-wrap" id="disp-list"></div>
       </div>
 
-      <!-- ── DIAS DE CULTO (gestores) ── -->
-      <div class="tab-panel" id="tab-dias-abertos">
-        <div class="panel-header">
-          <span class="eyebrow">Gestão</span>
-          <h1 class="panel-title">Dias de<br>Culto</h1>
-          <p class="panel-desc">Abre os dias em que os membros podem marcar presença. Só dias abertos ficam disponíveis para a equipa.</p>
-        </div>
-        <div class="cal-wrap">
-          <div class="cal-header">
-            <button class="cal-nav-btn" onclick="calGNav(-1)">&#8249;</button>
-            <div class="cal-month-label" id="calg-month-label"></div>
-            <button class="cal-nav-btn" onclick="calGNav(1)">&#8250;</button>
-          </div>
-          <div class="cal-grid" id="calg-grid"></div>
-          <div class="cal-legend">
-            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--teal)"></div>Aberto</div>
-            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(255,255,255,.25)"></div>Fechado</div>
-          </div>
-        </div>
-        <p style="font-size:.76rem;color:rgba(255,255,255,.2);margin-top:.8rem;">Clica num dia para abrir/fechar a marcação de presença.</p>
-      </div>
-
-      <!-- ── ESCALA LOUVOR (g-louvor) ── -->
+      <!-- ── ESCALA LOUVOR (gestores de louvor) ── -->
       <div class="tab-panel" id="tab-escala-louvor">
         <div class="panel-header">
           <span class="eyebrow">Equipa de Louvor</span>
           <h1 class="panel-title">Escala<br>de Louvor</h1>
-          <p class="panel-desc">Cria a escala de louvor para um domingo. Membros disponíveis aparecem a branco; indisponíveis a cinzento. Inclui setlist por momento.</p>
+          <p class="panel-desc">Cria a escala de louvor para um domingo, na tua congregação. Membros disponíveis aparecem a branco; indisponíveis a cinzento. Inclui setlist por momento.</p>
         </div>
         <div class="form-card" style="max-width:860px;">
           <p class="form-card-title">Nova Escala de Louvor</p>
-          <p class="form-card-sub">Seleciona a data e a congregação para começar.</p>
+          <p class="form-card-sub">Seleciona a data para começar.</p>
 
           <p class="f-section">Identificação</p>
           <div class="f-row">
@@ -345,10 +330,8 @@
               <label class="f-label">Congregação *</label>
               <select class="f-select" id="esc-lou-cong" onchange="onEscLouReady()">
                 <option value="">Seleciona…</option>
-                <option value="setubal">Setúbal — Sede</option>
-                <option value="barreiro">Barreiro</option>
-                <option value="pinhal-novo">Pinhal Novo</option>
               </select>
+              <p class="locked-note" id="esc-lou-cong-note" style="display:none;">Congregação fixa de acordo com o teu perfil.</p>
             </div>
           </div>
 
@@ -406,16 +389,16 @@
         </div>
       </div>
 
-      <!-- ── ESCALA SOM/IMAGEM (g-somimagem) ── -->
+      <!-- ── ESCALA SOM/IMAGEM (gestores de som) ── -->
       <div class="tab-panel" id="tab-escala-som">
         <div class="panel-header">
           <span class="eyebrow">Equipa de Som e Imagem</span>
           <h1 class="panel-title">Escala<br>Som & Imagem</h1>
-          <p class="panel-desc">Cria a escala técnica para um domingo. Membros disponíveis destacados; a pessoa selecionada numa função fica indisponível nas restantes.</p>
+          <p class="panel-desc">Cria a escala técnica para um domingo, na tua congregação. Membros disponíveis destacados; a pessoa selecionada numa função fica indisponível nas restantes.</p>
         </div>
         <div class="form-card" style="max-width:720px;">
           <p class="form-card-title">Nova Escala Som/Imagem</p>
-          <p class="form-card-sub">Seleciona a data e a congregação para começar.</p>
+          <p class="form-card-sub">Seleciona a data para começar.</p>
 
           <p class="f-section">Identificação</p>
           <div class="f-row">
@@ -427,10 +410,8 @@
               <label class="f-label">Congregação *</label>
               <select class="f-select" id="esc-som-cong" onchange="onEscSomReady()">
                 <option value="">Seleciona…</option>
-                <option value="setubal">Setúbal — Sede</option>
-                <option value="barreiro">Barreiro</option>
-                <option value="pinhal-novo">Pinhal Novo</option>
               </select>
+              <p class="locked-note" id="esc-som-cong-note" style="display:none;">Congregação fixa de acordo com o teu perfil.</p>
             </div>
           </div>
 
@@ -463,7 +444,7 @@
         <div class="panel-header">
           <span class="eyebrow">Equipa de Produção</span>
           <h1 class="panel-title">Relatório<br>de Escalas</h1>
-          <p class="panel-desc">Consulta as escalas de louvor e som/imagem guardadas pelos gestores. Usa para preencher a ficha de produção.</p>
+          <p class="panel-desc">Consulta as escalas de louvor e som/imagem guardadas pelos gestores, em todas as congregações. Usa para preencher a ficha de produção.</p>
         </div>
         <div class="flex-gap" style="margin-bottom:1.8rem;">
           <button class="f-submit" style="margin-top:0;" onclick="reloadAll().then(renderReport)">↺ Atualizar</button>
@@ -478,12 +459,12 @@
         <div class="panel-header">
           <span class="eyebrow">Equipa de Produção</span>
           <h1 class="panel-title">Ficha de<br>Produção</h1>
-          <p class="panel-desc">Ao escolheres a data, as pessoas das escalas já criadas são preenchidas automaticamente. Podes ajustar manualmente e gerar o PDF.</p>
+          <p class="panel-desc">Ao escolheres a congregação e a data, as pessoas das escalas já criadas são preenchidas automaticamente. Podes ajustar manualmente e gerar o PDF.</p>
         </div>
 
         <div class="form-card" style="max-width:880px;">
           <p class="form-card-title">Nova Ficha</p>
-          <p class="form-card-sub">Seleciona a congregação e a data. Se existir escala guardada para esse dia, os campos são pré-preenchidos automaticamente.</p>
+          <p class="form-card-sub">Seleciona a congregação e a data. Se existir escala guardada para esse dia e congregação, os campos são pré-preenchidos automaticamente.</p>
 
           <p class="f-section">Identificação</p>
           <div class="f-row">
@@ -491,19 +472,6 @@
               <label class="f-label">Congregação *</label>
               <select class="f-select" id="fp-cong" onchange="onFichaReady()">
                 <option value="">Seleciona…</option>
-                <option value="setubal">Setúbal — Sede</option>
-                <option value="barreiro">Barreiro</option>
-                <option value="pinhal-novo">Pinhal Novo</option>
-                <option value="moita">Moita</option>
-                <option value="aires">Aires (Palmela)</option>
-                <option value="montijo">Montijo</option>
-                <option value="alcochete">Alcochete</option>
-                <option value="beja">Beja</option>
-                <option value="vidigueira">Vidigueira</option>
-                <option value="ermidas">Ermidas</option>
-                <option value="alvalade">Alvalade do Sado</option>
-                <option value="ferreira">Ferreira do Alentejo</option>
-                <option value="ervidel">Ervidel</option>
               </select>
             </div>
             <div class="f-group">
@@ -516,7 +484,7 @@
             ✓ <strong style="color:var(--teal);">Escala encontrada</strong> — campos pré-preenchidos automaticamente. Podes ajustar se necessário.
           </div>
           <div id="fp-no-escala-notice" style="display:none;padding:.7rem 1rem;border-left:3px solid var(--orange);background:rgba(245,130,31,.07);font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:1rem;">
-            ⚠ Sem escala guardada para esta data. Preenche manualmente.
+            ⚠ Sem escala guardada para esta congregação/data. Preenche manualmente.
           </div>
 
           <p class="f-section">Programa</p>
@@ -580,7 +548,7 @@
         <div class="panel-header">
           <span class="eyebrow">Gestão</span>
           <h1 class="panel-title">Gerir<br>Escalas</h1>
-          <p class="panel-desc">Consulta, edita ou elimina as escalas que criaste.</p>
+          <p class="panel-desc">Consulta, edita ou elimina as escalas da tua congregação.</p>
         </div>
         <div class="flex-gap" style="margin-bottom:1.8rem;">
           <button class="f-submit" style="margin-top:0;" onclick="reloadAll().then(renderGerirEscalas)">↺ Atualizar</button>
@@ -611,22 +579,45 @@
 // ═══════════════════════════════════════════════════════════════════
 // ▼▼▼  CONFIGURAÇÃO — cola aqui o URL do teu Apps Script  ▼▼▼
 // ═══════════════════════════════════════════════════════════════════
-var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbxcqjGXVVspKsc-_gBdnBLb8jcDt266F-tsvNN73a7EF1jaSbxEnLffYOpbNU2R41kF/exec';
+var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbzRg_SPYH7qemLDXKtmLVtFmxkDtyJSgFrRaJp4jLRuBC6u-jFe3CvtpZcqdhDeKNpHxA/exec';
 // Exemplo:
 // var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfy.../exec';
+// IMPORTANTE: usa a versão atualizada do Apps Script (com suporte a "congregacao"
+// nas escalas), senão as escalas de congregações diferentes vão sobrepor-se.
 // ═══════════════════════════════════════════════════════════════════
 
 var API_OK = !!SHEETS_API_URL;
 
 // ── Cache em memória (substitui localStorage como fonte primária) ──
 var _cache = {
-  presencas:   {},   // { userId: { dateStr: true } }
-  escalas:     {},   // { dateStr: { tipo: obj } }
-  diasAbertos: {}    // { dateStr: true }
+  presencas: {},   // { userId: { dateStr: true } }
+  escalas:   {}    // { dateStr: { congregacao: { tipo: obj } } }
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// DADOS
+// CONGREGAÇÕES
+// ═══════════════════════════════════════════════════════════════════
+var CONGREGACOES = {
+  'setubal':      'Setúbal — Sede',
+  'barreiro':     'Barreiro',
+  'pinhal-novo':  'Pinhal Novo',
+  'moita':        'Moita',
+  'aires':        'Aires (Palmela)',
+  'montijo':      'Montijo',
+  'alcochete':    'Alcochete',
+  'beja':         'Beja',
+  'vidigueira':   'Vidigueira',
+  'ermidas':      'Ermidas',
+  'alvalade':     'Alvalade do Sado',
+  'ferreira':     'Ferreira do Alentejo',
+  'ervidel':      'Ervidel'
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// DADOS — músicos/técnicos disponíveis por congregação.
+// Só "setubal" está preenchido. Para ativar escalas noutra congregação,
+// acrescenta aqui um bloco igual com o nome dessa congregação (mesma
+// chave usada em CONGREGACOES) e os nomes dos membros de cada função.
 // ═══════════════════════════════════════════════════════════════════
 var ESCALA_DATA = {
   setubal: {
@@ -650,23 +641,25 @@ var ESCALA_DATA = {
       multimedia: ['Enzo Trega','Edmanuel','Samuel de Andrade']
     }
   }
+  // ,barreiro: { instrumentos: {...}, vozes: {...}, tecnica: {...} }
+  // ,pinhal-novo: { ... }  ← acrescenta conforme necessário
 };
 
 var USERS = [
-  {id:'u1',  nome:'João Amaral',       role:'g-louvor',    equipa:'louvor'},
-  {id:'u2',  nome:'Tito Lucero',       role:'g-somimagem', equipa:'somimagem'},
-  {id:'u3',  nome:'Dara Amaral',       role:'producao',    equipa:'producao'},
-  {id:'u4',  nome:'Marta Lucero',      role:'g-louvor',    equipa:'louvor'},
-  {id:'u5',  nome:'David Lucero',      role:'m-louvor',    equipa:'louvor'},
-  {id:'u6',  nome:'Ana Maria',         role:'m-louvor',    equipa:'louvor'},
-  {id:'u7',  nome:'Raquel Sousa',      role:'g-louvor',    equipa:'louvor'},
-  {id:'u8',  nome:'Macarena Caville',  role:'m-louvor',    equipa:'louvor'},
-  {id:'u9',  nome:'Arão Caville',      role:'m-louvor',    equipa:'louvor'},
-  {id:'u10', nome:'Maria Catarina',    role:'m-louvor',    equipa:'louvor'},
-  {id:'u11', nome:'Paulo Sacramento',  role:'m-somimagem', equipa:'somimagem'},
-  {id:'u12', nome:'Enzo Trega',        role:'m-somimagem', equipa:'somimagem'},
-  {id:'u13', nome:'Edmanuel',          role:'m-somimagem', equipa:'somimagem'},
-  {id:'u14', nome:'Samuel de Andrade', role:'m-somimagem', equipa:'somimagem'}
+  {id:'u1',  nome:'João Amaral',       role:'gl-setubal', equipa:'louvor',    congregacao:'setubal'},
+  {id:'u2',  nome:'Tito Lucero',       role:'gs-setubal', equipa:'somimagem', congregacao:'setubal'},
+  {id:'u3',  nome:'Dara Amaral',       role:'producao',   equipa:'producao',  congregacao:'todas'},
+  {id:'u4',  nome:'Marta Lucero',      role:'gl-setubal', equipa:'louvor',    congregacao:'setubal'},
+  {id:'u5',  nome:'David Lucero',      role:'ml-setubal', equipa:'louvor',    congregacao:'setubal'},
+  {id:'u6',  nome:'Ana Maria',         role:'ml-setubal', equipa:'louvor',    congregacao:'setubal'},
+  {id:'u7',  nome:'Raquel Sousa',      role:'gl-setubal', equipa:'louvor',    congregacao:'setubal'},
+  {id:'u8',  nome:'Macarena Caville',  role:'ml-setubal', equipa:'louvor',    congregacao:'setubal'},
+  {id:'u9',  nome:'Arão Caville',      role:'ml-setubal', equipa:'louvor',    congregacao:'setubal'},
+  {id:'u10', nome:'Maria Catarina',    role:'ml-setubal', equipa:'louvor',    congregacao:'setubal'},
+  {id:'u11', nome:'Paulo Sacramento',  role:'ms-setubal', equipa:'somimagem', congregacao:'setubal'},
+  {id:'u12', nome:'Enzo Trega',        role:'ms-setubal', equipa:'somimagem', congregacao:'setubal'},
+  {id:'u13', nome:'Edmanuel',          role:'ms-setubal', equipa:'somimagem', congregacao:'setubal'},
+  {id:'u14', nome:'Samuel de Andrade', role:'ms-setubal', equipa:'somimagem', congregacao:'setubal'}
 ];
 
 var ESC_LOU_INSTR = {
@@ -678,6 +671,29 @@ var ESC_LOU_VOZ = {
   'esc-lou-back3':'back3','esc-lou-back4':'back4'
 };
 var ESC_SOM_IDS = ['esc-som-som','esc-som-online','esc-som-multi'];
+
+// ═══════════════════════════════════════════════════════════════════
+// ROLES — formato "{g|m}{l|s}-{congregacao}" (ex.: "gl-setubal") ou "producao"
+// g=Gestor, m=Membro, l=Louvor, s=Som/Imagem
+// ═══════════════════════════════════════════════════════════════════
+function roleParts(role) {
+  if (role === 'producao') return { level: null, dept: null, cong: null, prefix: 'producao' };
+  var idx = role.indexOf('-');
+  var prefix = role.substring(0, idx);      // 'gl' | 'ml' | 'gs' | 'ms'
+  var cong   = role.substring(idx + 1);     // ex.: 'setubal', 'pinhal-novo'
+  return { level: prefix.charAt(0), dept: prefix.charAt(1), cong: cong, prefix: prefix };
+}
+function roleLabel(role) {
+  if (role === 'producao') return 'Produção';
+  var p = roleParts(role);
+  var levelLbl = p.level === 'g' ? 'Gestor' : 'Membro';
+  var deptLbl  = p.dept === 'l' ? 'Louvor' : 'Som/Imagem';
+  var congLbl  = CONGREGACOES[p.cong] || p.cong;
+  return levelLbl + ' ' + deptLbl + ' — ' + congLbl;
+}
+function roleBadgeClass(role) {
+  return role === 'producao' ? 'producao' : roleParts(role).prefix;
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // SYNC STATUS PILL
@@ -723,9 +739,8 @@ function lsSet(k,v) { try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} 
 // ═══════════════════════════════════════════════════════════════════
 function reloadAll() {
   if (!API_OK) {
-    // Fallback: reconstruct _cache from localStorage
+    // Fallback: reconstroi _cache a partir do localStorage
     _cache.escalas = lsGet('ads_escalas') || {};
-    _cache.diasAbertos = lsGet('ads_dias_abertos') || {};
     _cache.presencas = {};
     USERS.forEach(function(u) {
       var p = lsGet('ads_p_' + u.id);
@@ -737,12 +752,10 @@ function reloadAll() {
   syncPill('syncing', '↺ A sincronizar…');
   return Promise.all([
     apiGet({ action: 'getPresencas' }),
-    apiGet({ action: 'getEscalas'   }),
-    apiGet({ action: 'getDiasAbertos' })
+    apiGet({ action: 'getEscalas'   })
   ]).then(function(results) {
-    if (results[0]) _cache.presencas   = results[0];
-    if (results[1]) _cache.escalas     = results[1];
-    if (results[2]) _cache.diasAbertos = results[2];
+    if (results[0]) _cache.presencas = results[0];
+    if (results[1]) _cache.escalas   = results[1];
     syncPill('ok', '✓ Sincronizado');
   }).catch(function() {
     syncPill('err', '✕ Erro de ligação');
@@ -759,11 +772,10 @@ var SESSION = null;
   if (!raw) { window.location.href = 'login.html'; return; }
   try { SESSION = JSON.parse(raw); } catch(e) { window.location.href = 'login.html'; return; }
 
-  var labels = {'g-louvor':'Gestor Louvor','g-somimagem':'Gestor Som','producao':'Produção','m-louvor':'Membro Louvor','m-somimagem':'Membro Som'};
   document.getElementById('topbar-nome').textContent = SESSION.nome;
   var b = document.getElementById('topbar-badge');
-  b.textContent = labels[SESSION.role] || SESSION.role;
-  b.className = 'topbar-role-badge role-badge-' + SESSION.role;
+  b.textContent = roleLabel(SESSION.role);
+  b.className = 'topbar-role-badge role-badge-' + roleBadgeClass(SESSION.role);
 
   // Show API config warning on calendar if not configured
   if (!API_OK) {
@@ -772,6 +784,7 @@ var SESSION = null;
   }
 
   buildSidebar();
+  initCongSelects();
   document.getElementById('app').style.display = 'block';
 
   // Load data then open first tab
@@ -790,36 +803,40 @@ function doLogout() {
 // SIDEBAR
 // ═══════════════════════════════════════════════════════════════════
 function buildSidebar() {
-  var r = SESSION.role, html = '';
-  if (r === 'm-louvor' || r === 'm-somimagem') {
+  var isProducao = SESSION.role === 'producao';
+  var p = isProducao ? null : roleParts(SESSION.role);
+  var isGestor = !!p && p.level === 'g';
+  var isMembro = !!p && p.level === 'm';
+  var isLouvor = !!p && p.dept === 'l';
+  var isSom    = !!p && p.dept === 's';
+
+  var html = '';
+  if (isMembro) {
     html += '<p class="sidebar-section-label">A Minha Área</p><ul class="sidebar-nav">';
     html += navItem('presenca', icoCalendar(), 'Marcar Presença');
     html += '</ul>';
   }
-  if (r === 'g-louvor' || r === 'g-somimagem' || r === 'producao') {
+  if (isGestor || isProducao) {
     html += '<p class="sidebar-section-label">A Minha Área</p><ul class="sidebar-nav">';
     html += navItem('presenca', icoCalendar(), 'Marcar Presença');
     html += '</ul>';
     html += '<p class="sidebar-section-label">Gestão</p><ul class="sidebar-nav">';
     html += navItem('disponibilidade', icoUsers(), 'Disponibilidade');
-    if (r === 'g-louvor' || r === 'g-somimagem') {
-      html += navItem('dias-abertos', icoCalendar(), 'Dias de Culto');
-    }
     html += '</ul>';
   }
-  if (r === 'g-louvor') {
+  if (isGestor && isLouvor) {
     html += '<p class="sidebar-section-label">Louvor</p><ul class="sidebar-nav">';
     html += navItem('escala-louvor', icoMusic(), 'Nova Escala');
     html += navItem('gerir-escalas', icoList(), 'Gerir Escalas');
     html += '</ul>';
   }
-  if (r === 'g-somimagem') {
+  if (isGestor && isSom) {
     html += '<p class="sidebar-section-label">Som & Imagem</p><ul class="sidebar-nav">';
     html += navItem('escala-som', icoHeadphones(), 'Nova Escala');
     html += navItem('gerir-escalas', icoList(), 'Gerir Escalas');
     html += '</ul>';
   }
-  if (r === 'producao') {
+  if (isProducao) {
     html += '<p class="sidebar-section-label">Produção</p><ul class="sidebar-nav">';
     html += navItem('producao', icoMonitor(), 'Relatório Escalas');
     html += navItem('ficha-producao', icoClipboard(), 'Ficha de Produção');
@@ -840,10 +857,59 @@ function switchTab(id, el) {
   if (el) el.classList.add('active');
   if (id === 'presenca')        initCalendar();
   if (id === 'disponibilidade') reloadAll().then(renderDisponibilidade);
-  if (id === 'dias-abertos')    reloadAll().then(initCalGestor);
   if (id === 'producao')        reloadAll().then(renderReport);
   if (id === 'ficha-producao')  initFichaProducao();
   if (id === 'gerir-escalas')   reloadAll().then(renderGerirEscalas);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SELECTS DE CONGREGAÇÃO — preenchidos a partir de CONGREGACOES,
+// e bloqueados na congregação do próprio para gestores.
+// ═══════════════════════════════════════════════════════════════════
+function fillCongSelect(sel, includeAllOption) {
+  var html = includeAllOption ? '<option value="">Todas as Congregações</option>' : '<option value="">Seleciona…</option>';
+  Object.keys(CONGREGACOES).forEach(function(k){
+    html += '<option value="'+k+'">'+CONGREGACOES[k]+'</option>';
+  });
+  sel.innerHTML = html;
+}
+
+function initCongSelects() {
+  var isProducao = SESSION.role === 'producao';
+  var p = isProducao ? null : roleParts(SESSION.role);
+
+  // Disponibilidade
+  var dispCong = document.getElementById('disp-cong-filtro');
+  if (dispCong) {
+    fillCongSelect(dispCong, true);
+    if (!isProducao) { dispCong.value = p.cong; dispCong.disabled = true; }
+  }
+
+  // Ficha de Produção — produção vê/escolhe qualquer congregação
+  var fpCong = document.getElementById('fp-cong');
+  if (fpCong) fillCongSelect(fpCong, false);
+
+  // Escala Louvor
+  var louCong = document.getElementById('esc-lou-cong');
+  if (louCong) {
+    fillCongSelect(louCong, false);
+    if (!isProducao && p.dept === 'l') {
+      louCong.value = p.cong;
+      louCong.disabled = true;
+      document.getElementById('esc-lou-cong-note').style.display = 'block';
+    }
+  }
+
+  // Escala Som
+  var somCong = document.getElementById('esc-som-cong');
+  if (somCong) {
+    fillCongSelect(somCong, false);
+    if (!isProducao && p.dept === 's') {
+      somCong.value = p.cong;
+      somCong.disabled = true;
+      document.getElementById('esc-som-cong-note').style.display = 'block';
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -861,7 +927,6 @@ function togglePresencaRemote(uid, ds) {
   else        _cache.presencas[uid][ds] = true;
 
   if (!API_OK) {
-    // localStorage fallback
     lsSet('ads_p_' + uid, _cache.presencas[uid]);
     return Promise.resolve();
   }
@@ -872,7 +937,6 @@ function togglePresencaRemote(uid, ds) {
       if (res && (res.status === 'added' || res.status === 'removed')) {
         syncPill('ok', '✓ Guardado');
       } else {
-        // Rollback on failure
         if (wasOn) _cache.presencas[uid][ds] = true;
         else delete _cache.presencas[uid][ds];
         syncPill('err', '✕ Erro ao guardar');
@@ -881,43 +945,14 @@ function togglePresencaRemote(uid, ds) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// DIAS ABERTOS — helpers
-// ═══════════════════════════════════════════════════════════════════
-function getDiasAbertos() {
-  return _cache.diasAbertos || {};
-}
-
-function toggleAbertoRemote(ds) {
-  var wasOpen = !!_cache.diasAbertos[ds];
-  if (wasOpen) delete _cache.diasAbertos[ds];
-  else _cache.diasAbertos[ds] = true;
-
-  if (!API_OK) {
-    lsSet('ads_dias_abertos', _cache.diasAbertos);
-    return Promise.resolve();
-  }
-
-  syncPill('syncing', '↺ A guardar…');
-  return apiPost({ action: 'toggleDiaAberto', dateStr: ds })
-    .then(function(res) {
-      if (res && (res.status === 'added' || res.status === 'removed')) {
-        syncPill('ok', '✓ Guardado');
-      } else {
-        if (wasOpen) _cache.diasAbertos[ds] = true;
-        else delete _cache.diasAbertos[ds];
-        syncPill('err', '✕ Erro ao guardar');
-      }
-    });
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// ESCALAS — helpers
+// ESCALAS — helpers (agora indexadas por dateStr → congregacao → tipo)
 // ═══════════════════════════════════════════════════════════════════
 function getEscalas() { return _cache.escalas; }
 
-function saveEscala(date, tipo, obj) {
+function saveEscala(date, cong, tipo, obj) {
   if (!_cache.escalas[date]) _cache.escalas[date] = {};
-  _cache.escalas[date][tipo] = obj;
+  if (!_cache.escalas[date][cong]) _cache.escalas[date][cong] = {};
+  _cache.escalas[date][cong][tipo] = obj;
 
   if (!API_OK) {
     lsSet('ads_escalas', _cache.escalas);
@@ -925,7 +960,7 @@ function saveEscala(date, tipo, obj) {
   }
 
   syncPill('syncing', '↺ A guardar…');
-  return apiPost({ action: 'saveEscala', dateStr: date, tipo: tipo, dados: obj })
+  return apiPost({ action: 'saveEscala', dateStr: date, congregacao: cong, tipo: tipo, dados: obj })
     .then(function(res) {
       if (res && (res.status === 'created' || res.status === 'updated')) {
         syncPill('ok', '✓ Guardado na nuvem');
@@ -935,10 +970,11 @@ function saveEscala(date, tipo, obj) {
     });
 }
 
-function deleteEscalaRemote(ds, tipo) {
+function deleteEscalaRemote(ds, cong, tipo) {
   // Optimistic
-  if (_cache.escalas[ds]) {
-    delete _cache.escalas[ds][tipo];
+  if (_cache.escalas[ds] && _cache.escalas[ds][cong]) {
+    delete _cache.escalas[ds][cong][tipo];
+    if (!Object.keys(_cache.escalas[ds][cong]).length) delete _cache.escalas[ds][cong];
     if (!Object.keys(_cache.escalas[ds]).length) delete _cache.escalas[ds];
   }
 
@@ -948,7 +984,7 @@ function deleteEscalaRemote(ds, tipo) {
   }
 
   syncPill('syncing', '↺ A eliminar…');
-  return apiPost({ action: 'deleteEscala', dateStr: ds, tipo: tipo })
+  return apiPost({ action: 'deleteEscala', dateStr: ds, congregacao: cong, tipo: tipo })
     .then(function(res) {
       if (res && (res.status === 'deleted' || res.status === 'not_found')) {
         syncPill('ok', '✓ Eliminado');
@@ -958,9 +994,9 @@ function deleteEscalaRemote(ds, tipo) {
     });
 }
 
-function getAvail(ds, equipa) {
+function getAvail(ds, equipa, cong) {
   return USERS
-    .filter(function(u){ return u.equipa===equipa && !!getPresenca(u.id)[ds]; })
+    .filter(function(u){ return u.equipa===equipa && (!cong || u.congregacao===cong) && !!getPresenca(u.id)[ds]; })
     .map(function(u){ return u.nome; });
 }
 
@@ -968,7 +1004,6 @@ function getAvail(ds, equipa) {
 // CALENDAR
 // ═══════════════════════════════════════════════════════════════════
 var calY, calM;
-var calGY, calGM;
 
 function initCalendar() {
   if (calY) { renderCal(); return; }
@@ -987,7 +1022,6 @@ function renderCal() {
   var mNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   document.getElementById('cal-month-label').textContent = mNames[calM] + ' ' + calY;
   var presenca = getPresenca(SESSION.id);
-  var abertos = getDiasAbertos();
   var today = new Date(); today.setHours(0,0,0,0);
   var firstDow = new Date(calY, calM, 1).getDay();
   var days = new Date(calY, calM+1, 0).getDate();
@@ -997,81 +1031,29 @@ function renderCal() {
   for (var d=1;d<=days;d++) {
     var dt = new Date(calY,calM,d); dt.setHours(0,0,0,0);
     var ds = dateStr(dt);
-    var isAberto = !!abertos[ds];
+    var isSun = dt.getDay()===0;
     var isPast = dt < today;
     var isMarked = !!presenca[ds];
     var cls = 'cal-day';
-    if (isAberto && !isPast) cls += ' cal-clickable';
+    if (isSun) cls += ' cal-sunday';
     if (isPast) cls += ' cal-past';
     if (dt.getTime()===today.getTime()) cls += ' cal-today';
     if (isMarked) cls += ' cal-marked';
-    var click = isAberto && !isPast ? ' onclick="toggleP(\''+ds+'\')"' : '';
+    var click = isSun && !isPast ? ' onclick="toggleP(\''+ds+'\')"' : '';
     html += '<div class="'+cls+'"'+click+'>'+d+'<span class="cal-dot"></span></div>';
   }
   document.getElementById('cal-grid').innerHTML = html;
 }
 
 function toggleP(ds) {
-  // Visual optimistic feedback imediato
   var presenca = getPresenca(SESSION.id);
   if (presenca[ds]) delete presenca[ds]; else presenca[ds] = true;
   if (!_cache.presencas[SESSION.id]) _cache.presencas[SESSION.id] = {};
   _cache.presencas[SESSION.id] = presenca;
   renderCal();
 
-  // Persist (reverts cache automatically if Sheets call fails)
   togglePresencaRemote(SESSION.id, ds).then(function() {
-    renderCal(); // re-render with confirmed state
-  });
-}
-
-function initCalGestor() {
-  if (calGY) { renderCalGestor(); return; }
-  var n = new Date(); calGY = n.getFullYear(); calGM = n.getMonth();
-  renderCalGestor();
-}
-
-function calGNav(d) {
-  calGM += d;
-  if (calGM < 0)  { calGM = 11; calGY--; }
-  if (calGM > 11) { calGM = 0;  calGY++; }
-  renderCalGestor();
-}
-
-function renderCalGestor() {
-  var mNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  document.getElementById('calg-month-label').textContent = mNames[calGM] + ' ' + calGY;
-  var abertos = getDiasAbertos();
-  var today = new Date(); today.setHours(0,0,0,0);
-  var firstDow = new Date(calGY, calGM, 1).getDay();
-  var days = new Date(calGY, calGM+1, 0).getDate();
-  var html = '';
-  ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(function(d){ html+='<div class="cal-dow">'+d+'</div>'; });
-  for (var i=0;i<firstDow;i++) html+='<div class="cal-day"></div>';
-  for (var d=1;d<=days;d++) {
-    var dt = new Date(calGY,calGM,d); dt.setHours(0,0,0,0);
-    var ds = dateStr(dt);
-    var isPast = dt < today;
-    var isAberto = !!abertos[ds];
-    var cls = 'cal-day';
-    if (!isPast) cls += ' cal-clickable';
-    if (isPast) cls += ' cal-past';
-    if (dt.getTime()===today.getTime()) cls += ' cal-today';
-    if (isAberto) cls += ' cal-marked';
-    var click = !isPast ? ' onclick="toggleAberto(\''+ds+'\')"' : '';
-    html += '<div class="'+cls+'"'+click+'>'+d+'<span class="cal-dot"></span></div>';
-  }
-  document.getElementById('calg-grid').innerHTML = html;
-}
-
-function toggleAberto(ds) {
-  var abertos = getDiasAbertos();
-  if (abertos[ds]) delete abertos[ds]; else abertos[ds] = true;
-  _cache.diasAbertos = abertos;
-  renderCalGestor();
-
-  toggleAbertoRemote(ds).then(function() {
-    renderCalGestor();
+    renderCal();
   });
 }
 
@@ -1079,25 +1061,36 @@ function toggleAberto(ds) {
 // DISPONIBILIDADE
 // ═══════════════════════════════════════════════════════════════════
 function renderDisponibilidade() {
-  var r = SESSION.role;
+  var isProducao = SESSION.role === 'producao';
+  var p = isProducao ? null : roleParts(SESSION.role);
+
   var filtroEl = document.getElementById('disp-filtro');
-  if (r === 'g-louvor')    { filtroEl.value = 'louvor';    filtroEl.disabled = true; }
-  else if (r === 'g-somimagem') { filtroEl.value = 'somimagem'; filtroEl.disabled = true; }
-  else filtroEl.disabled = false;
+  var congEl   = document.getElementById('disp-cong-filtro');
+
+  if (!isProducao) {
+    filtroEl.value = (p.dept === 'l') ? 'louvor' : 'somimagem';
+    filtroEl.disabled = true;
+    congEl.value = p.cong;
+    congEl.disabled = true;
+  } else {
+    filtroEl.disabled = false;
+    congEl.disabled = false;
+  }
 
   var filtro = filtroEl.value || 'louvor';
-  var members = USERS.filter(function(u){ return u.equipa===filtro; });
-  var today = new Date(); today.setHours(0,0,0,0);
-  var sundays = Object.keys(getDiasAbertos()).filter(function(ds){
-    var dt = new Date(ds+'T00:00:00'); dt.setHours(0,0,0,0);
-    return dt >= today;
-  }).sort();
+  var cong   = congEl.value || '';
+  var members = USERS.filter(function(u){ return u.equipa===filtro && (!cong || u.congregacao===cong); });
+  var sundays = nextSundays(3);
   var escalas = getEscalas();
   var html = '';
 
   sundays.forEach(function(ds) {
     var present = members.filter(function(u){ return !!getPresenca(u.id)[ds]; });
-    var hasEsc  = !!(escalas[ds] && (escalas[ds].louvor || escalas[ds].som));
+    var hasEsc = false;
+    if (escalas[ds]) {
+      var congsToCheck = cong ? [cong] : Object.keys(escalas[ds]);
+      hasEsc = congsToCheck.some(function(c){ return escalas[ds][c] && (escalas[ds][c].louvor || escalas[ds][c].som); });
+    }
     var bodyId  = 'att-body-'+ds;
     html += '<div class="att-card">';
     html += '<div class="att-card-header" onclick="toggleAtt(\''+bodyId+'\',this)">';
@@ -1141,8 +1134,8 @@ function onEscLouReady() {
 }
 
 function populateEscLou(cong, ds) {
-  var cd = ESCALA_DATA[cong]; if (!cd) return;
-  var avail = getAvail(ds, 'louvor');
+  var cd = ESCALA_DATA[cong]; if (!cd) cd = {};
+  var avail = getAvail(ds, 'louvor', cong);
   function pop(map, bucket) {
     Object.keys(map).forEach(function(selId) {
       var key = map[selId];
@@ -1178,7 +1171,7 @@ function guardarEscalaLouvor() {
     setlist:{primeiros:getSetlist('sl-primeiros'),oferta:getSetlist('sl-oferta'),ceia:getSetlist('sl-ceia')},
     savedAt:new Date().toISOString(), savedBy:SESSION.nome
   };
-  saveEscala(d,'louvor',obj).then(function(){ show('esc-lou-ok'); setTimeout(function(){hide('esc-lou-ok');},5000); });
+  saveEscala(d,c,'louvor',obj).then(function(){ show('esc-lou-ok'); setTimeout(function(){hide('esc-lou-ok');},5000); });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1192,8 +1185,8 @@ function onEscSomReady() {
 }
 
 function populateEscSom(cong,ds) {
-  var cd=ESCALA_DATA[cong]; if(!cd) return;
-  var avail=getAvail(ds,'somimagem');
+  var cd=ESCALA_DATA[cong]; if(!cd) cd={};
+  var avail=getAvail(ds,'somimagem',cong);
   var keys=['som','online','multimedia'];
   ESC_SOM_IDS.forEach(function(selId,i){
     var sel=document.getElementById(selId);
@@ -1216,7 +1209,7 @@ function guardarEscalaSom() {
   var c=document.getElementById('esc-som-cong').value;
   if(!d||!c){show('esc-som-err');return;} hide('esc-som-err');
   var obj={data:d,congregacao:c,tecsom:gv('esc-som-som'),online:gv('esc-som-online'),multimedia:gv('esc-som-multi'),savedAt:new Date().toISOString(),savedBy:SESSION.nome};
-  saveEscala(d,'som',obj).then(function(){ show('esc-som-ok'); setTimeout(function(){hide('esc-som-ok');},5000); });
+  saveEscala(d,c,'som',obj).then(function(){ show('esc-som-ok'); setTimeout(function(){hide('esc-som-ok');},5000); });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1251,25 +1244,26 @@ function getSetlist(id) {
 // ═══════════════════════════════════════════════════════════════════
 // GERIR ESCALAS
 // ═══════════════════════════════════════════════════════════════════
-var _gerirEditDate=null, _gerirEditTipo=null;
+var _gerirEditDate=null, _gerirEditCong=null, _gerirEditTipo=null;
 
 function renderGerirEscalas() {
-  var r=SESSION.role;
-  var tipo=(r==='g-somimagem')?'som':'louvor';
-  var escalas=getEscalas();
-  var dates=Object.keys(escalas).filter(function(ds){return escalas[ds][tipo];}).sort();
-  var el=document.getElementById('gerir-escalas-container');
+  var p = roleParts(SESSION.role); // gerir-escalas só existe para gestores
+  var tipo = (p.dept === 's') ? 'som' : 'louvor';
+  var cong = p.cong;
+  var escalas = getEscalas();
+  var dates = Object.keys(escalas).filter(function(ds){ return escalas[ds][cong] && escalas[ds][cong][tipo]; }).sort();
+  var el = document.getElementById('gerir-escalas-container');
   fecharEditEscala();
-  if(!dates.length){el.innerHTML='<div class="report-empty">Ainda não existem escalas guardadas.</div>';return;}
+  if(!dates.length){el.innerHTML='<div class="report-empty">Ainda não existem escalas guardadas para '+(CONGREGACOES[cong]||cong)+'.</div>';return;}
   var html='';
   dates.forEach(function(ds){
-    var esc=escalas[ds][tipo];
+    var esc=escalas[ds][cong][tipo];
     html+='<div class="report-card" style="margin-bottom:1rem;">';
     html+='<div class="report-card-header" style="display:flex;align-items:center;justify-content:space-between;">';
     html+='<div class="report-card-title">📅 '+formatDatePT(ds)+'</div>';
     html+='<div class="flex-gap" style="gap:.6rem;">';
-    html+='<button class="f-submit secondary" style="margin-top:0;font-size:.7rem;padding:.45rem 1rem;" onclick="abrirEditEscala(\''+ds+'\',\''+tipo+'\')">✎ Editar</button>';
-    html+='<button class="f-submit" style="margin-top:0;font-size:.7rem;padding:.45rem 1rem;background:var(--red);" onclick="eliminarEscala(\''+ds+'\',\''+tipo+'\')">✕ Eliminar</button>';
+    html+='<button class="f-submit secondary" style="margin-top:0;font-size:.7rem;padding:.45rem 1rem;" onclick="abrirEditEscala(\''+ds+'\',\''+cong+'\',\''+tipo+'\')">✎ Editar</button>';
+    html+='<button class="f-submit" style="margin-top:0;font-size:.7rem;padding:.45rem 1rem;background:var(--red);" onclick="eliminarEscala(\''+ds+'\',\''+cong+'\',\''+tipo+'\')">✕ Eliminar</button>';
     html+='</div></div>';
     html+='<div style="padding:1rem 1.4rem;display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;">';
     if(tipo==='louvor'){
@@ -1289,17 +1283,16 @@ function renderGerirEscalas() {
   el.innerHTML=html;
 }
 
-function eliminarEscala(ds,tipo) {
+function eliminarEscala(ds,cong,tipo) {
   if(!confirm('Tens a certeza que queres eliminar a escala de '+formatDatePT(ds)+'?'))return;
-  deleteEscalaRemote(ds,tipo).then(renderGerirEscalas);
+  deleteEscalaRemote(ds,cong,tipo).then(renderGerirEscalas);
 }
 
-function abrirEditEscala(ds,tipo) {
-  _gerirEditDate=ds; _gerirEditTipo=tipo;
-  var esc=((getEscalas()[ds])||{})[tipo]||{};
-  var cong=esc.congregacao||'setubal';
+function abrirEditEscala(ds,cong,tipo) {
+  _gerirEditDate=ds; _gerirEditCong=cong; _gerirEditTipo=tipo;
+  var esc=(((getEscalas()[ds])||{})[cong]||{})[tipo]||{};
   document.getElementById('gerir-edit-title').textContent='Editar Escala — '+formatDatePT(ds);
-  document.getElementById('gerir-edit-sub').textContent='Congregação: '+cong.charAt(0).toUpperCase()+cong.slice(1).replace('-',' ');
+  document.getElementById('gerir-edit-sub').textContent='Congregação: '+(CONGREGACOES[cong]||cong);
   var fields='';
   if(tipo==='louvor'){
     var cd=(ESCALA_DATA[cong]||{}),instrAll=cd.instrumentos||{},vozAll=cd.vozes||{};
@@ -1333,13 +1326,13 @@ function abrirEditEscala(ds,tipo) {
 
 function fecharEditEscala() {
   document.getElementById('gerir-edit-wrap').style.display='none';
-  _gerirEditDate=null; _gerirEditTipo=null;
+  _gerirEditDate=null; _gerirEditCong=null; _gerirEditTipo=null;
 }
 
 function guardarEdicaoEscala() {
-  if(!_gerirEditDate||!_gerirEditTipo)return;
+  if(!_gerirEditDate||!_gerirEditCong||!_gerirEditTipo)return;
   var all=getEscalas();
-  var esc=((all[_gerirEditDate])||{})[_gerirEditTipo]||{};
+  var esc=(((all[_gerirEditDate])||{})[_gerirEditCong]||{})[_gerirEditTipo]||{};
   function gev(id){var el=document.getElementById('ge-'+id);return el?el.value:'';}
   if(_gerirEditTipo==='louvor'){
     esc.diretor=gev('diretor');esc.piano=gev('piano');esc.gtAc=gev('gt-ac');
@@ -1349,8 +1342,9 @@ function guardarEdicaoEscala() {
   } else {
     esc.tecsom=gev('tecsom');esc.online=gev('online');esc.multimedia=gev('multimedia');
   }
+  esc.congregacao=_gerirEditCong;
   esc.savedAt=new Date().toISOString();esc.savedBy=SESSION.nome;
-  saveEscala(_gerirEditDate,_gerirEditTipo,esc).then(function(){
+  saveEscala(_gerirEditDate,_gerirEditCong,_gerirEditTipo,esc).then(function(){
     show('gerir-edit-ok');
     setTimeout(function(){hide('gerir-edit-ok');},4000);
     renderGerirEscalas();
@@ -1359,7 +1353,7 @@ function guardarEdicaoEscala() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// RELATÓRIO
+// RELATÓRIO (produção — vê todas as congregações)
 // ═══════════════════════════════════════════════════════════════════
 function renderReport() {
   var escalas=getEscalas();
@@ -1368,21 +1362,24 @@ function renderReport() {
   if(!dates.length){el.innerHTML='<div class="report-empty">Ainda não existem escalas guardadas.</div>';return;}
   var html='';
   dates.forEach(function(ds){
-    var e=escalas[ds],lou=e.louvor||null,som=e.som||null;
-    html+='<div class="report-card"><div class="report-card-header"><div class="report-card-title">📅 '+formatDatePT(ds)+'</div></div><div class="report-cols">';
-    html+='<div class="report-col"><div class="report-col-title">🎵 Louvor</div>';
-    if(!lou){html+='<p class="no-escala">Escala não criada.</p>';}
-    else{
-      [['Diretor Musical',lou.diretor],['Piano',lou.piano],['Gt. Acústica',lou.gtAc],['Gt. Elétrica',lou.gtEl],['Baixo',lou.baixo],['Bateria',lou.bateria],['Dirigente',lou.dirigente],['Back 1',lou.back1],['Back 2',lou.back2],['Back 3',lou.back3],['Back 4',lou.back4]].forEach(function(r){
-        if(!r[1])return;
-        html+='<div class="report-row"><span class="report-row-label">'+r[0]+'</span><span class="report-row-val">'+r[1]+'</span></div>';
-      });
-      if(lou.setlist){html+=renderSetlistBlock('1º Tempo',lou.setlist.primeiros);html+=renderSetlistBlock('Oferta',lou.setlist.oferta);html+=renderSetlistBlock('Ceia',lou.setlist.ceia);}
-    }
-    html+='</div><div class="report-col"><div class="report-col-title">🎧 Som & Imagem</div>';
-    if(!som){html+='<p class="no-escala">Escala não criada.</p>';}
-    else{[['Técnico Som',som.tecsom],['Online',som.online],['Multimédia',som.multimedia]].forEach(function(r){if(!r[1])return;html+='<div class="report-row"><span class="report-row-label">'+r[0]+'</span><span class="report-row-val">'+r[1]+'</span></div>';});}
-    html+='</div></div></div>';
+    var congs = Object.keys(escalas[ds]).sort();
+    congs.forEach(function(cong){
+      var e=escalas[ds][cong],lou=e.louvor||null,som=e.som||null;
+      html+='<div class="report-card"><div class="report-card-header"><div class="report-card-title">📅 '+formatDatePT(ds)+'</div><div class="report-card-cong">'+(CONGREGACOES[cong]||cong)+'</div></div><div class="report-cols">';
+      html+='<div class="report-col"><div class="report-col-title">🎵 Louvor</div>';
+      if(!lou){html+='<p class="no-escala">Escala não criada.</p>';}
+      else{
+        [['Diretor Musical',lou.diretor],['Piano',lou.piano],['Gt. Acústica',lou.gtAc],['Gt. Elétrica',lou.gtEl],['Baixo',lou.baixo],['Bateria',lou.bateria],['Dirigente',lou.dirigente],['Back 1',lou.back1],['Back 2',lou.back2],['Back 3',lou.back3],['Back 4',lou.back4]].forEach(function(r){
+          if(!r[1])return;
+          html+='<div class="report-row"><span class="report-row-label">'+r[0]+'</span><span class="report-row-val">'+r[1]+'</span></div>';
+        });
+        if(lou.setlist){html+=renderSetlistBlock('1º Tempo',lou.setlist.primeiros);html+=renderSetlistBlock('Oferta',lou.setlist.oferta);html+=renderSetlistBlock('Ceia',lou.setlist.ceia);}
+      }
+      html+='</div><div class="report-col"><div class="report-col-title">🎧 Som & Imagem</div>';
+      if(!som){html+='<p class="no-escala">Escala não criada.</p>';}
+      else{[['Técnico Som',som.tecsom],['Online',som.online],['Multimédia',som.multimedia]].forEach(function(r){if(!r[1])return;html+='<div class="report-row"><span class="report-row-label">'+r[0]+'</span><span class="report-row-val">'+r[1]+'</span></div>';});}
+      html+='</div></div></div>';
+    });
   });
   el.innerHTML=html;
 }
@@ -1411,7 +1408,7 @@ function onFichaReady(){
   var cong=document.getElementById('fp-cong').value;
   if(!ds||!cong)return;
   populateFichaSelects(cong);
-  var esc=getEscalas()[ds]||{};
+  var esc=(getEscalas()[ds]||{})[cong]||{};
   var lou=esc.louvor||null,som=esc.som||null,hasEsc=!!(lou||som);
   document.getElementById('fp-escala-notice').style.display=hasEsc?'block':'none';
   document.getElementById('fp-no-escala-notice').style.display=hasEsc?'none':'block';
@@ -1421,7 +1418,7 @@ function onFichaReady(){
 }
 
 function populateFichaSelects(cong){
-  var cd=ESCALA_DATA[cong];if(!cd)return;
+  var cd=ESCALA_DATA[cong];if(!cd)cd={};
   function pop(map,bucket){Object.keys(map).forEach(function(selId){var key=map[selId],sel=document.getElementById(selId),cur=sel.value,members=(cd[bucket]&&cd[bucket][key])||[];sel.innerHTML='<option value="">— Ninguém —</option>';members.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});sel.disabled=!members.length;if(cur)sel.value=cur;});}
   var tecKeys=['som','online','multimedia'];
   FP_TEC_IDS.forEach(function(selId,i){var sel=document.getElementById(selId),cur=sel.value,members=(cd.tecnica&&cd.tecnica[tecKeys[i]])||[];sel.innerHTML='<option value="">— Ninguém —</option>';members.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});sel.disabled=!members.length;if(cur)sel.value=cur;});
